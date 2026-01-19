@@ -27,7 +27,7 @@ export const TopicService = {
        WHERE t.course_id = ?
        GROUP BY t.id, t.course_id, t.slug, t.title, t.description, t.order_num
        ORDER BY t.order_num ASC`,
-      [courseId]
+      [courseId],
     );
     return rows as Topic[];
   },
@@ -44,7 +44,7 @@ export const TopicService = {
        WHERE t.course_id = (SELECT id FROM courses WHERE slug = ?)
        GROUP BY t.id, t.course_id, t.slug, t.title, t.description, t.order_num
        ORDER BY t.order_num ASC`,
-      [courseSlug]
+      [courseSlug],
     );
     return rows as Topic[];
   },
@@ -55,7 +55,7 @@ export const TopicService = {
   async getTopicById(id: number): Promise<Topic | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM topics WHERE id = ?",
-      [id]
+      [id],
     );
     return rows.length > 0 ? (rows[0] as Topic) : null;
   },
@@ -66,7 +66,7 @@ export const TopicService = {
   async getTopicBySlug(slug: string): Promise<Topic | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM topics WHERE slug = ?",
-      [slug]
+      [slug],
     );
     return rows.length > 0 ? (rows[0] as Topic) : null;
   },

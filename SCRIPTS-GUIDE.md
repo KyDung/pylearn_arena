@@ -17,13 +17,13 @@ Course (Khóa học)
 
 ### 📦 NPM Scripts (Khuyến nghị)
 
-| Lệnh | Mô tả |
-|------|-------|
-| `pnpm validate` | Kiểm tra đồng bộ DB ↔ Content ↔ Assets |
-| `pnpm sync:content` | Tự động tạo files còn thiếu từ DB |
-| `pnpm list:games` | Hiển thị danh sách games với trạng thái |
-| `pnpm add:game` | Thêm game mới (all-in-one) |
-| `pnpm generate:game` | Tạo game từ template |
+| Lệnh                 | Mô tả                                   |
+| -------------------- | --------------------------------------- |
+| `pnpm validate`      | Kiểm tra đồng bộ DB ↔ Content ↔ Assets  |
+| `pnpm sync:content`  | Tự động tạo files còn thiếu từ DB       |
+| `pnpm list:games`    | Hiển thị danh sách games với trạng thái |
+| `pnpm add:game`      | Thêm game mới (all-in-one)              |
+| `pnpm generate:game` | Tạo game từ template                    |
 
 ---
 
@@ -38,6 +38,7 @@ npx tsx scripts/validate-content.ts
 ```
 
 Kiểm tra:
+
 - ✅ Mỗi game trong DB có file `src/content/.../index.ts` tương ứng
 - ✅ Game đã được import trong `PlayGameContent.tsx`
 - ✅ Path format đúng chuẩn
@@ -52,6 +53,7 @@ npx tsx scripts/sync-content.ts
 ```
 
 Tự động:
+
 - Tạo files content còn thiếu từ template
 - Tạo folders assets
 - **Lưu ý:** Sau khi sync, cần cập nhật GAME_CONFIG trong file mới
@@ -65,6 +67,7 @@ npx tsx scripts/list-games.ts
 ```
 
 Hiển thị cấu trúc cây với trạng thái file:
+
 - ✓ = Có file content
 - ✗ = Thiếu file content
 

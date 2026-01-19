@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
  * 🔄 SYNC CONTENT SCRIPT
- * 
+ *
  * Đồng bộ content từ DB:
  * - Tạo file content còn thiếu
  * - Tạo folder assets còn thiếu
  * - Cập nhật PlayGameContent.tsx
- * 
+ *
  * Chạy: npx tsx scripts/sync-content.ts
  */
 
@@ -25,8 +25,10 @@ const colors = {
 
 const log = {
   error: (msg: string) => console.log(`${colors.red}❌ ${msg}${colors.reset}`),
-  success: (msg: string) => console.log(`${colors.green}✅ ${msg}${colors.reset}`),
-  warn: (msg: string) => console.log(`${colors.yellow}⚠️  ${msg}${colors.reset}`),
+  success: (msg: string) =>
+    console.log(`${colors.green}✅ ${msg}${colors.reset}`),
+  warn: (msg: string) =>
+    console.log(`${colors.yellow}⚠️  ${msg}${colors.reset}`),
   info: (msg: string) => console.log(`${colors.blue}ℹ️  ${msg}${colors.reset}`),
 };
 
@@ -45,7 +47,7 @@ async function syncContent() {
   const contentDir = path.join(process.cwd(), "src/content");
   const publicDir = path.join(process.cwd(), "public");
   const templateDir = path.join(contentDir, "_template");
-  
+
   let createdFiles = 0;
   let createdFolders = 0;
   let skipped = 0;
@@ -61,7 +63,7 @@ async function syncContent() {
        INNER JOIN lessons l ON g.lesson_id = l.id
        INNER JOIN topics t ON l.topic_id = t.id
        INNER JOIN courses c ON t.course_id = c.id
-       ORDER BY g.id`
+       ORDER BY g.id`,
     );
 
     console.log(`\n📊 Tìm thấy ${games.length} games trong DB\n`);
@@ -85,17 +87,17 @@ async function syncContent() {
         const templatePath = path.join(templateDir, "game-template-type2.ts");
         if (fs.existsSync(templatePath)) {
           let template = fs.readFileSync(templatePath, "utf-8");
-          
+
           // Thay thế title
           template = template.replace(
             'title: "Tiêu đề game của bạn"',
-            `title: "${game.title}"`
+            `title: "${game.title}"`,
           );
-          
+
           // Thay thế path trong assets
           template = template.replace(
             /background: "\/game-id\//g,
-            `background: "/${gamePath}/`
+            `background: "/${gamePath}/`,
           );
 
           fs.writeFileSync(indexPath, template);
@@ -111,12 +113,12 @@ async function syncContent() {
       // 3. Tạo asset folder nếu chưa có
       if (!fs.existsSync(assetPath)) {
         fs.mkdirSync(assetPath, { recursive: true });
-        
+
         // Tạo README hướng dẫn
         const readmePath = path.join(assetPath, "README.txt");
         fs.writeFileSync(
           readmePath,
-          `Assets for game: ${game.title}\n\nAdd background images here:\n- scene1.png (720x520px)\n- scene2.png\n- scene3.png\n`
+          `Assets for game: ${game.title}\n\nAdd background images here:\n- scene1.png (720x520px)\n- scene2.png\n- scene3.png\n`,
         );
       }
     }
@@ -135,7 +137,6 @@ async function syncContent() {
     } else {
       log.success("Không có file mới cần tạo");
     }
-
   } finally {
     await conn.end();
   }

@@ -23,7 +23,10 @@ export const ProgressService = {
   /**
    * Lấy tiến độ của user
    */
-  async getUserProgress(userId: number, courseSlug?: string): Promise<UserProgress[]> {
+  async getUserProgress(
+    userId: number,
+    courseSlug?: string,
+  ): Promise<UserProgress[]> {
     let query = `
       SELECT up.*, g.title as game_title, g.slug as game_slug,
              l.title as lesson_title, l.slug as lesson_slug
@@ -52,10 +55,13 @@ export const ProgressService = {
   /**
    * Lấy tiến độ của game cụ thể
    */
-  async getGameProgress(userId: number, gameId: number): Promise<UserProgress | null> {
+  async getGameProgress(
+    userId: number,
+    gameId: number,
+  ): Promise<UserProgress | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM user_progress WHERE user_id = ? AND game_id = ?",
-      [userId, gameId]
+      [userId, gameId],
     );
     return rows.length > 0 ? (rows[0] as UserProgress) : null;
   },
@@ -78,14 +84,23 @@ export const ProgressService = {
          attempts = attempts + 1,
          last_attempt_at = NOW(),
          completed_at = IF(VALUES(is_completed) AND completed_at IS NULL, NOW(), completed_at)`,
-      [data.userId, data.gameId, data.isCompleted, data.score, data.isCompleted ? new Date() : null]
+      [
+        data.userId,
+        data.gameId,
+        data.isCompleted,
+        data.score,
+        data.isCompleted ? new Date() : null,
+      ],
     );
   },
 
   /**
    * Thống kê tiến độ theo course
    */
-  async getCourseStats(userId: number, courseSlug: string): Promise<{
+  async getCourseStats(
+    userId: number,
+    courseSlug: string,
+  ): Promise<{
     totalGames: number;
     completedGames: number;
     totalScore: number;
@@ -102,7 +117,7 @@ export const ProgressService = {
        INNER JOIN courses c ON t.course_id = c.id
        LEFT JOIN user_progress up ON g.id = up.game_id AND up.user_id = ?
        WHERE c.slug = ?`,
-      [userId, courseSlug]
+      [userId, courseSlug],
     );
 
     const stats = rows[0];
@@ -110,9 +125,10 @@ export const ProgressService = {
       totalGames: stats.total_games,
       completedGames: stats.completed_games,
       totalScore: stats.total_score,
-      completionRate: stats.total_games > 0 
-        ? Math.round((stats.completed_games / stats.total_games) * 100) 
-        : 0,
+      completionRate:
+        stats.total_games > 0
+          ? Math.round((stats.completed_games / stats.total_games) * 100)
+          : 0,
     };
   },
 };

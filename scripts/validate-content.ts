@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
  * 🔍 VALIDATE CONTENT SCRIPT
- * 
+ *
  * Kiểm tra đồng bộ giữa:
  * - Database (games table)
  * - Source code (src/content/...)
  * - Assets (public/...)
- * 
+ *
  * Chạy: npx tsx scripts/validate-content.ts
  */
 
@@ -26,10 +26,15 @@ const colors = {
 
 const log = {
   error: (msg: string) => console.log(`${colors.red}❌ ${msg}${colors.reset}`),
-  success: (msg: string) => console.log(`${colors.green}✅ ${msg}${colors.reset}`),
-  warn: (msg: string) => console.log(`${colors.yellow}⚠️  ${msg}${colors.reset}`),
+  success: (msg: string) =>
+    console.log(`${colors.green}✅ ${msg}${colors.reset}`),
+  warn: (msg: string) =>
+    console.log(`${colors.yellow}⚠️  ${msg}${colors.reset}`),
   info: (msg: string) => console.log(`${colors.blue}ℹ️  ${msg}${colors.reset}`),
-  header: (msg: string) => console.log(`\n${colors.cyan}${"=".repeat(60)}\n${msg}\n${"=".repeat(60)}${colors.reset}`),
+  header: (msg: string) =>
+    console.log(
+      `\n${colors.cyan}${"=".repeat(60)}\n${msg}\n${"=".repeat(60)}${colors.reset}`,
+    ),
 };
 
 interface ValidationResult {
@@ -41,9 +46,9 @@ interface ValidationResult {
 
 async function validateContent() {
   const results: ValidationResult[] = [];
-  
+
   log.header("🔍 VALIDATE CONTENT - Kiểm tra đồng bộ DB ↔ Content ↔ Assets");
-  
+
   // Connect to database
   const conn = await mysql.createConnection({
     host: process.env.MYSQL_HOST || "localhost",
@@ -65,18 +70,21 @@ async function validateContent() {
        INNER JOIN lessons l ON g.lesson_id = l.id
        INNER JOIN topics t ON l.topic_id = t.id
        INNER JOIN courses c ON t.course_id = c.id
-       ORDER BY c.slug, t.order_num, l.order_num, g.order_num`
+       ORDER BY c.slug, t.order_num, l.order_num, g.order_num`,
     );
 
     console.log(`   Tìm thấy ${games.length} games trong database\n`);
 
     // 2. Kiểm tra từng game
     log.header("📁 Kiểm tra Content Files");
-    
+
     const contentDir = path.join(process.cwd(), "src/content");
     const publicDir = path.join(process.cwd(), "public");
-    const playGamePath = path.join(process.cwd(), "src/components/PlayGameContent.tsx");
-    
+    const playGamePath = path.join(
+      process.cwd(),
+      "src/components/PlayGameContent.tsx",
+    );
+
     // Đọc PlayGameContent để check imports
     let playGameContent = "";
     if (fs.existsSync(playGamePath)) {
@@ -91,7 +99,7 @@ async function validateContent() {
       const gamePath = game.path;
       const contentPath = path.join(contentDir, gamePath, "index.ts");
       const assetPath = path.join(publicDir, gamePath);
-      
+
       // Check content file exists
       if (!fs.existsSync(contentPath)) {
         results.push({
@@ -129,19 +137,19 @@ async function validateContent() {
 
     // 3. Kiểm tra orphan content (có file nhưng không có trong DB)
     log.header("🔎 Kiểm tra Orphan Content (files không có trong DB)");
-    
+
     const dbPaths = new Set(games.map((g: any) => g.path));
     const orphanPaths: string[] = [];
-    
+
     // Scan content directory
     const scanDir = (dir: string, relativePath: string = "") => {
       if (!fs.existsSync(dir)) return;
-      
+
       const items = fs.readdirSync(dir);
       for (const item of items) {
         const fullPath = path.join(dir, item);
         const relPath = relativePath ? `${relativePath}/${item}` : item;
-        
+
         if (fs.statSync(fullPath).isDirectory()) {
           // Check if this is a game folder (has index.ts)
           const indexPath = path.join(fullPath, "index.ts");
@@ -158,9 +166,9 @@ async function validateContent() {
         }
       }
     };
-    
+
     scanDir(contentDir);
-    
+
     if (orphanPaths.length > 0) {
       for (const orphan of orphanPaths) {
         results.push({
@@ -178,7 +186,7 @@ async function validateContent() {
 
     // 4. Kiểm tra path format
     log.header("📐 Kiểm tra Path Format");
-    
+
     for (const game of games) {
       const expectedPath = `${game.course_slug}/${game.topic_slug}/${game.lesson_slug}`;
       if (!game.path.startsWith(expectedPath)) {
@@ -188,14 +196,16 @@ async function validateContent() {
           message: `Path không theo format chuẩn: ${game.path}`,
           path: game.path,
         });
-        log.warn(`[${game.slug}] Path: "${game.path}" != expected: "${expectedPath}/..."`);
+        log.warn(
+          `[${game.slug}] Path: "${game.path}" != expected: "${expectedPath}/..."`,
+        );
         warningCount++;
       }
     }
 
     // 5. Summary
     log.header("📊 KẾT QUẢ TỔNG HỢP");
-    
+
     console.log(`
    ✅ Valid:    ${validCount} games
    ❌ Errors:   ${errorCount}
@@ -204,13 +214,17 @@ async function validateContent() {
 `);
 
     if (errorCount > 0) {
-      console.log(`\n${colors.red}🚨 Có ${errorCount} lỗi cần sửa!${colors.reset}`);
+      console.log(
+        `\n${colors.red}🚨 Có ${errorCount} lỗi cần sửa!${colors.reset}`,
+      );
       console.log("\nĐể sửa lỗi thiếu content file:");
       console.log("  1. Chạy: npx tsx scripts/add-complete-game.ts");
       console.log("  2. Hoặc tạo file thủ công theo template\n");
       process.exit(1);
     } else if (warningCount > 0) {
-      console.log(`\n${colors.yellow}⚠️  Có ${warningCount} cảnh báo cần xem xét${colors.reset}\n`);
+      console.log(
+        `\n${colors.yellow}⚠️  Có ${warningCount} cảnh báo cần xem xét${colors.reset}\n`,
+      );
     } else {
       console.log(`\n${colors.green}🎉 Tất cả đều OK!${colors.reset}\n`);
     }
@@ -223,7 +237,6 @@ async function validateContent() {
       valid: validCount,
       results,
     };
-
   } finally {
     await conn.end();
   }

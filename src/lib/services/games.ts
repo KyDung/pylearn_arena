@@ -32,7 +32,7 @@ export const GameService = {
   async getGamesByLessonId(lessonId: number): Promise<Game[]> {
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM games WHERE lesson_id = ? ORDER BY order_num ASC`,
-      [lessonId]
+      [lessonId],
     );
     return rows as Game[];
   },
@@ -43,7 +43,7 @@ export const GameService = {
   async getGameById(id: number): Promise<Game | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM games WHERE id = ?",
-      [id]
+      [id],
     );
     return rows.length > 0 ? (rows[0] as Game) : null;
   },
@@ -54,7 +54,7 @@ export const GameService = {
   async getGameBySlug(slug: string): Promise<Game | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM games WHERE slug = ?",
-      [slug]
+      [slug],
     );
     return rows.length > 0 ? (rows[0] as Game) : null;
   },
@@ -65,7 +65,7 @@ export const GameService = {
   async getGameByPath(path: string): Promise<Game | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM games WHERE path = ?",
-      [path]
+      [path],
     );
     return rows.length > 0 ? (rows[0] as Game) : null;
   },
@@ -83,7 +83,7 @@ export const GameService = {
        INNER JOIN lessons l ON g.lesson_id = l.id
        INNER JOIN topics t ON l.topic_id = t.id
        INNER JOIN courses c ON t.course_id = c.id
-       ORDER BY c.id, t.order_num, l.order_num, g.order_num`
+       ORDER BY c.id, t.order_num, l.order_num, g.order_num`,
     );
     return rows as GameWithContext[];
   },
@@ -96,7 +96,7 @@ export const GameService = {
     courseSlug: string,
     topicSlug: string,
     lessonSlug: string,
-    gameId: string
+    gameId: string,
   ): string {
     return `${courseSlug}/${topicSlug}/${lessonSlug}/${gameId}`;
   },
@@ -121,7 +121,14 @@ export const GameService = {
          order_num = VALUES(order_num),
          path = VALUES(path),
          updated_at = CURRENT_TIMESTAMP`,
-      [data.lessonId, data.slug, data.title, data.description, data.orderNum, data.path]
+      [
+        data.lessonId,
+        data.slug,
+        data.title,
+        data.description,
+        data.orderNum,
+        data.path,
+      ],
     );
     return result.insertId;
   },
@@ -132,7 +139,7 @@ export const GameService = {
   async countGamesByLessonId(lessonId: number): Promise<number> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT COUNT(*) as count FROM games WHERE lesson_id = ?",
-      [lessonId]
+      [lessonId],
     );
     return rows[0].count;
   },

@@ -29,7 +29,7 @@ export const LessonService = {
        WHERE l.topic_id = ?
        GROUP BY l.id
        ORDER BY l.order_num ASC`,
-      [topicId]
+      [topicId],
     );
     return rows as Lesson[];
   },
@@ -44,7 +44,7 @@ export const LessonService = {
        INNER JOIN topics t ON l.topic_id = t.id
        WHERE t.course_id = (SELECT id FROM courses WHERE slug = ?)
        ORDER BY l.order_num ASC`,
-      [courseSlug]
+      [courseSlug],
     );
     return rows as Lesson[];
   },
@@ -55,7 +55,7 @@ export const LessonService = {
   async getLessonById(id: number): Promise<Lesson | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM lessons WHERE id = ?",
-      [id]
+      [id],
     );
     return rows.length > 0 ? (rows[0] as Lesson) : null;
   },
@@ -66,7 +66,7 @@ export const LessonService = {
   async getLessonBySlug(slug: string): Promise<Lesson | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM lessons WHERE slug = ?",
-      [slug]
+      [slug],
     );
     return rows.length > 0 ? (rows[0] as Lesson) : null;
   },
@@ -87,7 +87,7 @@ export const LessonService = {
        INNER JOIN topics t ON l.topic_id = t.id
        INNER JOIN courses c ON t.course_id = c.id
        WHERE l.id = ?`,
-      [lessonId]
+      [lessonId],
     );
 
     if (rows.length === 0) return null;

@@ -162,7 +162,7 @@ export const buildCodeEditorStyles = () => `
     font-weight: 600;
   }
   
-  /* Syntax Highlighted Display */
+  /* Syntax Highlighted Display - Hiển thị syntax highlighting */
   .code-display {
     position: absolute;
     left: 45px;
@@ -177,11 +177,12 @@ export const buildCodeEditorStyles = () => `
     word-wrap: break-word;
     overflow: auto;
     pointer-events: none;
-    z-index: 1;
+    z-index: 2;
     tab-size: 4;
+    background: transparent;
   }
   
-  /* Hidden Textarea for actual input */
+  /* Hidden Textarea for actual input - Ẩn text, chỉ nhận input */
   .code-input {
     position: absolute;
     left: 45px;
@@ -201,18 +202,21 @@ export const buildCodeEditorStyles = () => `
     outline: none;
     resize: none;
     overflow: auto;
-    z-index: 2;
+    z-index: 3;
     tab-size: 4;
     white-space: pre-wrap;
     word-wrap: break-word;
+    -webkit-text-fill-color: transparent;
   }
   
   .code-input::placeholder {
     color: #6c7086;
+    -webkit-text-fill-color: #6c7086;
   }
   
   .code-input::selection {
     background: rgba(137, 180, 250, 0.3);
+    -webkit-text-fill-color: transparent;
   }
   
   /* Syntax Highlighting Colors */
@@ -449,7 +453,14 @@ export const shouldIncreaseIndent = (line: string): boolean => {
 export const buildCodeEditorHTML = (
   starterCode: string,
   title: string = "Python Code",
-) => `
+) => {
+  // Escape HTML for safe insertion into textarea
+  const escapedCode = starterCode
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  return `
   <div class="code-editor-container">
     <div class="code-editor-header">
       <span class="code-editor-title">${title}</span>
@@ -470,7 +481,7 @@ export const buildCodeEditorHTML = (
         autocapitalize="off"
         data-gramm="false"
         placeholder="# Nhập code Python của bạn ở đây..."
-      >${starterCode}</textarea>
+      >${escapedCode}</textarea>
     </div>
     <div class="code-statusbar">
       <div class="code-statusbar-left">
@@ -485,6 +496,7 @@ export const buildCodeEditorHTML = (
     </div>
   </div>
 `;
+};
 
 // Initialize code editor functionality
 export const initCodeEditor = (root: HTMLElement, starterCode: string) => {

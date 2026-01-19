@@ -7,12 +7,6 @@ import {
   initCodeEditor,
   setupCodeFullscreen,
 } from "@/lib/codeEditor";
-import {
-  buildCodeEditorStyles,
-  buildCodeEditorHTML,
-  initCodeEditor,
-  setupCodeFullscreen,
-} from "@/lib/codeEditor";
 
 // ============================================================
 // VÍ DỤ TYPE 1: ĐẢO NGƯỢC CHUỖI

@@ -24,7 +24,7 @@ export const CourseService = {
       `SELECT id, slug, title, description, difficulty, is_published, created_at, updated_at 
        FROM courses 
        WHERE is_published = true
-       ORDER BY created_at ASC`
+       ORDER BY created_at ASC`,
     );
     return rows as Course[];
   },
@@ -35,7 +35,7 @@ export const CourseService = {
   async getCourseBySlug(slug: string): Promise<Course | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM courses WHERE slug = ?",
-      [slug]
+      [slug],
     );
     return rows.length > 0 ? (rows[0] as Course) : null;
   },
@@ -46,7 +46,7 @@ export const CourseService = {
   async getCourseById(id: number): Promise<Course | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM courses WHERE id = ?",
-      [id]
+      [id],
     );
     return rows.length > 0 ? (rows[0] as Course) : null;
   },
@@ -56,7 +56,7 @@ export const CourseService = {
    */
   async getAllCourses(): Promise<Course[]> {
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT * FROM courses ORDER BY created_at ASC`
+      `SELECT * FROM courses ORDER BY created_at ASC`,
     );
     return rows as Course[];
   },
