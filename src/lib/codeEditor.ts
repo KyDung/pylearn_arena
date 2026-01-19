@@ -356,88 +356,242 @@ export const buildCodeEditorStyles = () => `
   }
 `;
 
-// Syntax highlighting function
+// Syntax highlighting function - Simple and safe approach
 export const highlightPython = (code: string): string => {
-  // Escape HTML first
-  let html = code
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  // Process line by line to avoid regex conflicts
+  const lines = code.split("\n");
+  const highlightedLines = lines.map((line) => {
+    // Escape HTML first
+    let html = line
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
 
-  // Store string and comments to protect them
-  const protected_strings: string[] = [];
-  let protectIdx = 0;
+    // Check if line is a comment
+    const commentMatch = html.match(/^(\s*)(#.*)$/);
+    if (commentMatch) {
+      return `${commentMatch[1]}<span class="syntax-comment">${commentMatch[2]}</span>`;
+    }
 
-  // Protect triple-quoted strings first
-  html = html.replace(/('''[\s\S]*?'''|"""[\s\S]*?""")/g, (match) => {
-    protected_strings.push(`<span class="syntax-string">${match}</span>`);
-    return `__PROTECTED_${protectIdx++}__`;
+    // Process tokens using a simple tokenizer approach
+    // This avoids regex replacing inside already-replaced content
+    const tokens: {
+      type: string;
+      value: string;
+      start: number;
+      end: number;
+    }[] = [];
+
+    // Find strings first (they take priority)
+    const stringRegex = /("[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*')/g;
+    let match;
+    while ((match = stringRegex.exec(html)) !== null) {
+      tokens.push({
+        type: "string",
+        value: match[0],
+        start: match.index,
+        end: match.index + match[0].length,
+      });
+    }
+
+    // Find comments (after #)
+    const inlineCommentMatch = html.match(/(#.*)$/);
+    if (inlineCommentMatch && inlineCommentMatch.index !== undefined) {
+      // Check if # is inside a string
+      const hashPos = inlineCommentMatch.index;
+      const isInString = tokens.some(
+        (t) => t.type === "string" && hashPos >= t.start && hashPos < t.end,
+      );
+      if (!isInString) {
+        tokens.push({
+          type: "comment",
+          value: inlineCommentMatch[1],
+          start: hashPos,
+          end: html.length,
+        });
+      }
+    }
+
+    // Build result by going through the line
+    let result = "";
+    let pos = 0;
+
+    // Sort tokens by position
+    tokens.sort((a, b) => a.start - b.start);
+
+    for (const token of tokens) {
+      // Add non-token content before this token (with highlighting)
+      if (token.start > pos) {
+        result += highlightCodeSegment(html.substring(pos, token.start));
+      }
+
+      // Add the token with its class
+      if (token.type === "string") {
+        result += `<span class="syntax-string">${token.value}</span>`;
+      } else if (token.type === "comment") {
+        result += `<span class="syntax-comment">${token.value}</span>`;
+      }
+
+      pos = token.end;
+    }
+
+    // Add remaining content
+    if (pos < html.length) {
+      result += highlightCodeSegment(html.substring(pos));
+    }
+
+    return result;
   });
 
-  // Protect single-line strings
-  html = html.replace(
-    /("[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*')/g,
-    (match) => {
-      protected_strings.push(`<span class="syntax-string">${match}</span>`);
-      return `__PROTECTED_${protectIdx++}__`;
-    },
+  return highlightedLines.join("\n");
+};
+
+// Highlight a code segment (not inside string or comment)
+const highlightCodeSegment = (code: string): string => {
+  let result = code;
+
+  // Keywords list (excluding class to avoid HTML attribute conflicts)
+  const keywords = [
+    "def",
+    "if",
+    "elif",
+    "else",
+    "for",
+    "while",
+    "try",
+    "except",
+    "finally",
+    "with",
+    "as",
+    "import",
+    "from",
+    "return",
+    "yield",
+    "break",
+    "continue",
+    "pass",
+    "raise",
+    "global",
+    "nonlocal",
+    "lambda",
+    "and",
+    "or",
+    "not",
+    "in",
+    "is",
+    "True",
+    "False",
+    "None",
+    "async",
+    "await",
+    "assert",
+    "del",
+    "print",
+    "input",
+    "len",
+    "range",
+    "int",
+    "str",
+    "float",
+    "list",
+    "dict",
+    "set",
+    "tuple",
+    "bool",
+    "type",
+    "isinstance",
+    "open",
+    "class",
+  ];
+
+  // Process in specific order to avoid conflicts
+
+  // 1. Decorators
+  result = result.replace(
+    /(@\w+)/g,
+    '<span class="syntax-decorator">$1</span>',
   );
 
-  // Protect comments
-  html = html.replace(/(#.*$)/gm, (match) => {
-    protected_strings.push(`<span class="syntax-comment">${match}</span>`);
-    return `__PROTECTED_${protectIdx++}__`;
-  });
-
-  // Decorators
-  html = html.replace(/(@\w+)/g, '<span class="syntax-decorator">$1</span>');
-
-  // Function definitions
-  html = html.replace(
+  // 2. Function definitions: def function_name
+  result = result.replace(
     /\b(def)\s+(\w+)/g,
-    '<span class="syntax-keyword">$1</span> <span class="syntax-function">$2</span>',
+    (_, kw, fn) =>
+      `<span class="syntax-keyword">${kw}</span> <span class="syntax-function">${fn}</span>`,
   );
 
-  // Class definitions
-  html = html.replace(
+  // 3. Class definitions: class ClassName
+  result = result.replace(
     /\b(class)\s+(\w+)/g,
-    '<span class="syntax-keyword">$1</span> <span class="syntax-class">$2</span>',
+    (_, kw, cn) =>
+      `<span class="syntax-keyword">${kw}</span> <span class="syntax-class">${cn}</span>`,
   );
 
-  // Self keyword
-  html = html.replace(/\b(self)\b/g, '<span class="syntax-self">$1</span>');
+  // 4. Self keyword
+  result = result.replace(/\b(self)\b/g, '<span class="syntax-self">$1</span>');
 
-  // Keywords
-  const keywordPattern = new RegExp(
-    `\\b(${PYTHON_KEYWORDS.filter((k) => k !== "self").join("|")})\\b`,
-    "g",
-  );
-  html = html.replace(keywordPattern, '<span class="syntax-keyword">$1</span>');
-
-  // Numbers (int, float, hex, binary, octal)
-  html = html.replace(
+  // 5. Numbers
+  result = result.replace(
     /\b(0x[0-9a-fA-F]+|0b[01]+|0o[0-7]+|\d+\.?\d*(?:e[+-]?\d+)?)\b/g,
     '<span class="syntax-number">$1</span>',
   );
 
-  // Operators
-  html = html.replace(
-    /([+\-*/%=&|^~<>!]+)/g,
-    '<span class="syntax-operator">$1</span>',
-  );
+  // 6. Keywords - use word boundaries and negative lookbehind/ahead to avoid matching inside tags
+  // We'll use a different approach: split by HTML tags and only process non-tag parts
+  const parts = result.split(/(<span[^>]*>|<\/span>)/g);
+  result = parts
+    .map((part, i) => {
+      // Skip HTML tags (odd indices after split with capturing group)
+      if (part.startsWith("<span") || part === "</span>") {
+        return part;
+      }
+      // Process keywords in text parts
+      let processed = part;
+      for (const keyword of keywords) {
+        // Skip if already processed (def, class handled above)
+        if (keyword === "def" || keyword === "class") continue;
 
-  // Brackets
-  html = html.replace(/([()[\]{}])/g, '<span class="syntax-bracket">$1</span>');
+        const keywordRegex = new RegExp(`\\b(${keyword})\\b`, "g");
+        processed = processed.replace(
+          keywordRegex,
+          '<span class="syntax-keyword">$1</span>',
+        );
+      }
+      return processed;
+    })
+    .join("");
 
-  // Restore protected strings and comments
-  for (let i = protected_strings.length - 1; i >= 0; i--) {
-    html = html.replace(`__PROTECTED_${i}__`, protected_strings[i]);
-  }
+  // 7. Operators (but not inside HTML tags)
+  const parts2 = result.split(/(<span[^>]*>|<\/span>)/g);
+  result = parts2
+    .map((part) => {
+      if (part.startsWith("<span") || part === "</span>") {
+        return part;
+      }
+      return part.replace(
+        /([+\-*\/%=&|^~!]+|&lt;|&gt;)/g,
+        '<span class="syntax-operator">$1</span>',
+      );
+    })
+    .join("");
 
-  return html;
+  // 8. Brackets
+  const parts3 = result.split(/(<span[^>]*>|<\/span>)/g);
+  result = parts3
+    .map((part) => {
+      if (part.startsWith("<span") || part === "</span>") {
+        return part;
+      }
+      return part.replace(
+        /([()[\]{}])/g,
+        '<span class="syntax-bracket">$1</span>',
+      );
+    })
+    .join("");
+
+  return result;
 };
 
-// Calculate current indent level
+// Calculate current indent level// Calculate current indent level
 export const getIndentLevel = (line: string): number => {
   const match = line.match(/^(\s*)/);
   return match ? match[1].length : 0;
