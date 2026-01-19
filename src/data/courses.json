@@ -1,0 +1,41 @@
+[
+  {
+    "id": "python-basics",
+    "title": "Tin học 10 - Sách cánh diều - Python Cơ bản",
+    "level": "Cơ bản",
+    "description": "Làm quen cú pháp và tư duy lập trình cơ bản.",
+    "chapters": [
+      {
+        "id": "chapter-F",
+        "title": "Chủ đề F: Giải quyết vấn đề với sự trợ giúp của máy tính",
+        "lessons": [
+          {
+            "id": "t10-cd-b12",
+            "title": "Bài 12: KIỂU DỮ LIỆU XÂU KÍ TỰ - XỬ LÍ XÂU KÍ TỰ ",
+            "summary": "Học về xâu kí tự qua các mini game thú vị.",
+            "games": [
+              {
+                "id": "t10-cd-b12-id1",
+                "title": "Game 01: Cửa hàng ngược tên",
+                "summary": "Tên cửa hàng này đang bị ngược rồi !!!",
+                "path": "python-basics/chapter-1/t10-cd-b12/id1"
+              },
+              {
+                "id": "t10-cd-b12-id2",
+                "title": "Game 02: Cắt ký tự thừa",
+                "summary": "Tên bị thừa 1 ký tự ở cuối, hãy cắt bỏ.",
+                "path": "python-basics/chapter-1/t10-cd-b12/id2"
+              },
+              {
+                "id": "t10-cd-b12-id3",
+                "title": "Game 03: Cuộc đua vượt chướng ngại vật",
+                "summary": "Chạy đua với bot, vượt qua các chướng ngại vật!",
+                "path": "python-basics/chapter-1/t10-cd-b12/id3"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
