@@ -7,7 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:init": "tsx database/init.ts"
+    "db:init": "tsx database/init.ts",
+    "validate": "tsx scripts/validate-content.ts",
+    "validate:content": "tsx scripts/validate-content.ts",
+    "sync:content": "tsx scripts/sync-content.ts",
+    "list:games": "tsx scripts/list-games.ts",
+    "add:game": "tsx scripts/add-complete-game.ts",
+    "generate:game": "tsx scripts/generate-game.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

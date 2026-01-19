@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { CourseService, TopicService } from "@/lib/services";
 
 export async function GET(
   request: Request,
@@ -9,35 +9,21 @@ export async function GET(
 
   try {
     // Get course by slug
-    const [courseRows] = (await pool.query(
-      "SELECT id FROM courses WHERE slug = ?",
-      [courseId],
-    )) as any;
+    const course = await CourseService.getCourseBySlug(courseId);
 
-    if (!courseRows || courseRows.length === 0) {
+    if (!course) {
       return NextResponse.json(
         { success: false, error: "Course not found" },
         { status: 404 },
       );
     }
 
-    const dbCourseId = courseRows[0].id;
-
     // Get topics with lessons count
-    const [rows] = await pool.query(
-      `SELECT t.id, t.slug, t.title, t.description, t.order_num,
-              COUNT(l.id) as lesson_count
-       FROM topics t
-       LEFT JOIN lessons l ON t.id = l.topic_id
-       WHERE t.course_id = ?
-       GROUP BY t.id, t.slug, t.title, t.description, t.order_num
-       ORDER BY t.order_num ASC`,
-      [dbCourseId],
-    );
+    const topics = await TopicService.getTopicsByCourseId(course.id);
 
     return NextResponse.json({
       success: true,
-      topics: rows,
+      topics,
     });
   } catch (error) {
     console.error("Error fetching topics:", error);

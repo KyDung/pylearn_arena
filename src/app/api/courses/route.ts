@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
-import pool from "@/lib/db";
+import { CourseService } from "@/lib/services";
 
 export async function GET() {
   try {
-    const [rows] = await pool.query(
-      `SELECT id, slug, title, description, difficulty, is_published, created_at, updated_at 
-       FROM courses 
-       WHERE is_published = true
-       ORDER BY created_at ASC`,
-    );
+    const courses = await CourseService.getPublishedCourses();
 
     return NextResponse.json({
       success: true,
-      courses: rows,
+      courses,
     });
   } catch (error) {
     console.error("Error fetching courses:", error);
