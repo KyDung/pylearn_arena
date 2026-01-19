@@ -1,6 +1,18 @@
 // @ts-nocheck
 import * as Phaser from "phaser";
 import { isPyodideTimeout, withPyodideTimeout } from "@/lib/pyodideTimeout";
+import {
+  buildCodeEditorStyles,
+  buildCodeEditorHTML,
+  initCodeEditor,
+  setupCodeFullscreen,
+} from "@/lib/codeEditor";
+import {
+  buildCodeEditorStyles,
+  buildCodeEditorHTML,
+  initCodeEditor,
+  setupCodeFullscreen,
+} from "@/lib/codeEditor";
 
 // ============================================================
 // VÍ DỤ TYPE 1: ĐẢO NGƯỢC CHUỖI
@@ -76,7 +88,7 @@ const buildLayout = () => `
     .lesson-side { display: flex; flex-direction: column; gap: 1rem; }
     .lesson-panel { background: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .code-panel h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
-    .code-editor { width: 100%; min-height: 300px; padding: 1rem; font-family: 'Courier New', monospace; font-size: 0.875rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical; background: #f9fafb; }
+    ${buildCodeEditorStyles()}
     .code-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
     .code-actions button { padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
     .code-actions button.primary { background: #3b82f6; color: white; }
@@ -96,9 +108,6 @@ const buildLayout = () => `
     .testcase-table .fail { color: #ef4444; font-weight: 600; }
     .testcase-table .input, .testcase-table .output { font-family: 'Courier New', monospace; font-size: 0.75rem; }
     
-    .code-panel.fullscreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; margin: 0; border-radius: 0; max-width: 100%; display: flex; flex-direction: column; }
-    .code-panel.fullscreen .code-editor { flex: 1; min-height: 0; }
-    body.no-scroll { overflow: hidden; }
     @media (max-width: 1024px) { .lesson-layout { grid-template-columns: 1fr; } }
   </style>
   <div class="lesson-header">
@@ -115,8 +124,7 @@ const buildLayout = () => `
     </div>
     <aside class="lesson-side">
       <div class="lesson-panel code-panel">
-        <h3>Code</h3>
-        <textarea id="code-input" class="code-editor" spellcheck="false">${GAME_CONFIG.starterCode}</textarea>
+        ${buildCodeEditorHTML(GAME_CONFIG.starterCode, "Python Code")}
         <div class="code-actions">
           <button class="primary" id="submit-code">Submit & Play</button>
           <button class="code-toggle" type="button">Phóng to</button>
@@ -158,9 +166,12 @@ export default function initGame(
   const sceneProgress = root.querySelector("#scene-progress") as HTMLElement;
   const output = root.querySelector("#output") as HTMLElement;
   const submitButton = root.querySelector("#submit-code") as HTMLButtonElement;
-  const codeInput = root.querySelector("#code-input") as HTMLTextAreaElement;
   const testcaseTable = root.querySelector("#testcase-table") as HTMLElement;
   const testcaseBody = root.querySelector("#testcase-body") as HTMLElement;
+
+  // Initialize enhanced code editor
+  const codeEditor = initCodeEditor(root, GAME_CONFIG.starterCode);
+  setupCodeFullscreen(root);
 
   let phaserGame: Phaser.Game | null = null;
   let currentScene = 0;
@@ -195,40 +206,6 @@ export default function initGame(
       testcaseBody.appendChild(row);
     });
   };
-
-  codeInput.addEventListener("keydown", (event) => {
-    if (event.key !== "Tab") return;
-    event.preventDefault();
-    const start = codeInput.selectionStart;
-    const end = codeInput.selectionEnd;
-    const value = codeInput.value;
-    codeInput.value = `${value.slice(0, start)}    ${value.slice(end)}`;
-    codeInput.selectionStart = codeInput.selectionEnd = start + 4;
-  });
-
-  const setupCodeFullscreen = (root: HTMLElement) => {
-    const panel = root.querySelector(".code-panel");
-    const toggle = root.querySelector(".code-toggle");
-    if (!panel || !toggle) return;
-
-    const setState = (isFullscreen: boolean) => {
-      panel.classList.toggle("fullscreen", isFullscreen);
-      document.body.classList.toggle("no-scroll", isFullscreen);
-      toggle.textContent = isFullscreen ? "Thu nhỏ" : "Phóng to";
-    };
-
-    toggle.addEventListener("click", () => {
-      setState(!panel.classList.contains("fullscreen"));
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && panel.classList.contains("fullscreen")) {
-        setState(false);
-      }
-    });
-  };
-
-  setupCodeFullscreen(root);
 
   // ============================================================
   // PHASER MULTI-SCENE GAME
@@ -418,7 +395,7 @@ export default function initGame(
     try {
       // Run student code
       withPyodideTimeout(pyodide, () => {
-        pyodide.runPython(codeInput.value);
+        pyodide.runPython(codeEditor.getCode());
       });
 
       pythonFunction = pyodide.globals.get(GAME_CONFIG.pythonFunction);

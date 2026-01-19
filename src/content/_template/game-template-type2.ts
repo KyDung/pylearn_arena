@@ -1,6 +1,12 @@
 // @ts-nocheck
 import * as Phaser from "phaser";
 import { isPyodideTimeout, withPyodideTimeout } from "@/lib/pyodideTimeout";
+import {
+  buildCodeEditorStyles,
+  buildCodeEditorHTML,
+  initCodeEditor,
+  setupCodeFullscreen,
+} from "@/lib/codeEditor";
 
 // ============================================================
 // CẤU HÌNH GAME TYPE 2 - CODERUNNER STYLE
@@ -71,41 +77,48 @@ print(result)`,
 
 const buildLayout = () => `
   <style>
+    ${buildCodeEditorStyles()}
+    
     .lesson-header { margin-bottom: 1rem; }
-    .lesson-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .lesson-header p { color: #4b5563; line-height: 1.5; white-space: pre-line; font-size: 0.875rem; }
+    .lesson-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #1f2937; }
+    .lesson-header p { color: #4b5563; line-height: 1.6; white-space: pre-line; font-size: 0.875rem; }
     .lesson-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .lesson-game { display: flex; flex-direction: column; }
-    .game-card { background: white; border-radius: 0.5rem; padding: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .game-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .phaser-frame { background: #121425; border-radius: 0.5rem; overflow: hidden; aspect-ratio: 720/520; width: 100%; }
-    .game-status { margin-top: 0.5rem; text-align: center; color: #6b7280; font-size: 0.75rem; }
-    .scene-progress { margin-top: 0.25rem; text-align: center; font-weight: 600; color: #3b82f6; font-size: 0.875rem; }
+    .game-status { margin-top: 0.75rem; text-align: center; color: #6b7280; font-size: 0.8rem; }
+    .scene-progress { margin-top: 0.25rem; text-align: center; font-weight: 600; color: #3b82f6; font-size: 0.9rem; }
     .lesson-side { display: flex; flex-direction: column; gap: 0.75rem; }
-    .lesson-panel { background: white; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .code-panel h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; }
-    .code-editor { width: 100%; min-height: 250px; padding: 0.75rem; font-family: 'Courier New', monospace; font-size: 0.8rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical; background: #f9fafb; }
-    .code-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
-    .code-actions button { padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; font-size: 0.875rem; }
-    .code-actions button.primary { background: #3b82f6; color: white; }
-    .code-actions button.primary:hover { background: #2563eb; }
-    .code-actions button.primary:disabled { background: #9ca3af; cursor: not-allowed; }
-    .code-toggle { background: #e5e7eb; color: #374151; }
-    .code-toggle:hover { background: #d1d5db; }
-    .output-panel { font-family: 'Courier New', monospace; font-size: 0.75rem; color: #374151; max-height: 150px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+    .lesson-panel { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .code-panel { padding: 0; overflow: hidden; }
+    .output-panel { 
+      font-family: 'JetBrains Mono', 'Fira Code', monospace; 
+      font-size: 0.75rem; 
+      color: #374151; 
+      max-height: 150px; 
+      overflow-y: auto; 
+      white-space: pre-wrap; 
+      word-break: break-word;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+    .output-panel:empty::before {
+      content: '📋 Output sẽ hiển thị ở đây...';
+      color: #94a3b8;
+      font-style: italic;
+    }
     
     /* Test Case Table */
     .testcase-table { margin-top: 1rem; display: none; }
     .testcase-table.visible { display: block; }
-    .testcase-table table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    .testcase-table th, .testcase-table td { padding: 0.5rem; border: 1px solid #d1d5db; text-align: left; }
-    .testcase-table th { background: #f3f4f6; font-weight: 600; }
+    .testcase-table h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: #1f2937; }
+    .testcase-table table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .testcase-table th, .testcase-table td { padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; text-align: left; }
+    .testcase-table th { background: #f1f5f9; font-weight: 600; color: #475569; }
     .testcase-table .pass { color: #10b981; font-weight: 600; }
     .testcase-table .fail { color: #ef4444; font-weight: 600; }
-    .testcase-table .input, .testcase-table .output { font-family: 'Courier New', monospace; font-size: 0.75rem; white-space: pre-wrap; }
+    .testcase-table .input, .testcase-table .output { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; white-space: pre-wrap; }
     
-    .code-panel.fullscreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; margin: 0; border-radius: 0; max-width: 100%; display: flex; flex-direction: column; }
-    .code-panel.fullscreen .code-editor { flex: 1; min-height: 0; }
-    body.no-scroll { overflow: hidden; }
     .next-scene-btn { 
       margin: 16px auto; 
       padding: 12px 32px; 
@@ -144,7 +157,7 @@ const buildLayout = () => `
       
       <!-- Test Case Table -->
       <div class="lesson-panel testcase-table" id="testcase-table">
-        <h3>Test Cases</h3>
+        <h3>📊 Kết quả Test Cases</h3>
         <table>
           <thead>
             <tr>
@@ -161,11 +174,10 @@ const buildLayout = () => `
     </div>
     <aside class="lesson-side">
       <div class="lesson-panel code-panel">
-        <h3>Code</h3>
-        <textarea id="code-input" class="code-editor" spellcheck="false">${GAME_CONFIG.starterCode}</textarea>
-        <div class="code-actions">
-          <button class="primary" id="submit-code">Submit & Play</button>
-          <button class="code-toggle" type="button">Phóng to</button>
+        ${buildCodeEditorHTML(GAME_CONFIG.starterCode, "Python Code")}
+        <div class="code-actions" style="padding: 12px;">
+          <button class="primary" id="submit-code">▶ Chạy Code</button>
+          <button class="code-toggle" type="button">⛶ Phóng to</button>
         </div>
       </div>
       <div class="lesson-panel output-panel" id="output"></div>
@@ -187,12 +199,15 @@ export default function initGame(
   const sceneProgress = root.querySelector("#scene-progress") as HTMLElement;
   const output = root.querySelector("#output") as HTMLElement;
   const submitButton = root.querySelector("#submit-code") as HTMLButtonElement;
-  const codeInput = root.querySelector("#code-input") as HTMLTextAreaElement;
   const testcaseTable = root.querySelector("#testcase-table") as HTMLElement;
   const testcaseBody = root.querySelector("#testcase-body") as HTMLElement;
   const nextSceneBtn = root.querySelector(
     "#next-scene-btn",
   ) as HTMLButtonElement;
+
+  // Initialize enhanced code editor
+  const codeEditor = initCodeEditor(root, GAME_CONFIG.starterCode);
+  setupCodeFullscreen(root);
 
   let phaserGame: Phaser.Game | null = null;
   let currentScene = 0;
@@ -280,40 +295,6 @@ export default function initGame(
       testcaseBody.appendChild(row);
     });
   };
-
-  codeInput.addEventListener("keydown", (event) => {
-    if (event.key !== "Tab") return;
-    event.preventDefault();
-    const start = codeInput.selectionStart;
-    const end = codeInput.selectionEnd;
-    const value = codeInput.value;
-    codeInput.value = `${value.slice(0, start)}    ${value.slice(end)}`;
-    codeInput.selectionStart = codeInput.selectionEnd = start + 4;
-  });
-
-  const setupCodeFullscreen = (root: HTMLElement) => {
-    const panel = root.querySelector(".code-panel");
-    const toggle = root.querySelector(".code-toggle");
-    if (!panel || !toggle) return;
-
-    const setState = (isFullscreen: boolean) => {
-      panel.classList.toggle("fullscreen", isFullscreen);
-      document.body.classList.toggle("no-scroll", isFullscreen);
-      toggle.textContent = isFullscreen ? "Thu nhỏ" : "Phóng to";
-    };
-
-    toggle.addEventListener("click", () => {
-      setState(!panel.classList.contains("fullscreen"));
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && panel.classList.contains("fullscreen")) {
-        setState(false);
-      }
-    });
-  };
-
-  setupCodeFullscreen(root);
 
   // ============================================================
   // PHASER MULTI-SCENE GAME - TRUE SCENE SWITCHING
@@ -496,8 +477,10 @@ export default function initGame(
       });
 
       // Run student code
+      if (!codeEditor) return;
+      const code = codeEditor.getCode();
       withPyodideTimeout(pyodide, () => {
-        pyodide.runPython(codeInput.value);
+        pyodide.runPython(code);
       });
 
       // Compare output
