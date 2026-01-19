@@ -422,7 +422,7 @@ sceneAssets: [/* 3 items */],  // Must match!
 
 ### Database
 
-- Verify PostgreSQL running: `psql -U postgres -d pylearn_arena`
+- Verify MySQL running: `mysql -u root -p pylearn_arena`
 - Check tables: `SELECT * FROM games;`
 
 ### Assets
