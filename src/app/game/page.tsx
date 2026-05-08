@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getUser } from "@/lib/auth";
+import { clearUser, getUser } from "@/lib/auth";
 import type { User } from "@/types";
 
 interface CourseFromDB {
@@ -85,10 +85,16 @@ export default function GamePage() {
       } else {
         console.error(
           "❌ API returned error:",
-          data.message || "Unknown error",
+          data.error || data.message || "Unknown error",
         );
         console.error("❌ Full error response:", data);
         setCourses([]); // Set empty để không bị undefined
+
+        if (response.status === 401) {
+          clearUser();
+          router.push("/login?next=game");
+          return;
+        }
       }
       setLoading(false);
     } catch (error) {

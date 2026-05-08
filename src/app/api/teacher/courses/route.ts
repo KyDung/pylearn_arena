@@ -25,7 +25,7 @@ export const GET = withAuth(
           c.title,
           c.description
         FROM courses c
-        WHERE c.is_published = 1
+        WHERE c.is_published = TRUE
         ORDER BY c.title ASC
       `;
 

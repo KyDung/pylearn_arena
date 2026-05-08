@@ -40,7 +40,7 @@ export const GET = withAuth(
          INNER JOIN class_members cm ON cl.id = cm.class_id
          WHERE cm.user_id = ? 
            AND cm.status = 'active'
-           AND c.is_published = 1
+           AND c.is_published = TRUE
          ORDER BY ca.granted_at DESC, c.title ASC`,
         [user.id],
       );
