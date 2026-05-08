@@ -956,18 +956,74 @@ export const initCodeEditor = (root: HTMLElement, starterCode: string) => {
     });
   }
 
-  // Copy button
+  // Copy button with mobile fallback
   if (copyBtn) {
     copyBtn.addEventListener("click", async () => {
       try {
-        await navigator.clipboard.writeText(codeInput.value);
+        let copySuccess = false;
+
+        // Try modern Clipboard API first (desktop & modern mobile)
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          try {
+            await navigator.clipboard.writeText(codeInput.value);
+            copySuccess = true;
+          } catch (clipboardErr) {
+            console.warn(
+              "Clipboard API failed, trying fallback:",
+              clipboardErr,
+            );
+          }
+        }
+
+        // Fallback for mobile browsers without Clipboard API
+        if (!copySuccess) {
+          // Create temporary textarea
+          const textarea = document.createElement("textarea");
+          textarea.value = codeInput.value;
+          textarea.style.position = "fixed";
+          textarea.style.left = "-999999px";
+          textarea.style.top = "-999999px";
+          document.body.appendChild(textarea);
+
+          // Select and copy
+          textarea.focus();
+          textarea.select();
+
+          try {
+            copySuccess = document.execCommand("copy");
+            if (!copySuccess) {
+              throw new Error("execCommand returned false");
+            }
+          } catch (execErr) {
+            console.error("execCommand copy failed:", execErr);
+            // Show user-friendly error
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = "❌ Copy failed";
+            setTimeout(() => {
+              copyBtn.textContent = originalText;
+            }, 2000);
+            document.body.removeChild(textarea);
+            return;
+          }
+
+          document.body.removeChild(textarea);
+        }
+
+        // Show success message
+        if (copySuccess) {
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = "✓ Copied!";
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+          }, 2000);
+        }
+      } catch (err) {
+        console.error("Failed to copy:", err);
         const originalText = copyBtn.textContent;
-        copyBtn.textContent = "✓ Copied!";
+        copyBtn.textContent = "❌ Error";
         setTimeout(() => {
           copyBtn.textContent = originalText;
         }, 2000);
-      } catch (err) {
-        console.error("Failed to copy:", err);
       }
     });
   }

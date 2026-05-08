@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import pool from "@/lib/db";
+
+const JWT_SECRET =
+  process.env.JWT_SECRET || "pylearn-secret-key-change-in-production";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     // Query user từ database
     const [rows] = (await pool.query(
-      "SELECT id, username, password, full_name, role FROM users WHERE username = ?",
+      "SELECT id, username, password, full_name, email, role FROM users WHERE username = ?",
       [username],
     )) as any;
 
@@ -43,8 +47,16 @@ export async function POST(request: NextRequest) {
       id: user.id,
       username: user.username,
       fullName: user.full_name,
+      email: user.email,
       role: user.role,
     };
+
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user.id, username: user.username, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "7d" },
+    );
 
     // Tạo response và set cookie
     const response = NextResponse.json({
@@ -52,9 +64,17 @@ export async function POST(request: NextRequest) {
       user: userInfo,
     });
 
-    // Set cookie để lưu session
-    response.cookies.set("auth-token", JSON.stringify(userInfo), {
+    // Set JWT cookie
+    response.cookies.set("auth-token", token, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    // Also set user info cookie for client-side access
+    response.cookies.set("user-info", JSON.stringify(userInfo), {
+      httpOnly: false, // Allow client-side access
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7, // 7 days

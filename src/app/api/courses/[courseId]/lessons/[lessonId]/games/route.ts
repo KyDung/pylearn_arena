@@ -8,20 +8,28 @@ export async function GET(
   const { courseId, lessonId } = await context.params;
 
   try {
-    // Get lesson by slug
-    const [lessonRows] = (await pool.query(
-      "SELECT id FROM lessons WHERE slug = ?",
-      [lessonId],
-    )) as any;
+    let dbLessonId: number;
 
-    if (!lessonRows || lessonRows.length === 0) {
-      return NextResponse.json(
-        { success: false, error: "Lesson not found" },
-        { status: 404 },
-      );
+    // Check if lessonId is numeric (ID) or string (slug)
+    if (/^\d+$/.test(lessonId)) {
+      // lessonId is numeric - use directly
+      dbLessonId = parseInt(lessonId);
+    } else {
+      // Get lesson by slug
+      const [lessonRows] = (await pool.query(
+        "SELECT id FROM lessons WHERE slug = ?",
+        [lessonId],
+      )) as any;
+
+      if (!lessonRows || lessonRows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Lesson not found" },
+          { status: 404 },
+        );
+      }
+
+      dbLessonId = lessonRows[0].id;
     }
-
-    const dbLessonId = lessonRows[0].id;
 
     const [rows] = await pool.query(
       `SELECT id, lesson_id, slug, title, description, path, order_num, created_at, updated_at
@@ -33,7 +41,8 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      games: rows,
+      data: rows,
+      games: rows, // backward compatibility
     });
   } catch (error) {
     console.error("Error fetching games:", error);

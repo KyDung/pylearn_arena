@@ -76,7 +76,22 @@ const buildLayout = () => `
     .lesson-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
     .lesson-game { display: flex; flex-direction: column; }
     .game-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .phaser-frame { background: #121425; border-radius: 0.5rem; overflow: hidden; aspect-ratio: 720/520; width: 100%; }
+    .phaser-frame { 
+      background: #121425; 
+      border-radius: 0.5rem; 
+      overflow: hidden; 
+      aspect-ratio: 720/520; 
+      width: 100%; 
+      max-width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .phaser-frame canvas {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100%;
+      display: block;
+    }
     .game-status { margin-top: 0.75rem; text-align: center; color: #6b7280; font-size: 0.875rem; }
     .scene-progress { margin-top: 0.5rem; text-align: center; font-weight: 600; color: #3b82f6; }
     .lesson-side { display: flex; flex-direction: column; gap: 1rem; }
@@ -102,7 +117,29 @@ const buildLayout = () => `
     .testcase-table .fail { color: #ef4444; font-weight: 600; }
     .testcase-table .input, .testcase-table .output { font-family: 'Courier New', monospace; font-size: 0.75rem; }
     
-    @media (max-width: 1024px) { .lesson-layout { grid-template-columns: 1fr; } }
+    /* Responsive Design */
+    @media (max-width: 1024px) { 
+      .lesson-layout { grid-template-columns: 1fr; }
+      .lesson-header h2 { font-size: 1.25rem; }
+      .lesson-header p { font-size: 0.8rem; }
+      .game-card { padding: 0.75rem; }
+      .lesson-panel { padding: 0.75rem; }
+      .output-panel { max-height: 120px; font-size: 0.7rem; }
+      .testcase-table { font-size: 0.75rem; }
+      .testcase-table th, .testcase-table td { padding: 0.375rem 0.5rem; }
+    }
+    
+    @media (max-width: 640px) {
+      .lesson-header h2 { font-size: 1.1rem; }
+      .lesson-header p { font-size: 0.75rem; line-height: 1.4; }
+      .game-card { padding: 0.5rem; }
+      .lesson-panel { padding: 0.5rem; }
+      .output-panel { max-height: 100px; font-size: 0.65rem; }
+      .testcase-table { font-size: 0.65rem; }
+      .testcase-table th, .testcase-table td { padding: 0.25rem 0.3rem; font-size: 0.6rem; }
+      .game-status { font-size: 0.7rem; }
+      .scene-progress { font-size: 0.8rem; }
+    }
   </style>
   <div class="lesson-header">
     <h2>${GAME_CONFIG.title}</h2>
@@ -241,8 +278,14 @@ export default function initGame(
           this.load.audio("wrong", "/sound_global/wrong.mp3");
         },
         create() {
-          correctSound = this.sound.add("correct");
-          wrongSound = this.sound.add("wrong");
+          try {
+            if (this.sound) {
+              correctSound = this.sound.add("correct");
+              wrongSound = this.sound.add("wrong");
+            }
+          } catch (error) {
+            console.warn("Sound initialization failed:", error);
+          }
 
           this.loadScene(currentScene);
         },
@@ -373,7 +416,7 @@ export default function initGame(
     status.textContent = "Pyodide sẵn sàng. Submit code để bắt đầu.";
     pyodide.setStdout({
       batched: (text: string) => {
-        if (text.trim()) logLine(text.trim());
+        logLine(text);
       },
     });
   }
@@ -409,4 +452,25 @@ export default function initGame(
       logLine(String(error));
     }
   });
+
+  // ============================================================
+  // EXPOSE GAME INSTANCE FOR SESSION SUBMISSION
+  // ============================================================
+  const getScore = () => {
+    const passed = testResults.filter((r) => r.passed).length;
+    const total = GAME_CONFIG.testCases.length;
+    return Math.round((passed / total) * 100);
+  };
+
+  const getTestResults = () => {
+    const passed = testResults.filter((r) => r.passed).length;
+    const total = GAME_CONFIG.testCases.length;
+    return { passed, total };
+  };
+
+  (window as any).gameInstance = {
+    getTestResults: getTestResults,
+    getScore: getScore,
+    getCode: () => codeEditor?.getCode() || "",
+  };
 }

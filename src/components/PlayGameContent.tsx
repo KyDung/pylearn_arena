@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import initGame1 from "@/content/python-basics/chapter-1/t10-cd-b12/id1/index";
-import initGame2 from "@/content/python-basics/chapter-1/t10-cd-b12/id2/index";
-import initGame3 from "@/content/python-basics/chapter-1/t10-cd-b12/id3/index";
 
 // Declare global loadPyodide from CDN
 declare global {
@@ -15,16 +12,6 @@ declare global {
 interface PlayGameContentProps {
   pathParam: string;
 }
-
-// Map game paths to their init functions
-const gameModules: Record<
-  string,
-  (root: HTMLElement, context: { pyodide: any }) => void
-> = {
-  "python-basics/chapter-1/t10-cd-b12/id1": initGame1,
-  "python-basics/chapter-1/t10-cd-b12/id2": initGame2,
-  "python-basics/chapter-1/t10-cd-b12/id3": initGame3,
-};
 
 export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
   const gameRootRef = useRef<HTMLDivElement>(null);
@@ -45,7 +32,7 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
         if (!window.loadPyodide) {
           const script = document.createElement("script");
           script.src =
-            "https://cdn.jsdelivr.net/pyodide/v0.29.1/full/pyodide.js";
+            "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js";
           script.async = true;
 
           await new Promise<void>((resolve, reject) => {
@@ -57,7 +44,7 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
         }
 
         const pyodide = await window.loadPyodide({
-          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.29.1/full/",
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/",
         });
 
         if (!mounted) return;
@@ -65,18 +52,27 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
         const result = pyodide.runPython("1 + 1");
         setStatus(`Pyodide sẵn sàng (${result})`);
 
-        // Load game module
-        const initGame = gameModules[pathParam];
-        if (!initGame) {
-          setError(`Game không tồn tại: ${pathParam}`);
-          return;
-        }
+        // Dynamic import game module based on path
+        setStatus("Đang tải game module...");
 
-        if (!mounted) return;
+        try {
+          const gameModule = await import(`@/content/${pathParam}/index`);
+          const initGame = gameModule.default;
 
-        if (gameRootRef.current) {
-          initGame(gameRootRef.current, { pyodide });
-          setStatus("Game đã sẵn sàng!");
+          if (!initGame) {
+            setError(`Game module không có export default: ${pathParam}`);
+            return;
+          }
+
+          if (!mounted) return;
+
+          if (gameRootRef.current) {
+            initGame(gameRootRef.current, { pyodide });
+            setStatus("Game đã sẵn sàng!");
+          }
+        } catch (importError: any) {
+          console.error("Failed to import game module:", importError);
+          setError(`Không thể tải game: ${pathParam}`);
         }
       } catch (err) {
         console.error("Error loading Pyodide:", err);
@@ -94,9 +90,9 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 p-6 rounded-lg">
-        <p className="text-red-700 mb-2">{error}</p>
-        <p className="text-sm text-gray-600">
+      <div className="bg-red-50 border border-red-200 p-4 sm:p-6 rounded-lg">
+        <p className="text-red-700 mb-2 text-sm sm:text-base">{error}</p>
+        <p className="text-xs sm:text-sm text-gray-600">
           Các game cần được chuyển đổi sang Next.js. Vui lòng kiểm tra lại.
         </p>
       </div>
@@ -105,8 +101,11 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
-      <div ref={gameRootRef} className="min-h-[600px] p-6">
-        <p className="text-gray-600">{status}</p>
+      <div
+        ref={gameRootRef}
+        className="min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] p-3 sm:p-4 lg:p-6"
+      >
+        <p className="text-gray-600 text-sm sm:text-base">{status}</p>
       </div>
     </div>
   );

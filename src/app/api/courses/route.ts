@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { CourseService } from "@/lib/services";
+import { getCurrentUser } from "@/lib/apiAuth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Luôn trả về tất cả khóa học published - phân quyền sẽ xử lý ở các trang chi tiết
     const courses = await CourseService.getPublishedCourses();
 
     return NextResponse.json({

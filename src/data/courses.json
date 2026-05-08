@@ -31,6 +31,12 @@
                 "title": "Game 03: Cuộc đua vượt chướng ngại vật",
                 "summary": "Chạy đua với bot, vượt qua các chướng ngại vật!",
                 "path": "python-basics/chapter-1/t10-cd-b12/id3"
+              },
+              {
+                "id": "t10-cd-b12-id4",
+                "title": "Test",
+                "summary": "Game test",
+                "path": "python-basics/chapter-1/t10-cd-b12/id4"
               }
             ]
           }

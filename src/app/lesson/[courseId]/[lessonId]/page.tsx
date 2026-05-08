@@ -91,13 +91,16 @@ export default function LessonPage({
 
   if (!lesson) {
     return (
-      <main className="flex-1 px-16 py-12">
+      <main className="flex-1 px-4 sm:px-8 lg:px-16 py-8 sm:py-10 lg:py-12">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-red-50 border border-red-200 p-6 rounded-lg">
-            <p className="text-red-700 mb-4">
+          <div className="bg-red-50 border border-red-200 p-5 sm:p-6 rounded-lg">
+            <p className="text-red-700 mb-3 sm:mb-4 text-sm sm:text-base">
               Không tìm thấy bài học. Vui lòng chọn lại.
             </p>
-            <Link href="/game" className="text-blue-600 hover:underline">
+            <Link
+              href="/game"
+              className="text-blue-600 hover:underline text-sm sm:text-base"
+            >
               Quay lại danh sách
             </Link>
           </div>
@@ -108,49 +111,53 @@ export default function LessonPage({
 
   return (
     <main className="flex-1">
-      <section className="px-16 py-12">
+      <section className="px-4 sm:px-8 lg:px-16 py-8 sm:py-10 lg:py-12">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <Link
               href={`/course/${courseId}`}
-              className="text-blue-600 hover:underline mb-4 inline-block"
+              className="text-blue-600 hover:underline mb-3 sm:mb-4 inline-block text-sm sm:text-base"
             >
               ← Quay lại khóa học
             </Link>
-            <h2 className="text-4xl font-bold mb-4">{lesson.title}</h2>
-            <p className="text-gray-700 mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">
+              {lesson.title}
+            </h2>
+            <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">
               {lesson.summary || "Bài học thú vị"}
             </p>
-            <div className="flex gap-4 text-sm text-gray-600">
+            <div className="flex gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
               <span>🎮 {games.length} games</span>
             </div>
           </div>
 
           {games.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {games.map((game, index) => (
                 <article
                   key={game.id}
-                  className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                  className="bg-white p-5 sm:p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow"
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
+                  <div className="flex items-start justify-between mb-3 sm:mb-4 gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-base sm:text-lg flex-shrink-0">
                         {index + 1}
                       </div>
-                      <div>
-                        <h3 className="text-xl font-bold">{game.title}</h3>
+                      <div className="min-w-0">
+                        <h3 className="text-base sm:text-lg lg:text-xl font-bold break-words">
+                          {game.title}
+                        </h3>
                       </div>
                     </div>
                   </div>
-                  <p className="text-gray-700 mb-4">
+                  <p className="text-sm sm:text-base text-gray-700 mb-4 leading-relaxed">
                     {game.description ||
                       game.summary ||
                       "Thử thách lập trình thú vị!"}
                   </p>
                   <Link
                     href={`/play?path=${encodeURIComponent(game.path)}`}
-                    className="block w-full text-center px-4 py-2 bg-[#ff7a50] text-white rounded-lg font-medium hover:bg-[#ff6940] transition-colors"
+                    className="block w-full text-center px-4 py-2.5 sm:py-2 bg-[#ff7a50] text-white rounded-lg font-medium hover:bg-[#ff6940] transition-all hover:shadow-lg text-sm sm:text-base"
                   >
                     Chơi game
                   </Link>
@@ -158,8 +165,10 @@ export default function LessonPage({
               ))}
             </div>
           ) : (
-            <div className="bg-white p-8 rounded-xl shadow-md text-center">
-              <p className="text-gray-500">Bài học này chưa có game nào.</p>
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md text-center">
+              <p className="text-gray-500 text-sm sm:text-base">
+                Bài học này chưa có game nào.
+              </p>
             </div>
           )}
         </div>

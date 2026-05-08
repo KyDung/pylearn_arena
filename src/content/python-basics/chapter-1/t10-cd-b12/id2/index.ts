@@ -78,7 +78,22 @@ const buildLayout = () => `
     .lesson-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .lesson-game { display: flex; flex-direction: column; }
     .game-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .phaser-frame { background: #121425; border-radius: 0.5rem; overflow: hidden; aspect-ratio: 720/520; width: 100%; }
+    .phaser-frame { 
+      background: #121425; 
+      border-radius: 0.5rem; 
+      overflow: hidden; 
+      aspect-ratio: 720/520; 
+      width: 100%; 
+      max-width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .phaser-frame canvas {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100%;
+      display: block;
+    }
     .game-status { margin-top: 0.75rem; text-align: center; color: #6b7280; font-size: 0.8rem; }
     .scene-progress { margin-top: 0.25rem; text-align: center; font-weight: 600; color: #3b82f6; font-size: 0.9rem; }
     .lesson-side { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -113,25 +128,71 @@ const buildLayout = () => `
     
     @media (max-width: 1024px) { .lesson-layout { grid-template-columns: 1fr; } }
     .next-scene-btn { 
-      margin: 16px auto; 
-      padding: 12px 32px; 
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 36px; 
       font-size: 16px; 
       font-weight: 600; 
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white; 
       border: none; 
-      border-radius: 8px; 
+      border-radius: 50px; 
       cursor: pointer; 
-      display: block;
+      display: none;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+      z-index: 1000;
+      animation: pulse 2s infinite;
     }
     .next-scene-btn:hover { 
-      transform: translateY(-2px); 
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transform: scale(1.05);
+      box-shadow: 0 12px 24px rgba(102, 126, 234, 0.6);
     }
     .next-scene-btn:active { 
-      transform: translateY(0); 
+      transform: scale(0.98); 
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4); }
+      50% { box-shadow: 0 8px 24px rgba(102, 126, 234, 0.7), 0 0 20px rgba(102, 126, 234, 0.3); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1024px) { 
+      .lesson-layout { grid-template-columns: 1fr; }
+      .lesson-header h2 { font-size: 1.25rem; }
+      .lesson-header p { font-size: 0.8rem; }
+      .game-card { padding: 0.75rem; }
+      .lesson-panel { padding: 0.75rem; }
+      .output-panel { max-height: 120px; font-size: 0.7rem; }
+      .testcase-table { font-size: 0.75rem; }
+      .testcase-table th, .testcase-table td { padding: 0.3rem 0.4rem; }
+      .next-scene-btn { 
+        padding: 12px 28px; 
+        font-size: 15px;
+        bottom: 20px;
+        right: 20px;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .lesson-header h2 { font-size: 1.1rem; }
+      .lesson-header p { font-size: 0.75rem; line-height: 1.4; }
+      .game-card { padding: 0.5rem; }
+      .lesson-panel { padding: 0.5rem; }
+      .output-panel { max-height: 100px; font-size: 0.65rem; }
+      .testcase-table { font-size: 0.65rem; }
+      .testcase-table th, .testcase-table td { padding: 0.25rem 0.3rem; font-size: 0.6rem; }
+      .testcase-table h3 { font-size: 0.85rem; }
+      .game-status { font-size: 0.7rem; }
+      .scene-progress { font-size: 0.8rem; }
+      .next-scene-btn { 
+        padding: 10px 20px; 
+        font-size: 13px;
+        bottom: 16px;
+        right: 16px;
+        border-radius: 40px;
+      }
     }
   </style>
   <div class="lesson-header">
@@ -144,7 +205,6 @@ const buildLayout = () => `
         <div id="phaser-root" class="phaser-frame"></div>
         <p class="game-status" id="status">Đang tải Pyodide...</p>
         <p class="scene-progress" id="scene-progress"></p>
-        <button class="next-scene-btn" id="next-scene-btn" style="display: none;">Next Scene ➜</button>
       </div>
       
       <div class="lesson-panel testcase-table" id="testcase-table">
@@ -174,6 +234,9 @@ const buildLayout = () => `
       <div class="lesson-panel output-panel" id="output"></div>
     </aside>
   </div>
+  
+  <!-- Floating Next Scene Button (outside layout for fixed positioning) -->
+  <button class="next-scene-btn" id="next-scene-btn" style="display: none;">🚀 Next Scene ➜</button>
 `;
 
 // ============================================================
@@ -372,8 +435,14 @@ export default function initGame(
       }
 
       create() {
-        correctSound = this.sound.add("correct");
-        wrongSound = this.sound.add("wrong");
+        try {
+          if (this.sound) {
+            correctSound = this.sound.add("correct");
+            wrongSound = this.sound.add("wrong");
+          }
+        } catch (error) {
+          console.warn("Sound initialization failed:", error);
+        }
         this.scene.start("GameScene0");
       }
     }
@@ -409,6 +478,15 @@ export default function initGame(
         setTimeout(() => {
           if (sceneIndex < GAME_CONFIG.testCases.length - 1) {
             nextSceneBtn.style.display = "block";
+
+            // Auto-scroll to game canvas for better UX
+            const phaserRoot = document.getElementById("phaser-root");
+            if (phaserRoot) {
+              phaserRoot.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }
           } else {
             // Đã hết scenes - hiển thị kết quả
             status.textContent = testResults.every((r) => r.passed)
@@ -471,7 +549,7 @@ export default function initGame(
     status.textContent = "Pyodide sẵn sàng. Submit code để bắt đầu.";
     pyodide.setStdout({
       batched: (text: string) => {
-        if (text.trim()) logLine(text.trim());
+        logLine(text);
       },
     });
   }
@@ -505,4 +583,25 @@ export default function initGame(
       logLine(String(error));
     }
   });
+
+  // ============================================================
+  // EXPOSE GAME INSTANCE FOR SESSION SUBMISSION
+  // ============================================================
+  const getScore = () => {
+    const passed = testResults.filter((r) => r.passed).length;
+    const total = GAME_CONFIG.testCases.length;
+    return Math.round((passed / total) * 100);
+  };
+
+  const getTestResults = () => {
+    const passed = testResults.filter((r) => r.passed).length;
+    const total = GAME_CONFIG.testCases.length;
+    return { passed, total };
+  };
+
+  (window as any).gameInstance = {
+    getTestResults: getTestResults,
+    getScore: getScore,
+    getCode: () => codeInput?.value || "",
+  };
 }

@@ -34,13 +34,7 @@ async function resetAdmin() {
     await pool.query(
       `INSERT INTO users (username, password, email, full_name, role) 
        VALUES (?, ?, ?, ?, ?)`,
-      [
-        "admin",
-        hashedPassword,
-        "admin@pylearn.com",
-        "Administrator",
-        "teacher",
-      ],
+      ["admin", hashedPassword, "admin@pylearn.com", "Administrator", "admin"],
     );
 
     console.log("\n✅ Admin account created successfully!");

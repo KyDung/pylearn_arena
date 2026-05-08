@@ -7,6 +7,14 @@ import {
   initCodeEditor,
   setupCodeFullscreen,
 } from "@/lib/codeEditor";
+import { setupContestSubmission } from "@/lib/contestIntegration";
+
+// ============================================================
+// GAME PATH - THAY ĐỔI THEO ĐƯỜNG DẪN GAME
+// ============================================================
+// Format: "[course]/[topic]/[lesson]/[game-id]"
+// Ví dụ: "python-basics/chapter-1/t10-cd-b12/id1"
+const GAME_PATH = "CHANGE_ME";
 
 // ============================================================
 // CẤU HÌNH GAME TYPE 1 - MULTI-SCENE FUNCTION TESTING
@@ -85,7 +93,22 @@ const buildLayout = () => `
     .lesson-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .lesson-game { display: flex; flex-direction: column; }
     .game-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .phaser-frame { background: #121425; border-radius: 0.5rem; overflow: hidden; aspect-ratio: 720/520; width: 100%; }
+    .phaser-frame { 
+      background: #121425; 
+      border-radius: 0.5rem; 
+      overflow: hidden; 
+      aspect-ratio: 720/520; 
+      width: 100%; 
+      max-width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .phaser-frame canvas {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100%;
+      display: block;
+    }
     .game-status { margin-top: 0.75rem; text-align: center; color: #6b7280; font-size: 0.8rem; }
     .scene-progress { margin-top: 0.25rem; text-align: center; font-weight: 600; color: #3b82f6; font-size: 0.9rem; }
     .lesson-side { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -119,28 +142,73 @@ const buildLayout = () => `
     .testcase-table .fail { color: #ef4444; font-weight: 600; }
     .testcase-table .input, .testcase-table .output { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
     
+    /* Floating Next Scene Button - Always visible at bottom right */
     .next-scene-btn { 
-      margin: 16px auto; 
-      padding: 12px 32px; 
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 36px; 
       font-size: 16px; 
       font-weight: 600; 
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white; 
       border: none; 
-      border-radius: 8px; 
+      border-radius: 50px; 
       cursor: pointer; 
-      display: block;
+      display: none;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+      z-index: 1000;
+      animation: pulse 2s infinite;
     }
     .next-scene-btn:hover { 
-      transform: translateY(-2px); 
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transform: scale(1.05);
+      box-shadow: 0 12px 24px rgba(102, 126, 234, 0.6);
     }
     .next-scene-btn:active { 
-      transform: translateY(0); 
+      transform: scale(0.98); 
     }
-    @media (max-width: 1024px) { .lesson-layout { grid-template-columns: 1fr; } }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4); }
+      50% { box-shadow: 0 8px 24px rgba(102, 126, 234, 0.7), 0 0 20px rgba(102, 126, 234, 0.3); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1024px) { 
+      .lesson-layout { grid-template-columns: 1fr; }
+      .lesson-header h2 { font-size: 1.25rem; }
+      .lesson-header p { font-size: 0.8rem; }
+      .game-card { padding: 0.75rem; }
+      .lesson-panel { padding: 0.75rem; }
+      .output-panel { max-height: 120px; font-size: 0.7rem; }
+      .testcase-table { font-size: 0.75rem; }
+      .testcase-table th, .testcase-table td { padding: 0.4rem 0.5rem; }
+      .next-scene-btn { 
+        padding: 12px 28px; 
+        font-size: 15px;
+        bottom: 20px;
+        right: 20px;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .lesson-header h2 { font-size: 1.1rem; }
+      .lesson-header p { font-size: 0.75rem; }
+      .game-card { padding: 0.5rem; }
+      .lesson-panel { padding: 0.5rem; }
+      .output-panel { max-height: 100px; font-size: 0.65rem; }
+      .testcase-table { font-size: 0.7rem; }
+      .testcase-table th, .testcase-table td { padding: 0.3rem 0.4rem; }
+      .next-scene-btn { 
+        padding: 10px 20px; 
+        font-size: 13px;
+        bottom: 16px;
+        right: 16px;
+        border-radius: 40px;
+      }
+      .game-status { font-size: 0.7rem; }
+      .scene-progress { font-size: 0.8rem; }
+    }
   </style>
   <div class="lesson-header">
     <h2>${GAME_CONFIG.title}</h2>
@@ -152,7 +220,6 @@ const buildLayout = () => `
         <div id="phaser-root" class="phaser-frame"></div>
         <p class="game-status" id="status">Đang tải Pyodide...</p>
         <p class="scene-progress" id="scene-progress"></p>
-        <button class="next-scene-btn" id="next-scene-btn" style="display: none;">Next Scene ➜</button>
       </div>
       
       <!-- Test Case Table -->
@@ -183,6 +250,9 @@ const buildLayout = () => `
       <div class="lesson-panel output-panel" id="output"></div>
     </aside>
   </div>
+  
+  <!-- Floating Next Scene Button (outside layout for fixed positioning) -->
+  <button class="next-scene-btn" id="next-scene-btn" style="display: none;">🚀 Next Scene ➜</button>
 `;
 
 // ============================================================
@@ -314,6 +384,12 @@ export default function initGame(
     }
 
     create() {
+      // Safety check for Phaser APIs
+      if (!this.add || !this.tweens || !this.cameras) {
+        console.error("Phaser APIs not ready in create()");
+        return;
+      }
+
       currentSceneInstance = this;
 
       // Load background if exists
@@ -382,8 +458,31 @@ export default function initGame(
     }
 
     create() {
-      correctSound = this.sound.add("correct");
-      wrongSound = this.sound.add("wrong");
+      // Initialize sounds with proper AudioContext state checking
+      try {
+        if (this.sound && this.sound.context) {
+          const audioContext = this.sound.context;
+
+          // Only initialize sounds if AudioContext is not closed
+          if (audioContext.state !== "closed") {
+            correctSound = this.sound.add("correct");
+            wrongSound = this.sound.add("wrong");
+
+            // Resume AudioContext if suspended
+            if (audioContext.state === "suspended") {
+              audioContext.resume().catch((err: Error) => {
+                console.warn("AudioContext resume failed:", err);
+              });
+            }
+          } else {
+            console.warn(
+              "AudioContext is closed, skipping sound initialization",
+            );
+          }
+        }
+      } catch (error) {
+        console.warn("Sound initialization failed:", error);
+      }
 
       // Start first game scene
       this.scene.start("GameScene0");
@@ -391,13 +490,22 @@ export default function initGame(
   }
 
   const startPhaser = () => {
+    // Cleanup old game instance
     if (phaserGame) {
-      phaserGame.destroy(true);
+      try {
+        phaserGame.destroy(true);
+      } catch (error) {
+        console.warn("Error destroying old game:", error);
+      }
       phaserGame = null;
     }
 
+    // Reset global state and sound references
     currentScene = 0;
     testResults = [];
+    currentSceneInstance = null;
+    correctSound = null;
+    wrongSound = null;
     updateSceneProgress();
     nextSceneBtn.style.display = "none";
 
@@ -433,22 +541,75 @@ export default function initGame(
 
         setTimeout(() => {
           nextSceneBtn.style.display = "block";
+
+          // Auto-scroll to game canvas for better UX
+          const phaserRoot = document.getElementById("phaser-root");
+          if (phaserRoot) {
+            phaserRoot.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }
         }, 1500);
       },
     };
   };
 
-  const ui = startPhaser();
+  let ui = startPhaser();
 
   // ============================================================
   // PYTHON CODE VALIDATION
   // ============================================================
+
+  // Helper function: Wait for Phaser scene to be fully initialized
+  const waitForSceneReady = (maxRetries = 20): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      let retries = 0;
+
+      const checkReady = () => {
+        // Check if scene instance exists and has all required APIs
+        if (
+          currentSceneInstance &&
+          currentSceneInstance.add &&
+          currentSceneInstance.tweens &&
+          currentSceneInstance.cameras
+        ) {
+          console.log("Scene is ready!");
+          resolve();
+          return;
+        }
+
+        retries++;
+        if (retries >= maxRetries) {
+          console.error("Timeout waiting for scene to be ready");
+          reject(new Error("Scene initialization timeout"));
+          return;
+        }
+
+        // Retry after 50ms
+        setTimeout(checkReady, 50);
+      };
+
+      checkReady();
+    });
+  };
+
   let pythonFunction: any = null;
 
   const runTestForScene = (sceneIndex: number) => {
     if (!pythonFunction) return;
 
     const testCase = GAME_CONFIG.testCases[sceneIndex];
+
+    // Safety check
+    if (!testCase) {
+      console.error(
+        `Test case ${sceneIndex} not found. Available: ${GAME_CONFIG.testCases.length}`,
+      );
+      status.textContent = `Error: Test case ${sceneIndex + 1} not found`;
+      return;
+    }
+
     try {
       const resultProxy = withPyodideTimeout(pyodide, () =>
         pythonFunction(testCase.input),
@@ -473,11 +634,11 @@ export default function initGame(
       );
     } catch (error) {
       testResults[sceneIndex] = {
-        input: testCase.input,
-        expected: testCase.expected,
+        input: testCase?.input || "N/A",
+        expected: testCase?.expected || "N/A",
         actual: String(error),
         passed: false,
-        description: testCase.description,
+        description: testCase?.description || `Test ${sceneIndex + 1}`,
       };
       ui.showResult(sceneIndex, testResults[sceneIndex]);
       logLine(`Scene ${sceneIndex + 1}: ✗ Error - ${error}`);
@@ -491,20 +652,34 @@ export default function initGame(
     status.textContent = "Pyodide sẵn sàng. Submit code để bắt đầu.";
     pyodide.setStdout({
       batched: (text: string) => {
-        if (text.trim()) logLine(text.trim());
+        logLine(text);
       },
     });
   }
 
-  submitButton.addEventListener("click", () => {
+  submitButton.addEventListener("click", async () => {
     if (!codeEditor) return;
 
     resetOutput();
     testResults = [];
     currentScene = 0;
     testcaseTable.classList.remove("visible");
-    status.textContent = "Đang chấm bài và chạy game...";
+    status.textContent = "Đang khởi tạo game...";
     updateSceneProgress();
+
+    // Restart Phaser game
+    ui = startPhaser();
+
+    // Wait for scene to be fully initialized
+    try {
+      await waitForSceneReady();
+      status.textContent = "Đang chấm bài và chạy game...";
+    } catch (error) {
+      status.textContent = "Lỗi khởi tạo game. Vui lòng thử lại.";
+      logLine("❌ Game initialization failed. Please refresh and try again.");
+      console.error(error);
+      return;
+    }
 
     try {
       // Run student code
@@ -530,4 +705,48 @@ export default function initGame(
       logLine(String(error));
     }
   });
+
+  // ============================================================
+  // CONTEST INTEGRATION - Tích hợp cuộc thi
+  // ============================================================
+  // Tự động kiểm tra game có đang trong cuộc thi không
+  // Nếu có, hiển thị nút "Nộp code cuộc thi"
+
+  const getScore = () => {
+    const passed = testResults.filter((r) => r.passed).length;
+    const total = GAME_CONFIG.testCases.length;
+    return Math.round((passed / total) * 100);
+  };
+
+  const getTestResults = () => {
+    const passed = testResults.filter((r) => r.passed).length;
+    const total = GAME_CONFIG.testCases.length;
+    return { passed, total };
+  };
+
+  // Setup contest - nếu GAME_PATH đúng, sẽ tự hiển thị nút nộp bài
+  if (GAME_PATH !== "CHANGE_ME" && codeEditor) {
+    setupContestSubmission(root, GAME_PATH, {
+      getCode: () => codeEditor.getCode(),
+      getScore: getScore,
+      getTestResults: getTestResults,
+      onSubmitted: (result) => {
+        if (result.success) {
+          logLine("🏆 Đã nộp bài cuộc thi thành công!");
+        } else {
+          logLine(`❌ Lỗi nộp bài: ${result.error}`);
+        }
+      },
+    });
+  }
+
+  // ============================================================
+  // EXPOSE GAME INSTANCE FOR SESSION SUBMISSION
+  // ============================================================
+  // Session system cần gameInstance để lấy kết quả test
+  (window as any).gameInstance = {
+    getTestResults: getTestResults,
+    getScore: getScore,
+    getCode: () => codeEditor?.getCode() || "",
+  };
 }

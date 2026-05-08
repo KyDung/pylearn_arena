@@ -18,12 +18,6 @@ export default function LoginPage() {
   );
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (getUser()) {
-      router.push("/profile");
-    }
-  }, [router]);
-
   const getNextPage = () => {
     const next = searchParams.get("next");
     const course = searchParams.get("course");
@@ -50,8 +44,38 @@ export default function LoginPage() {
       return "/game";
     }
 
+    if (next === "contests") {
+      return "/contests";
+    }
+
     return "/";
   };
+
+  useEffect(() => {
+    const user = getUser();
+    if (user) {
+      // If already logged in, redirect to appropriate page based on next param or role
+      const next = searchParams.get("next");
+      if (next === "contests") {
+        if (user.role === "admin" || user.role === "teacher") {
+          router.push("/contests");
+        } else {
+          router.push("/student/contests");
+        }
+      } else if (next) {
+        router.push(getNextPage());
+      } else {
+        // Default redirect based on role
+        if (user.role === "admin") {
+          router.push("/admin");
+        } else if (user.role === "teacher") {
+          router.push("/teacher");
+        } else {
+          router.push("/profile");
+        }
+      }
+    }
+  }, [router, searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

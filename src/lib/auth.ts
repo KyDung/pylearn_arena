@@ -4,13 +4,29 @@ const STORAGE_KEY = "pylearn-user";
 
 export const getUser = (): User | null => {
   if (typeof window === "undefined") return null;
+
+  // First try localStorage
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (!stored) return null;
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return null;
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {}
   }
+
+  // Fallback to cookie
+  const cookies = document.cookie.split(";");
+  const userCookie = cookies.find((c) => c.trim().startsWith("user-info="));
+  if (userCookie) {
+    try {
+      const cookieValue = decodeURIComponent(userCookie.split("=")[1]);
+      const user = JSON.parse(cookieValue);
+      // Sync back to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      return user;
+    } catch {}
+  }
+
+  return null;
 };
 
 export const setUser = (user: User): void => {

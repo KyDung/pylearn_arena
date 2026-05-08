@@ -12,4 +12,5 @@ const pool = mysql.createPool({
   charset: "utf8mb4",
 });
 
+export { pool };
 export default pool;

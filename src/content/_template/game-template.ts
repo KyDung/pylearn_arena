@@ -201,6 +201,34 @@ export default function initGame(
   const ui = startPhaser();
 
   // ============================================================
+  // SESSION INTEGRATION - Lưu trữ kết quả test
+  // ============================================================
+  interface TestResult {
+    input: string;
+    expected: string;
+    actual: string;
+    passed: boolean;
+    description: string;
+  }
+  const testResults: TestResult[] = [];
+
+  // Expose gameInstance globally for session submission
+  (window as any).gameInstance = {
+    getTestResults: () => {
+      const passed = testResults.filter((r) => r.passed).length;
+      const total = GAME_CONFIG.testCases.length;
+      return { passed, total };
+    },
+    getScore: () => {
+      const passed = testResults.filter((r) => r.passed).length;
+      const total = GAME_CONFIG.testCases.length;
+      if (total === 0) return 0;
+      return Math.round((passed / total) * 100);
+    },
+    getCode: () => getCode(),
+  };
+
+  // ============================================================
   // PYTHON CODE VALIDATION
   // ============================================================
   if (!pyodide) {
@@ -219,6 +247,8 @@ export default function initGame(
   submitButton.addEventListener("click", () => {
     resetOutput();
     status.textContent = "Đang chấm bài...";
+    // Clear previous test results
+    testResults.length = 0;
 
     try {
       // Run student code
@@ -243,6 +273,15 @@ export default function initGame(
 
         const passed = result === testCase.expected;
         allPassed = allPassed && passed;
+
+        // Lưu kết quả test cho session
+        testResults.push({
+          input: String(testCase.input),
+          expected: String(testCase.expected),
+          actual: result,
+          passed: passed,
+          description: testCase.description,
+        });
 
         logLine(
           `${testCase.description}: ${passed ? "✓ Đúng" : "✗ Sai"} (${result})`,
