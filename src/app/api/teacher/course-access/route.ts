@@ -7,7 +7,7 @@ import {
   getClassCourseAccess,
 } from "@/lib/services/courseAccess";
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket } from "@/lib/dbTypes";
 
 // GET /api/teacher/course-access - Lấy danh sách lớp và quyền truy cập
 export const GET = withAuth(

@@ -5,7 +5,7 @@ import type {
   AssignmentStatus,
   PaginatedResponse,
 } from "@/types";
-import type { RowDataPacket, ResultSetHeader } from "mysql2";
+import type { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 
 // ============================================================
 // ASSIGNMENT QUERIES

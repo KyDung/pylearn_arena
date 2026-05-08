@@ -8,7 +8,7 @@ import type {
   ClassStatus,
   PaginatedResponse,
 } from "@/types";
-import type { RowDataPacket, ResultSetHeader } from "mysql2";
+import type { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 import { nanoid } from "nanoid";
 
 // ============================================================
@@ -296,7 +296,9 @@ export async function hardDeleteClass(id: number): Promise<boolean> {
 
     const tablesToClean = [
       { query: "DELETE FROM class_members WHERE class_id = ?", params: [id] },
-      { query: "DELETE FROM class_courses WHERE class_id = ?", params: [id] },
+      { query: "DELETE FROM class_course_settings WHERE class_id = ?", params: [id] },
+      { query: "DELETE FROM course_access WHERE class_id = ?", params: [id] },
+      { query: "DELETE FROM course_content_access WHERE class_id = ?", params: [id] },
       { query: "DELETE FROM assignments WHERE class_id = ?", params: [id] },
       { query: "DELETE FROM sessions WHERE class_id = ?", params: [id] },
       {

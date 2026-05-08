@@ -3,7 +3,7 @@
  * Quản lý quyền truy cập khóa học cho lớp học
  */
 import pool from "@/lib/db";
-import { RowDataPacket, ResultSetHeader } from "mysql2";
+import { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 
 // ============================================================
 // INTERFACES
@@ -40,7 +40,9 @@ export async function addCourseToClass(
   const [result] = await pool.query<ResultSetHeader>(
     `INSERT INTO class_course_settings (class_id, course_id, created_by)
      VALUES (?, ?, ?)
-     ON DUPLICATE KEY UPDATE updated_at = NOW()`,
+     ON CONFLICT (class_id, course_id) DO UPDATE SET
+       created_by = EXCLUDED.created_by,
+       updated_at = NOW()`,
     [classId, courseId, teacherId],
   );
   return result.insertId;
@@ -100,7 +102,9 @@ export async function unlockContent(
   const [result] = await pool.query(
     `INSERT INTO course_access (class_id, course_id, granted_at)
      VALUES (?, ?, NOW())
-     ON DUPLICATE KEY UPDATE class_id = class_id`,
+     ON CONFLICT (class_id, course_id) DO UPDATE SET
+       is_active = TRUE,
+       granted_at = NOW()`,
     [classId, courseId],
   );
   console.log("✅ course_access created/updated:", result);
@@ -110,7 +114,7 @@ export async function unlockContent(
     `INSERT INTO course_content_access 
      (class_id, course_id, content_type, content_id, is_unlocked, unlocked_by, unlocked_at)
      VALUES (?, ?, ?, ?, TRUE, ?, NOW())
-     ON DUPLICATE KEY UPDATE 
+     ON CONFLICT (class_id, course_id, content_type, content_id) DO UPDATE SET
        is_unlocked = TRUE, 
        unlocked_by = ?, 
        unlocked_at = NOW()`,
@@ -194,9 +198,9 @@ export async function bulkUnlockContent(
     `INSERT INTO course_content_access 
      (class_id, course_id, content_type, content_id, is_unlocked, unlocked_by, unlocked_at)
      VALUES ${placeholders}
-     ON DUPLICATE KEY UPDATE 
+     ON CONFLICT (class_id, course_id, content_type, content_id) DO UPDATE SET
        is_unlocked = TRUE, 
-       unlocked_by = VALUES(unlocked_by), 
+       unlocked_by = EXCLUDED.unlocked_by, 
        unlocked_at = NOW()`,
     values.flat(),
   );
@@ -256,7 +260,7 @@ export async function checkStudentAccess(
   // Get all classes student belongs to
   const [classRows] = await pool.query<RowDataPacket[]>(
     `SELECT class_id FROM class_members 
-     WHERE student_id = ? AND status = 'active'`,
+     WHERE user_id = ? AND status = 'active'`,
     [studentId],
   );
 
@@ -293,7 +297,7 @@ export async function getStudentUnlockedContent(
   // Get all classes student belongs to
   const [classRows] = await pool.query<RowDataPacket[]>(
     `SELECT class_id FROM class_members 
-     WHERE student_id = ? AND status = 'active'`,
+     WHERE user_id = ? AND status = 'active'`,
     [studentId],
   );
 

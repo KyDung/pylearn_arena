@@ -8,7 +8,13 @@
  * - Rankings được tính toán và cache riêng
  */
 import pool from "@/lib/db";
-import { RowDataPacket, ResultSetHeader } from "mysql2";
+import { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
+
+function parseJsonField<T>(value: unknown): T | null {
+  if (!value) return null;
+  if (typeof value === "string") return JSON.parse(value) as T;
+  return value as T;
+}
 
 export interface Contest {
   id: number;
@@ -253,8 +259,8 @@ export const ContestService = {
         NOW() >= c.start_time as is_started,
         NOW() >= c.end_time as is_ended,
         CASE 
-          WHEN NOW() < c.start_time THEN TIMESTAMPDIFF(MINUTE, NOW(), c.start_time)
-          WHEN NOW() < c.end_time THEN TIMESTAMPDIFF(MINUTE, NOW(), c.end_time)
+          WHEN NOW() < c.start_time THEN FLOOR(EXTRACT(EPOCH FROM (c.start_time - NOW())) / 60)
+          WHEN NOW() < c.end_time THEN FLOOR(EXTRACT(EPOCH FROM (c.end_time - NOW())) / 60)
           ELSE 0
         END as remaining_minutes
        FROM contests c
@@ -270,7 +276,7 @@ export const ContestService = {
     // Parse prizes JSON
     const items = rows.map((row: any) => ({
       ...row,
-      prizes: row.prizes ? JSON.parse(row.prizes) : null,
+      prizes: parseJsonField<Record<string, string>>(row.prizes),
     }));
 
     return {
@@ -293,8 +299,8 @@ export const ContestService = {
         NOW() >= c.start_time as is_started,
         NOW() >= c.end_time as is_ended,
         CASE 
-          WHEN NOW() < c.start_time THEN TIMESTAMPDIFF(MINUTE, NOW(), c.start_time)
-          WHEN NOW() < c.end_time THEN TIMESTAMPDIFF(MINUTE, NOW(), c.end_time)
+          WHEN NOW() < c.start_time THEN FLOOR(EXTRACT(EPOCH FROM (c.start_time - NOW())) / 60)
+          WHEN NOW() < c.end_time THEN FLOOR(EXTRACT(EPOCH FROM (c.end_time - NOW())) / 60)
           ELSE 0
         END as remaining_minutes
        FROM contests c
@@ -309,7 +315,7 @@ export const ContestService = {
 
     const contest = {
       ...rows[0],
-      prizes: rows[0].prizes ? JSON.parse(rows[0].prizes) : null,
+      prizes: parseJsonField<Record<string, string>>(rows[0].prizes),
     };
 
     return contest as ContestWithDetails;
@@ -425,11 +431,12 @@ export const ContestService = {
     // Insert submission
     const [result] = await pool.query<ResultSetHeader>(
       `INSERT INTO contest_submissions (
-        contest_id, user_id, code, score, passed_tests, total_tests,
+        contest_id, game_id, user_id, code, score, passed_tests, total_tests,
         execution_time, is_late, final_score, status, attempt_number, submitted_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'passed', ?, NOW())`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'passed', ?, NOW())`,
       [
         data.contest_id,
+        contest.game_id,
         data.user_id,
         data.code,
         data.score,
@@ -470,32 +477,31 @@ export const ContestService = {
     await pool.query(
       `INSERT INTO contest_rankings (contest_id, user_id, best_score, best_submission_id, total_attempts, first_submission_at, best_submission_at)
        VALUES (?, ?, ?, ?, 1, NOW(), NOW())
-       ON DUPLICATE KEY UPDATE
-         best_score = IF(? > best_score, ?, best_score),
-         best_submission_id = IF(? > best_score, ?, best_submission_id),
-         best_submission_at = IF(? > best_score, NOW(), best_submission_at),
-         total_attempts = total_attempts + 1`,
-      [
-        contestId,
-        userId,
-        score,
-        submissionId,
-        score,
-        score,
-        submissionId,
-        score,
-        submissionId,
-        score,
-      ],
+       ON CONFLICT (contest_id, user_id) DO UPDATE SET
+         best_score = GREATEST(contest_rankings.best_score, EXCLUDED.best_score),
+         best_submission_id = CASE
+           WHEN EXCLUDED.best_score > contest_rankings.best_score THEN EXCLUDED.best_submission_id
+           ELSE contest_rankings.best_submission_id
+         END,
+         best_submission_at = CASE
+           WHEN EXCLUDED.best_score > contest_rankings.best_score THEN NOW()
+           ELSE contest_rankings.best_submission_at
+         END,
+         total_attempts = contest_rankings.total_attempts + 1`,
+      [contestId, userId, score, submissionId],
     );
 
     // Recalculate all ranks for this contest
     await pool.query(
-      `SET @rank := 0;
-       UPDATE contest_rankings
-       SET rank_position = (@rank := @rank + 1)
-       WHERE contest_id = ?
-       ORDER BY best_score DESC, best_submission_at ASC`,
+      `WITH ranked AS (
+         SELECT id, ROW_NUMBER() OVER (ORDER BY best_score DESC, best_submission_at ASC) as rank_position
+         FROM contest_rankings
+         WHERE contest_id = ?
+       )
+       UPDATE contest_rankings cr
+       SET rank_position = ranked.rank_position
+       FROM ranked
+       WHERE cr.id = ranked.id`,
       [contestId],
     );
   },
@@ -556,7 +562,7 @@ export const ContestService = {
         u.username as creator_name,
         NOW() >= c.start_time as is_started,
         NOW() >= c.end_time as is_ended,
-        TIMESTAMPDIFF(MINUTE, NOW(), c.end_time) as remaining_minutes
+        FLOOR(EXTRACT(EPOCH FROM (c.end_time - NOW())) / 60) as remaining_minutes
        FROM contests c
        INNER JOIN classes cl ON c.class_id = cl.id
        INNER JOIN class_members cm ON cl.id = cm.class_id
@@ -572,7 +578,7 @@ export const ContestService = {
 
     return rows.map((row: any) => ({
       ...row,
-      prizes: row.prizes ? JSON.parse(row.prizes) : null,
+      prizes: parseJsonField<Record<string, string>>(row.prizes),
     })) as ContestWithDetails[];
   },
 

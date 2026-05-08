@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket } from "@/lib/dbTypes";
 
 // GET /api/student/contests/active - Lấy danh sách cuộc thi active cho học sinh
 export const GET = withAuth(

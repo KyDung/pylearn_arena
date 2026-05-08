@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -30,7 +30,7 @@ interface ActiveSession {
   duration_minutes: number;
 }
 
-export default function PlayPage() {
+function PlayContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
@@ -325,5 +325,13 @@ export default function PlayPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function PlayPage() {
+  return (
+    <Suspense fallback={null}>
+      <PlayContent />
+    </Suspense>
   );
 }

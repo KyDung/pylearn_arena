@@ -7,7 +7,7 @@
  * 3. Học sinh chỉ thấy nút "Nộp code" khi game được mở cuộc thi
  */
 import pool from "@/lib/db";
-import { RowDataPacket, ResultSetHeader } from "mysql2";
+import { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 
 // ============================================================
 // INTERFACES
@@ -359,7 +359,9 @@ export const ContestGameService = {
     await pool.query(
       `INSERT INTO contest_games (contest_id, game_id, sort_order, is_active)
        VALUES (?, ?, ?, TRUE)
-       ON DUPLICATE KEY UPDATE is_active = TRUE, sort_order = VALUES(sort_order)`,
+       ON CONFLICT (contest_id, game_id) DO UPDATE SET
+         is_active = TRUE,
+         sort_order = EXCLUDED.sort_order`,
       [contestId, gameId, sortOrder || 0],
     );
   },
@@ -369,7 +371,7 @@ export const ContestGameService = {
    */
   async addAllLessonGames(contestId: number, lessonId: number): Promise<void> {
     const [games] = await pool.query<RowDataPacket[]>(
-      "SELECT id, sort_order FROM games WHERE lesson_id = ? AND is_active = TRUE ORDER BY sort_order",
+      "SELECT id, order_num as sort_order FROM games WHERE lesson_id = ? AND is_active = TRUE ORDER BY order_num",
       [lessonId],
     );
 

@@ -3,7 +3,7 @@ import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import SessionService from "@/lib/services/sessions";
 import pool from "@/lib/db";
-import { ResultSetHeader } from "mysql2";
+import { ResultSetHeader } from "@/lib/dbTypes";
 
 // POST /api/student/sessions/[id]/submit - Nộp bài
 export const POST = withAuth(

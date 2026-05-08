@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket } from "@/lib/dbTypes";
 
 // GET /api/teacher/courses/[courseId]/lessons - Lấy danh sách lessons của course
 export const GET = withAuth(

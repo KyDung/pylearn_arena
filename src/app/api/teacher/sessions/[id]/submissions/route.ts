@@ -3,7 +3,7 @@ import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import SessionService from "@/lib/services/sessions";
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket } from "@/lib/dbTypes";
 
 // GET /api/teacher/sessions/[id]/submissions - Xem submissions của session
 export const GET = withAuth(

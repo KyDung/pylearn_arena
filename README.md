@@ -10,7 +10,7 @@ Nền tảng học Python tương tác qua mini-game với Phaser.js và Pyodide
 - **Tailwind CSS 4**
 - **Phaser 3.90.0** - Game engine
 - **Pyodide 0.29.1** - Python in browser
-- **MySQL** - Database
+- **Supabase/PostgreSQL** - Database
 - **pnpm** - Package manager
 
 ## 📦 Cài đặt
@@ -21,31 +21,25 @@ Nền tảng học Python tương tác qua mini-game với Phaser.js và Pyodide
 pnpm install
 ```
 
-### 2. Cấu hình MySQL Database
+### 2. Cấu hình Supabase Database
 
 ```bash
 # Copy file config mẫu
 cp .env.example .env
 
 # Chỉnh sửa thông tin database trong .env
-MYSQL_HOST=localhost
-MYSQL_PORT=3306
-MYSQL_USER=root
-MYSQL_PASSWORD=your_password_here
-MYSQL_DATABASE=pylearn_arena
+SUPABASE_DB_URL=postgresql://postgres.your-project-ref:your-password@aws-0-region.pooler.supabase.com:6543/postgres
+SUPABASE_DB_SSL=true
 ```
 
 ### 3. Khởi tạo database
 
 ```bash
-# Test kết nối MySQL
-npx tsx scripts/test-mysql-connection.ts
+# Chạy migration để tạo tables trên Supabase/Postgres
+pnpm db:supabase
 
-# Chạy migration để tạo tables
-npx tsx scripts/run-migration.ts
-
-# Hoặc chạy SQL trực tiếp trong MySQL Workbench
-# Import file: scripts/mysql-schema.sql
+# Hoặc copy nội dung file này vào Supabase SQL Editor
+# database/supabase/schema.sql
 ```
 
 ### 4. Chạy ứng dụng
@@ -103,7 +97,7 @@ public/
 
 ## 🎮 Tính năng
 
-✅ MySQL Authentication với phân quyền Admin/Student
+✅ Supabase/PostgreSQL database với phân quyền Admin/Teacher/Student
 ✅ Course Management từ database
 ✅ Interactive Games với Phaser
 ✅ Python Execution trong browser với Pyodide
@@ -149,11 +143,8 @@ Server chạy tại: http://localhost:3001
 ### Database Setup
 
 ```bash
-# Test kết nối
-npx tsx database/test.ts
-
-# Khởi tạo toàn bộ database
-npx tsx database/init-full.ts
+# Khởi tạo toàn bộ database Supabase/Postgres
+pnpm db:supabase
 ```
 
 ## 🎯 Scripts Hữu Ích

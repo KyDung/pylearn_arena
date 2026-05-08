@@ -7,7 +7,7 @@ import type {
   Ranking,
   PaginatedResponse,
 } from "@/types";
-import type { RowDataPacket, ResultSetHeader } from "mysql2";
+import type { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 import { canUserSubmit, getAssignmentById } from "./assignments";
 
 // ============================================================
@@ -364,7 +364,10 @@ async function updateRanking(submissionId: number): Promise<void> {
       await pool.query(
         `UPDATE rankings 
          SET best_score = ?, best_submission_id = ?, total_attempts = total_attempts + 1,
-             first_passed_at = IF(first_passed_at IS NULL AND ? >= 100, NOW(), first_passed_at)
+             first_passed_at = CASE
+               WHEN first_passed_at IS NULL AND ? >= 100 THEN NOW()
+               ELSE first_passed_at
+             END
          WHERE assignment_id = ? AND user_id = ?`,
         [score, submissionId, score, assignmentId, userId],
       );

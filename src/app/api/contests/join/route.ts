@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import { ContestService } from "@/lib/services/contests";
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket } from "@/lib/dbTypes";
 
 // GET /api/contests/join?code=ABC123 - Tham gia cuộc thi bằng mã
 export const GET = withAuth(

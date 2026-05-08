@@ -2,7 +2,7 @@
  * 📚 Course Service - Quản lý truy vấn courses
  */
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket } from "@/lib/dbTypes";
 
 export interface Course {
   id: number;

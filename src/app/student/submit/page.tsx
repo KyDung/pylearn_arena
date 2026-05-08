@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -32,7 +32,7 @@ interface User {
   role: string;
 }
 
-export default function StudentQuickSubmitPage() {
+function StudentQuickSubmitContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const codeParam = searchParams.get("code");
@@ -353,5 +353,13 @@ export default function StudentQuickSubmitPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function StudentQuickSubmitPage() {
+  return (
+    <Suspense fallback={null}>
+      <StudentQuickSubmitContent />
+    </Suspense>
   );
 }

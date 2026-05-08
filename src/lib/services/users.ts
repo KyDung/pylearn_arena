@@ -8,7 +8,7 @@ import type {
   PaginatedResponse,
 } from "@/types";
 import bcrypt from "bcryptjs";
-import type { RowDataPacket, ResultSetHeader } from "mysql2";
+import type { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 
 // ============================================================
 // USER QUERIES
@@ -375,7 +375,7 @@ export async function getUserStats(): Promise<{
   );
 
   const [recentStats] = await pool.query<RowDataPacket[]>(
-    "SELECT COUNT(*) as count FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+    "SELECT COUNT(*) as count FROM users WHERE created_at >= NOW() - INTERVAL '7 days'",
   );
 
   const byRole: Record<UserRole, number> = { admin: 0, teacher: 0, student: 0 };

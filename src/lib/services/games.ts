@@ -2,7 +2,7 @@
  * 🎮 Game Service - Quản lý truy vấn games
  */
 import pool from "@/lib/db";
-import { RowDataPacket, ResultSetHeader } from "mysql2";
+import { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 
 export interface Game {
   id: number;
@@ -115,11 +115,11 @@ export const GameService = {
     const [result] = await pool.query<ResultSetHeader>(
       `INSERT INTO games (lesson_id, slug, title, description, order_num, path)
        VALUES (?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE 
-         title = VALUES(title),
-         description = VALUES(description),
-         order_num = VALUES(order_num),
-         path = VALUES(path),
+       ON CONFLICT (lesson_id, slug) DO UPDATE SET
+         title = EXCLUDED.title,
+         description = EXCLUDED.description,
+         order_num = EXCLUDED.order_num,
+         path = EXCLUDED.path,
          updated_at = CURRENT_TIMESTAMP`,
       [
         data.lessonId,

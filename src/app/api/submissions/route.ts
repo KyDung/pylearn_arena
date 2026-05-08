@@ -33,23 +33,20 @@ export async function POST(request: NextRequest) {
     )) as any;
 
     // Update user progress
+    const isCompleted = status === "completed";
     await pool.query(
-      `INSERT INTO user_progress (user_id, game_id, is_completed, score, attempts, last_attempt_at)
-       VALUES (?, ?, ?, ?, 1, NOW())
-       ON DUPLICATE KEY UPDATE 
-         score = GREATEST(score, ?),
-         attempts = attempts + 1,
+      `INSERT INTO user_progress (user_id, game_id, is_completed, score, attempts, last_attempt_at, completed_at)
+       VALUES (?, ?, ?, ?, 1, NOW(), CASE WHEN ? THEN NOW() ELSE NULL END)
+       ON CONFLICT (user_id, game_id) DO UPDATE SET
+         score = GREATEST(user_progress.score, EXCLUDED.score),
+         attempts = user_progress.attempts + 1,
          last_attempt_at = NOW(),
-         is_completed = ?,
-         completed_at = IF(? = 1 AND completed_at IS NULL, NOW(), completed_at)`,
-      [
-        user.id,
-        gameId,
-        score || 0,
-        score || 0,
-        status === "completed" ? 1 : 0,
-        status === "completed" ? 1 : 0,
-      ],
+         is_completed = EXCLUDED.is_completed,
+         completed_at = CASE
+           WHEN EXCLUDED.is_completed AND user_progress.completed_at IS NULL THEN NOW()
+           ELSE user_progress.completed_at
+         END`,
+      [user.id, gameId, isCompleted, score || 0, isCompleted],
     );
 
     return NextResponse.json({

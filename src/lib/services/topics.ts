@@ -2,7 +2,7 @@
  * 📂 Topic Service - Quản lý truy vấn topics
  */
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket } from "@/lib/dbTypes";
 
 export interface Topic {
   id: number;

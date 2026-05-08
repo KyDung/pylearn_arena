@@ -12,7 +12,7 @@ import {
   ContestSubmissionService,
 } from "@/lib/services/contests";
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket } from "@/lib/dbTypes";
 
 // GET - Kiểm tra trạng thái cuộc thi của game
 export const GET = withAuth(async (request, context) => {

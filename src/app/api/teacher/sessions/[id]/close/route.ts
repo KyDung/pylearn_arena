@@ -6,11 +6,11 @@ import SessionService from "@/lib/services/sessions";
 export const PUT = withAuth(
   async (
     request: NextRequest,
-    context: { params: Promise<{ id: string }>; user: any },
+    context: { params?: Record<string, string>; user: any },
   ) => {
     try {
-      const { id } = await context.params;
-      const sessionId = parseInt(id);
+      const id = context.params?.id;
+      const sessionId = id ? parseInt(id) : 0;
       const { user } = context;
 
       if (!sessionId) {

@@ -2,7 +2,7 @@
  * 📊 Progress Service - Quản lý tiến độ học tập
  */
 import pool from "@/lib/db";
-import { RowDataPacket, ResultSetHeader } from "mysql2";
+import { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 
 export interface UserProgress {
   id: number;
@@ -78,12 +78,18 @@ export const ProgressService = {
     await pool.query<ResultSetHeader>(
       `INSERT INTO user_progress (user_id, game_id, is_completed, score, attempts, last_attempt_at, completed_at)
        VALUES (?, ?, ?, ?, 1, NOW(), ?)
-       ON DUPLICATE KEY UPDATE
-         is_completed = IF(VALUES(is_completed), true, is_completed),
-         score = GREATEST(score, VALUES(score)),
-         attempts = attempts + 1,
+       ON CONFLICT (user_id, game_id) DO UPDATE SET
+         is_completed = CASE
+           WHEN EXCLUDED.is_completed THEN TRUE
+           ELSE user_progress.is_completed
+         END,
+         score = GREATEST(user_progress.score, EXCLUDED.score),
+         attempts = user_progress.attempts + 1,
          last_attempt_at = NOW(),
-         completed_at = IF(VALUES(is_completed) AND completed_at IS NULL, NOW(), completed_at)`,
+         completed_at = CASE
+           WHEN EXCLUDED.is_completed AND user_progress.completed_at IS NULL THEN NOW()
+           ELSE user_progress.completed_at
+         END`,
       [
         data.userId,
         data.gameId,

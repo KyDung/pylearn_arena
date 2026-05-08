@@ -19,7 +19,9 @@ export const POST = withAuth(
       await pool.query(
         `INSERT INTO course_access (class_id, course_id, granted_at)
          VALUES (?, ?, NOW())
-         ON DUPLICATE KEY UPDATE granted_at = NOW()`,
+         ON CONFLICT (class_id, course_id) DO UPDATE SET
+           granted_at = NOW(),
+           is_active = TRUE`,
         [classId, courseId],
       );
 

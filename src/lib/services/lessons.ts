@@ -2,7 +2,7 @@
  * 📝 Lesson Service - Quản lý truy vấn lessons
  */
 import pool from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { RowDataPacket } from "@/lib/dbTypes";
 
 export interface Lesson {
   id: number;
