@@ -7,6 +7,10 @@ import {
   initCodeEditor,
   setupCodeFullscreen,
 } from "@/lib/codeEditor";
+import {
+  buildGameMetadataStyles,
+  renderGameMetadata,
+} from "@/lib/gameMetadata";
 import { setupContestSubmission } from "@/lib/contestIntegration";
 
 // ============================================================
@@ -41,6 +45,12 @@ vi_tri`,
   // Dùng "\n" để phân tách nhiều lần gọi input() trong 1 test case
   // Ví dụ: input = "5\n10" → input() lần 1 = "5", input() lần 2 = "10"
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
+  ioExamples: [
+    { input: "Buoc chan tren dai Truong Son\nTruong Son", output: "Co\n19" },
+    { input: "Tin hoc lop 12\nPython", output: "Khong\n-1" },
+    { input: "ababahabab\nba", output: "Co\n1" },
+  ],
+
   testCases: [
     {
       input: "Buoc chan tren dai Truong Son\nTruong Son",
@@ -94,6 +104,7 @@ print(result)`,
 const buildLayout = () => `
   <style>
     ${buildCodeEditorStyles()}
+    ${buildGameMetadataStyles()}
     
     .lesson-header { margin-bottom: 1rem; }
     .lesson-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #1f2937; }
@@ -220,7 +231,7 @@ const buildLayout = () => `
   </style>
   <div class="lesson-header">
     <h2>${GAME_CONFIG.title}</h2>
-    <p>${GAME_CONFIG.description}</p>
+    ${renderGameMetadata(GAME_CONFIG.description, GAME_CONFIG.ioExamples)}
   </div>
   <div class="lesson-layout">
     <div class="lesson-game">

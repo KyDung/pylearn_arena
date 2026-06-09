@@ -7,6 +7,10 @@ import {
   initCodeEditor,
   setupCodeFullscreen,
 } from "@/lib/codeEditor";
+import {
+  buildGameMetadataStyles,
+  renderGameMetadata,
+} from "@/lib/gameMetadata";
 
 // ============================================================
 // CẤU HÌNH GAME - CHỈNH SỬA PHẦN NÀY (LEGACY TEMPLATE)
@@ -23,6 +27,8 @@ const GAME_CONFIG = {
   `,
 
   // Hàm Python mà học sinh cần viết
+  ioExamples: [{ input: "test1", output: "result1" }],
+
   pythonFunction: "my_function",
 
   // Code Python mẫu cho học sinh
@@ -63,6 +69,7 @@ const GAME_CONFIG = {
 const buildLayout = () => `
   <style>
     ${buildCodeEditorStyles()}
+    ${buildGameMetadataStyles()}
     .lesson-header { margin-bottom: 1.5rem; }
     .lesson-header h2 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.75rem; }
     .lesson-header p { color: #4b5563; line-height: 1.625; white-space: pre-line; }
@@ -80,7 +87,7 @@ const buildLayout = () => `
   </style>
   <div class="lesson-header">
     <h2>${GAME_CONFIG.title}</h2>
-    <p>${GAME_CONFIG.description}</p>
+    ${renderGameMetadata(GAME_CONFIG.description, GAME_CONFIG.ioExamples)}
   </div>
   <div class="lesson-layout">
     <div class="lesson-game">

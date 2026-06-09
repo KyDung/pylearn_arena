@@ -7,6 +7,10 @@ import {
   initCodeEditor,
   setupCodeFullscreen,
 } from "@/lib/codeEditor";
+import {
+  buildGameMetadataStyles,
+  renderGameMetadata,
+} from "@/lib/gameMetadata";
 import { setupContestSubmission } from "@/lib/contestIntegration";
 
 // ============================================================
@@ -30,6 +34,8 @@ const GAME_CONFIG = {
   `,
 
   // Hàm Python mà học sinh cần viết
+  ioExamples: [{ input: "test input", output: "expected output" }],
+
   pythonFunction: "my_function",
 
   // Code Python mẫu cho học sinh
@@ -75,6 +81,7 @@ const GAME_CONFIG = {
 const buildLayout = () => `
   <style>
     ${buildCodeEditorStyles()}
+    ${buildGameMetadataStyles()}
     
     .lesson-header { margin-bottom: 1rem; }
     .lesson-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #1f2937; }
@@ -201,7 +208,7 @@ const buildLayout = () => `
   </style>
   <div class="lesson-header">
     <h2>${GAME_CONFIG.title}</h2>
-    <p>${GAME_CONFIG.description}</p>
+    ${renderGameMetadata(GAME_CONFIG.description, GAME_CONFIG.ioExamples)}
   </div>
   <div class="lesson-layout">
     <div class="lesson-game">

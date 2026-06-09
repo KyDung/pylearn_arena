@@ -7,6 +7,10 @@ import {
   initCodeEditor,
   setupCodeFullscreen,
 } from "@/lib/codeEditor";
+import {
+  buildGameMetadataStyles,
+  renderGameMetadata,
+} from "@/lib/gameMetadata";
 import { setupContestSubmission } from "@/lib/contestIntegration";
 
 // ============================================================
@@ -30,6 +34,15 @@ const GAME_CONFIG = {
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
+  ioExamples: [
+    { input: "duongdi-vatcan-duongdi", output: "chay-ne-chay" },
+    { input: "duongdi-vatcan-vatcan-duongdi-vatcan", output: "chay-ne-ne-chay-ne" },
+    {
+      input: "vatcan-duongdi-vatcan-duongdi-vatcan-duongdi-duongdi",
+      output: "ne-chay-ne-chay-ne-chay-chay",
+    },
+  ],
+
   testCases: [
     {
       input: "duongdi-vatcan-duongdi",
@@ -92,6 +105,7 @@ print(result)`,
 const buildLayout = () => `
   <style>
     ${buildCodeEditorStyles()}
+    ${buildGameMetadataStyles()}
     .lesson-header { margin-bottom: 1rem; }
     .lesson-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
     .lesson-header p { color: #4b5563; line-height: 1.5; white-space: pre-line; font-size: 0.875rem; }
@@ -202,7 +216,7 @@ const buildLayout = () => `
   </style>
   <div class="lesson-header">
     <h2>${GAME_CONFIG.title}</h2>
-    <p>${GAME_CONFIG.description}</p>
+    ${renderGameMetadata(GAME_CONFIG.description, GAME_CONFIG.ioExamples)}
   </div>
   <div class="lesson-layout">
     <div class="lesson-game">

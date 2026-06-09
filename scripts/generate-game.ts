@@ -14,6 +14,27 @@ const question = (query: string): Promise<string> => {
   });
 };
 
+const toTsString = (value: string) =>
+  JSON.stringify(String(value).replace(/\r\n/g, "\n").replace(/\r/g, "\n"));
+
+const toTsTemplateLiteralBody = (value: string) =>
+  String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`")
+    .replace(/\$\{/g, "\\${");
+
+const formatIOExamples = (rows: Array<{ input: string; output: string }>) => {
+  return rows
+    .filter((row) => row.input.trim() || row.output.trim())
+    .map(
+      (row) =>
+        `    { input: ${toTsString(row.input)}, output: ${toTsString(row.output)} }`,
+    )
+    .join(",\n");
+};
+
+const normalizePromptValue = (value: string) => value.replace(/\\n/g, "\n");
+
 async function generateGame() {
   console.log("\n🎮 GENERATE NEW GAME\n");
   console.log("=".repeat(50));
@@ -56,6 +77,20 @@ async function generateGame() {
   }
   const description = descriptionLines.join("\n");
 
+  console.log(
+    "\nBang Input/Output minh hoa (bo trong Input de ket thuc, dung \\n de xuong dong):",
+  );
+  const ioExamples: Array<{ input: string; output: string }> = [];
+  while (true) {
+    const input = await question("Input: ");
+    if (!input.trim()) break;
+    const output = await question("Output: ");
+    ioExamples.push({
+      input: normalizePromptValue(input),
+      output: normalizePromptValue(output),
+    });
+  }
+
   console.log("\n✅ Đang tạo game...\n");
 
   // Đường dẫn hierarchical: course/topic/lesson/game
@@ -92,11 +127,11 @@ async function generateGame() {
   // Thay thế các giá trị
   template = template.replace(
     'title: "Tiêu đề game của bạn"',
-    `title: "${title}"`,
+    `title: ${toTsString(title)}`,
   );
   template = template.replace(
     /description: `[\s\S]*?`,/,
-    `description: \`\n${description}\n  \`,`,
+    `description: \`\n${toTsTemplateLiteralBody(description)}\n  \`,`,
   );
 
   if (pythonFunction) {
@@ -109,6 +144,11 @@ async function generateGame() {
       `starterCode: \`def ${pythonFunction}`,
     );
   }
+
+  template = template.replace(
+    /ioExamples:\s*\[([\s\S]*?)\],/,
+    `ioExamples: [\n${formatIOExamples(ioExamples)}\n  ],`,
+  );
 
   // Replace background paths for all scenes - hierarchical format
   const assetPath = `${courseId}/${topicId}/${lessonId}/${gameId}`;

@@ -34,6 +34,26 @@ const question = (query: string): Promise<string> => {
   });
 };
 
+const toTsString = (value: string) =>
+  JSON.stringify(String(value).replace(/\r\n/g, "\n").replace(/\r/g, "\n"));
+
+const toTsTemplateLiteralBody = (value: string) =>
+  String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`")
+    .replace(/\$\{/g, "\\${");
+
+const normalizePromptValue = (value: string) => value.replace(/\\n/g, "\n");
+
+const formatIOExamples = (rows: Array<{ input: string; output: string }>) =>
+  rows
+    .filter((row) => row.input.trim() || row.output.trim())
+    .map(
+      (row) =>
+        `    { input: ${toTsString(row.input)}, output: ${toTsString(row.output)} }`,
+    )
+    .join(",\n");
+
 async function main() {
   console.log("\n🎮 ADD COMPLETE GAME - ALL IN ONE\n");
   console.log("=".repeat(50));
@@ -126,6 +146,20 @@ async function main() {
     const templateType = (await question("Chọn (1/2): ")) || "2";
 
     // Build paths
+    console.log(
+      "\nBang Input/Output minh hoa (bo trong Input de ket thuc, dung \\n de xuong dong):",
+    );
+    const ioExamples: Array<{ input: string; output: string }> = [];
+    while (true) {
+      const input = await question("Input: ");
+      if (!input.trim()) break;
+      const output = await question("Output: ");
+      ioExamples.push({
+        input: normalizePromptValue(input),
+        output: normalizePromptValue(output),
+      });
+    }
+
     const gamePath = `${courseSlug}/${topicSlug}/${lessonSlug}/${gameId}`;
     const contentDir = path.join(process.cwd(), "src/content", gamePath);
     const publicDir = path.join(process.cwd(), "public", gamePath);
@@ -155,7 +189,15 @@ async function main() {
     // Replace placeholders
     template = template.replace(
       'title: "Tiêu đề game của bạn"',
-      `title: "${title}"`,
+      `title: ${toTsString(title)}`,
+    );
+    template = template.replace(
+      /description: `[\s\S]*?`,/,
+      `description: \`\n    ${toTsTemplateLiteralBody(description)}\n  \`,`,
+    );
+    template = template.replace(
+      /ioExamples:\s*\[([\s\S]*?)\],/,
+      `ioExamples: [\n${formatIOExamples(ioExamples)}\n  ],`,
     );
     template = template.replace(
       /background: "\/game-id\//g,

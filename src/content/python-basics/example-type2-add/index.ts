@@ -7,6 +7,10 @@ import {
   initCodeEditor,
   setupCodeFullscreen,
 } from "@/lib/codeEditor";
+import {
+  buildGameMetadataStyles,
+  renderGameMetadata,
+} from "@/lib/gameMetadata";
 
 // ============================================================
 // VÍ DỤ TYPE 2: CỘNG HAI SỐ (CODERUNNER STYLE)
@@ -21,6 +25,12 @@ const GAME_CONFIG = {
     
     Game sẽ tự động test với các bộ input khác nhau!
   `,
+
+  ioExamples: [
+    { input: "5\n10", output: "15" },
+    { input: "100\n200", output: "300" },
+    { input: "-5\n3", output: "-2" },
+  ],
 
   // 3 test cases = 3 scenes
   testCases: [
@@ -72,6 +82,7 @@ print(total)`,
 const buildLayout = () => `
   <style>
     ${buildCodeEditorStyles()}
+    ${buildGameMetadataStyles()}
     
     .lesson-header { margin-bottom: 1.5rem; }
     .lesson-header h2 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.75rem; color: #1f2937; }
@@ -156,7 +167,7 @@ const buildLayout = () => `
   </style>
   <div class="lesson-header">
     <h2>${GAME_CONFIG.title}</h2>
-    <p>${GAME_CONFIG.description}</p>
+    ${renderGameMetadata(GAME_CONFIG.description, GAME_CONFIG.ioExamples)}
   </div>
   <div class="lesson-layout">
     <div class="lesson-game">
