@@ -210,17 +210,18 @@ export const SessionService = {
         g.title as game_title,
         g.path as game_path,
         u.username as creator_name,
-        GREATEST(0, s.duration_minutes - FLOOR(EXTRACT(EPOCH FROM (NOW() - s.started_at)) / 60)) as remaining_minutes
+        GREATEST(0, s.duration_minutes - FLOOR(EXTRACT(EPOCH FROM (NOW() - s.started_at)) / 60)) as remaining_minutes,
+        EXISTS(SELECT 1 FROM session_submissions ss WHERE ss.session_id = s.id AND ss.user_id = ?) as has_submitted
        FROM sessions s
        INNER JOIN classes c ON s.class_id = c.id
        INNER JOIN class_members cm ON c.id = cm.class_id
        LEFT JOIN games g ON s.game_id = g.id
        LEFT JOIN users u ON s.created_by = u.id
        WHERE cm.user_id = ? AND cm.status = 'active' AND s.status = 'active'
-         AND (s.duration_minutes IS NULL OR 
+         AND (s.duration_minutes IS NULL OR
               FLOOR(EXTRACT(EPOCH FROM (NOW() - s.started_at)) / 60) < s.duration_minutes)
        ORDER BY s.created_at DESC`,
-      [userId],
+      [userId, userId],
     );
     return rows as SessionWithDetails[];
   },

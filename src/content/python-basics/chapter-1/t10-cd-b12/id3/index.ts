@@ -347,7 +347,7 @@ export default function initGame(
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>Scene ${index + 1}</td>
-        <td class="input">${result.input.replace(/\n/g, "\\n")}</td>
+        <td class="input">${result.input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>
         <td class="input">${result.expected}</td>
         <td class="output">${result.actual}</td>
         <td class="${result.passed ? "pass" : "fail"}">${result.passed ? "✓ Pass" : "✗ Fail"}</td>
@@ -1019,41 +1019,31 @@ export default function initGame(
     }
 
     try {
-      // Setup stdin for input
-      const inputLines = (testCase.input || "").split("\n");
-      let inputIndex = 0;
+      const inputLines = testCase.input ? testCase.input.split("\n") : [];
 
-      pyodide.setStdin({
-        stdin: () => {
-          if (inputIndex < inputLines.length) {
-            return inputLines[inputIndex++];
-          }
-          return "";
-        },
-      });
-
-      // Capture stdout using Python StringIO
       pyodide.runPython(`
 import sys
 from io import StringIO
+_input_lines = ${JSON.stringify(inputLines)}
+_input_idx = [0]
+def input(prompt=""):
+    idx = _input_idx[0]
+    _input_idx[0] += 1
+    return _input_lines[idx] if idx < len(_input_lines) else ""
 _captured_output = StringIO()
 sys.stdout = _captured_output
-      `);
+`);
 
-      // Run student code
       withPyodideTimeout(pyodide, () => {
         pyodide.runPython(codeInput.value);
       });
 
-      // Get captured output
-      const capturedOutput = pyodide.runPython(`
-_captured_output.getvalue()
-      `);
+      const capturedOutput = pyodide.runPython(`_captured_output.getvalue()`);
 
-      // Restore stdout
       pyodide.runPython(`
 sys.stdout = sys.__stdout__
-      `);
+del input
+`);
 
       // Compare output
       const actualOutput = capturedOutput.trim();
@@ -1074,9 +1064,14 @@ sys.stdout = sys.__stdout__
       logLine(
         `Scene ${sceneIndex + 1}: ${passed ? "✓ Pass" : "✗ Fail"} - ${testCase.description || ""}`,
       );
+      if (actualOutput) {
+        actualOutput.split("\n").filter(Boolean).forEach((line) =>
+          logLine(`  📤 Log: ${line}`),
+        );
+      }
       if (!passed) {
-        logLine(`  Expected: ${expectedOutput}`);
-        logLine(`  Got: ${actualOutput}`);
+        logLine(`  Expected: "${expectedOutput}"`);
+        logLine(`  Got:      "${actualOutput || "(no output)"}"`);
       }
     } catch (error) {
       testResults[sceneIndex] = {

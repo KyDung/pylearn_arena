@@ -40,6 +40,7 @@ function PlayContent() {
   );
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [hasAlreadySubmitted, setHasAlreadySubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const pathParam = searchParams.get("path");
   const [effectivePathParam, setEffectivePathParam] = useState<string | null>(
@@ -81,6 +82,7 @@ function PlayContent() {
             const session = sessions.find((s) => s.id === parseInt(sessionId));
             if (session) {
               setActiveSession(session);
+              setHasAlreadySubmitted(!!(session as any).has_submitted);
               // Dùng game_path từ session
               if ((session as any).game_path) {
                 setEffectivePathParam((session as any).game_path);
@@ -96,9 +98,11 @@ function PlayContent() {
             );
             if (session) {
               setActiveSession(session);
+              setHasAlreadySubmitted(!!(session as any).has_submitted);
             } else if (sessions.length > 0) {
               // Set first available session as fallback
               setActiveSession(sessions[0]);
+              setHasAlreadySubmitted(!!(sessions[0] as any).has_submitted);
             }
           }
         }
@@ -193,7 +197,7 @@ function PlayContent() {
 
       if (res.ok) {
         setSubmitSuccess(true);
-        setTimeout(() => setSubmitSuccess(false), 3000);
+        setHasAlreadySubmitted(true);
       } else {
         setSubmitError(data.error || "Có lỗi xảy ra khi nộp bài");
       }
@@ -278,24 +282,24 @@ function PlayContent() {
               {activeSession && (
                 <button
                   onClick={handleSubmitCode}
-                  disabled={submitting || submitSuccess}
+                  disabled={submitting || hasAlreadySubmitted}
                   className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all text-sm sm:text-base ${
-                    submitSuccess
-                      ? "bg-green-500 text-white"
+                    hasAlreadySubmitted
+                      ? "bg-green-500 text-white cursor-not-allowed"
                       : submitting
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg hover:scale-105"
                   }`}
                 >
-                  {submitSuccess ? (
+                  {hasAlreadySubmitted ? (
                     "✓ Đã nộp"
                   ) : submitting ? (
                     "Đang nộp..."
                   ) : (
-                    <span className="hidden sm:inline">📤 Nộp bài</span>
-                  )}
-                  {submitting ? null : submitSuccess ? null : (
-                    <span className="sm:hidden">📤</span>
+                    <>
+                      <span className="hidden sm:inline">📤 Nộp bài</span>
+                      <span className="sm:hidden">📤</span>
+                    </>
                   )}
                 </button>
               )}
@@ -315,9 +319,9 @@ function PlayContent() {
             </div>
           )}
 
-          {submitSuccess && (
+          {hasAlreadySubmitted && submitSuccess && (
             <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-xs sm:text-sm">
-              ✓ Nộp bài thành công! Giáo viên sẽ xem và chấm điểm.
+              ✓ Nộp bài thành công! Giáo viên sẽ xem và chấm điểm. Bạn đã hoàn thành session này.
             </div>
           )}
 

@@ -1,22 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getUser } from "@/lib/auth";
-import type { User, PaginatedResponse, UserRole } from "@/types";
+import type { User, PaginatedResponse, UserRole, UserStatus } from "@/types";
 
 interface UserStats {
   total: number;
   byRole: Record<UserRole, number>;
+  byStatus: Record<UserStatus, number>;
   recentlyCreated: number;
 }
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<PaginatedResponse<User> | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [activeTab, setActiveTab] = useState<
     "overview" | "teachers" | "students"
   >("overview");
@@ -42,15 +44,37 @@ export default function AdminDashboard() {
       router.push("/");
       return;
     }
-    setCurrentUser(user);
     loadData();
+    loadStats();
   }, [router]);
 
-  const loadData = async (role?: UserRole) => {
+  const loadStats = async () => {
+    try {
+      const response = await fetch("/api/admin/stats");
+      const data = await response.json();
+      if (data.success) setStats(data.data);
+    } catch (error) {
+      console.error("Failed to load stats:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      loadData(
+        activeTab === "teachers" ? "teacher" : activeTab === "students" ? "student" : undefined,
+        searchText,
+      );
+    }, 300);
+    return () => { if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current); };
+  }, [searchText]);
+
+  const loadData = async (role?: UserRole, search?: string) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (role) params.set("role", role);
+      if (search) params.set("search", search);
       params.set("pageSize", "50");
 
       const response = await fetch(`/api/admin/users?${params}`);
@@ -105,10 +129,10 @@ export default function AdminDashboard() {
     if (!confirm("Bạn có chắc muốn khóa tài khoản này?")) return;
 
     try {
-      const response = await fetch(`/api/admin/users/${userId}/status`, {
+      const response = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "suspended" }),
+        body: JSON.stringify({ action: "suspend" }),
       });
 
       const data = await response.json();
@@ -128,10 +152,10 @@ export default function AdminDashboard() {
 
   const handleActivateUser = async (userId: number) => {
     try {
-      const response = await fetch(`/api/admin/users/${userId}/status`, {
+      const response = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "active" }),
+        body: JSON.stringify({ action: "activate" }),
       });
 
       const data = await response.json();
@@ -229,7 +253,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
-                {users?.total || 0}
+                {stats?.total ?? users?.total ?? 0}
               </div>
               <div className="text-blue-100 text-sm font-medium mb-3">
                 Tổng người dùng
@@ -268,7 +292,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
-                {users?.items.filter((u) => u.role === "teacher").length || 0}
+                {stats?.byRole.teacher ?? users?.items.filter((u) => u.role === "teacher").length ?? 0}
               </div>
               <div className="text-green-100 text-sm font-medium mb-3">
                 Giáo viên
@@ -307,7 +331,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
-                {users?.items.filter((u) => u.role === "student").length || 0}
+                {stats?.byRole.student ?? users?.items.filter((u) => u.role === "student").length ?? 0}
               </div>
               <div className="text-purple-100 text-sm font-medium mb-3">
                 Học sinh
@@ -350,10 +374,10 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
-                {users?.items.filter((u) => u.status === "active").length || 0}
+                {stats?.byStatus.active ?? users?.items.filter((u) => u.status === "active").length ?? 0}
               </div>
               <div className="text-orange-100 text-sm font-medium mb-3">
-                Đang hoạt động
+                Tài khoản kích hoạt
               </div>
               <div className="flex items-center text-xs text-orange-200">
                 <svg
@@ -363,11 +387,11 @@ export default function AdminDashboard() {
                 >
                   <path
                     fillRule="evenodd"
-                    d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                     clipRule="evenodd"
                   />
                 </svg>
-                Online users
+                Trạng thái active
               </div>
             </div>
           </div>
@@ -511,7 +535,7 @@ export default function AdminDashboard() {
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="text-4xl group-hover:scale-110 transition-transform">
-                  ⚙️
+                  📝
                 </div>
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                   <svg
@@ -528,10 +552,10 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-teal-700 transition-colors">
-                Công cụ phát triển
+                Quản lý Nội dung
               </h3>
               <p className="text-sm text-gray-600">
-                Content Manager, debug và kiểm tra hệ thống
+                Tạo và chỉnh sửa Course, Topic, Lesson, Game
               </p>
             </button>
           </div>
@@ -590,9 +614,23 @@ export default function AdminDashboard() {
                   {activeTab === "overview" && <>📋 Tất cả người dùng</>}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Quản lý {users?.items.length || 0} người dùng
+                  Quản lý {users?.total || 0} người dùng
                 </p>
               </div>
+              <div className="flex gap-3 items-center">
+                {/* Search Input */}
+                <div className="relative">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    placeholder="Tìm kiếm..."
+                    className="pl-9 pr-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all w-56 text-sm"
+                  />
+                </div>
               <button
                 onClick={() => {
                   setCreateForm((prev) => ({
@@ -616,6 +654,7 @@ export default function AdminDashboard() {
                 </svg>
                 Thêm {activeTab === "teachers" ? "giáo viên" : "người dùng"}
               </button>
+              </div>
             </div>
 
             {/* Users Table */}

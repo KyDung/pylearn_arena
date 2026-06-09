@@ -41,24 +41,13 @@ const GAME_CONFIG = {
     return result`,
 
   // Test cases - MỖI TEST CASE = 1 SCENE
+  // Dùng Generate Tests trong Content Manager để tự động tạo test cases
   testCases: [
     {
-      input: "test1",
-      expected: "result1",
-      description: "Scene 1: Test case 1",
+      input: "", // Input truyền vào hàm (string, number, list...)
+      expected: "", // Kết quả mong đợi
+      description: "Test case 1",
       sceneText: "Level 1", // Text hiển thị trong scene
-    },
-    {
-      input: "test2",
-      expected: "result2",
-      description: "Scene 2: Test case 2",
-      sceneText: "Level 2",
-    },
-    {
-      input: "test3",
-      expected: "result3",
-      description: "Scene 3: Test case 3",
-      sceneText: "Level 3",
     },
   ],
 

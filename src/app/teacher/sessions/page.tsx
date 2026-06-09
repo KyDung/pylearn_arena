@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { getUser } from "@/lib/auth";
 
 interface Session {
   id: number;
@@ -48,10 +49,14 @@ export default function TeacherSessionsPage() {
     title: "",
     description: "",
     duration_minutes: 60,
-    max_submissions: null as number | null,
   });
 
   useEffect(() => {
+    const user = getUser();
+    if (!user || (user.role !== "admin" && user.role !== "teacher")) {
+      router.push("/login");
+      return;
+    }
     loadData();
   }, [filter, selectedClass]);
 
@@ -126,7 +131,6 @@ export default function TeacherSessionsPage() {
           title: "",
           description: "",
           duration_minutes: 60,
-          max_submissions: null,
         });
         loadData();
       } else {
@@ -319,9 +323,9 @@ export default function TeacherSessionsPage() {
             </div>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200">
-            <div className="text-sm text-gray-600 mb-1">Tổng bài nộp</div>
+            <div className="text-sm text-gray-600 mb-1">Học sinh đã nộp</div>
             <div className="text-3xl font-bold text-blue-600">
-              {sessions.reduce((sum, s) => sum + s.total_submissions, 0)}
+              {sessions.reduce((sum, s) => sum + s.unique_submitters, 0)}
             </div>
           </div>
         </div>
@@ -408,21 +412,12 @@ export default function TeacherSessionsPage() {
                   <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                     <div className="flex items-center gap-6">
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="text-2xl">📊</span>
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {session.total_submissions}
-                          </div>
-                          <div className="text-xs text-gray-500">bài nộp</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
                         <span className="text-2xl">👥</span>
                         <div>
                           <div className="font-semibold text-gray-900">
                             {session.unique_submitters}
                           </div>
-                          <div className="text-xs text-gray-500">học sinh</div>
+                          <div className="text-xs text-gray-500">học sinh đã nộp</div>
                         </div>
                       </div>
                     </div>
@@ -580,32 +575,6 @@ export default function TeacherSessionsPage() {
                 </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Giới hạn số lần nộp bài (tùy chọn)
-                </label>
-                <input
-                  type="number"
-                  value={newSession.max_submissions || ""}
-                  onChange={(e) =>
-                    setNewSession({
-                      ...newSession,
-                      max_submissions: e.target.value
-                        ? parseInt(e.target.value)
-                        : null,
-                    })
-                  }
-                  min={1}
-                  max={100}
-                  placeholder="Không giới hạn"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  🔢 Để trống = không giới hạn. Ví dụ: 3 = mỗi học sinh chỉ được
-                  nộp tối đa 3 lần
-                </p>
-              </div>
-
               <div className="flex gap-3 pt-4 border-t">
                 <button
                   type="submit"
@@ -623,7 +592,6 @@ export default function TeacherSessionsPage() {
                       title: "",
                       description: "",
                       duration_minutes: 60,
-                      max_submissions: null,
                     });
                   }}
                   className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition"

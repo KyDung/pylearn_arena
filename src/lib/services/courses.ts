@@ -11,6 +11,7 @@ export interface Course {
   description: string;
   difficulty: string;
   is_published: boolean;
+  order_num: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -55,10 +56,18 @@ export const CourseService = {
    * Lấy tất cả courses (bao gồm chưa published)
    */
   async getAllCourses(): Promise<Course[]> {
-    const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT * FROM courses ORDER BY created_at ASC`,
-    );
-    return rows as Course[];
+    try {
+      const [rows] = await pool.query<RowDataPacket[]>(
+        `SELECT * FROM courses ORDER BY order_num ASC, created_at ASC`,
+      );
+      return rows as Course[];
+    } catch {
+      // Fallback nếu cột order_num chưa tồn tại (migration chưa chạy)
+      const [rows] = await pool.query<RowDataPacket[]>(
+        `SELECT * FROM courses ORDER BY created_at ASC`,
+      );
+      return rows as Course[];
+    }
   },
 
   /**
@@ -71,6 +80,7 @@ export const CourseService = {
       description?: string;
       difficulty?: string;
       is_published?: boolean;
+      order_num?: number;
     },
   ): Promise<Course | null> {
     const fields: string[] = [];
@@ -91,6 +101,10 @@ export const CourseService = {
     if (data.is_published !== undefined) {
       fields.push("is_published = ?");
       values.push(data.is_published);
+    }
+    if (data.order_num !== undefined) {
+      fields.push("order_num = ?");
+      values.push(data.order_num as any);
     }
 
     if (fields.length === 0) return null;
@@ -402,11 +416,12 @@ export const CourseService = {
     description?: string;
     order_num: number;
     path?: string;
+    game_type?: string;
   }): Promise<{ success: boolean; gameId?: string; error?: string }> {
     try {
       const [result] = await pool.query<any>(
-        `INSERT INTO games (lesson_id, slug, title, description, order_num, path)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO games (lesson_id, slug, title, description, order_num, path, game_type)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           data.lesson_id,
           data.slug,
@@ -414,6 +429,7 @@ export const CourseService = {
           data.description || "",
           data.order_num,
           data.path || null,
+          data.game_type || "type1",
         ],
       );
       return { success: true, gameId: result.insertId.toString() };

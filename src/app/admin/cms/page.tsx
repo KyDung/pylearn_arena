@@ -11,6 +11,7 @@ interface Course {
   description: string;
   difficulty: string;
   is_published: boolean;
+  order_num: number;
 }
 
 interface Topic {
@@ -19,7 +20,7 @@ interface Topic {
   slug: string;
   title: string;
   description: string;
-  sort_order: number;
+  order_num: number;
 }
 
 interface Lesson {
@@ -29,7 +30,7 @@ interface Lesson {
   slug: string;
   title: string;
   description: string;
-  sort_order: number;
+  order_num: number;
 }
 
 interface Game {
@@ -40,7 +41,7 @@ interface Game {
   description: string;
   game_type: string;
   path: string;
-  sort_order: number;
+  order_num: number;
 }
 
 export default function AdminCMSPage() {
@@ -53,8 +54,8 @@ export default function AdminCMSPage() {
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reordering, setReordering] = useState(false);
 
-  // Editing states
   const [editMode, setEditMode] = useState<{
     type: "course" | "topic" | "lesson" | "game" | null;
     item: any;
@@ -73,10 +74,13 @@ export default function AdminCMSPage() {
   const loadCourses = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/courses");
+      const res = await fetch("/api/admin/courses");
       if (res.ok) {
         const data = await res.json();
-        setCourses(data.courses || []);
+        const list = (data.data || data.courses || []).sort(
+          (a: Course, b: Course) => (a.order_num ?? 0) - (b.order_num ?? 0),
+        );
+        setCourses(list);
       }
     } catch (err) {
       console.error(err);
@@ -90,7 +94,10 @@ export default function AdminCMSPage() {
       const res = await fetch(`/api/courses/${courseSlug}/topics`);
       if (res.ok) {
         const data = await res.json();
-        setTopics(data.topics || []);
+        const list = (data.topics || []).sort(
+          (a: Topic, b: Topic) => (a.order_num ?? 0) - (b.order_num ?? 0),
+        );
+        setTopics(list);
       }
     } catch (err) {
       console.error(err);
@@ -104,7 +111,10 @@ export default function AdminCMSPage() {
       );
       if (res.ok) {
         const data = await res.json();
-        setLessons(data.lessons || []);
+        const list = (data.lessons || []).sort(
+          (a: Lesson, b: Lesson) => (a.order_num ?? 0) - (b.order_num ?? 0),
+        );
+        setLessons(list);
       }
     } catch (err) {
       console.error(err);
@@ -118,7 +128,10 @@ export default function AdminCMSPage() {
       );
       if (res.ok) {
         const data = await res.json();
-        setGames(data.games || data.data || []);
+        const list = (data.games || data.data || []).sort(
+          (a: Game, b: Game) => (a.order_num ?? 0) - (b.order_num ?? 0),
+        );
+        setGames(list);
       }
     } catch (err) {
       console.error(err);
@@ -153,6 +166,57 @@ export default function AdminCMSPage() {
     }
   };
 
+  // ============================================================
+  // Reorder: đổi vị trí trong array rồi bulk renumber 1,2,3...
+  // Cách này đúng kể cả khi nhiều items có cùng order_num
+  // ============================================================
+  const moveItem = async (
+    type: "course" | "topic" | "lesson" | "game",
+    items: any[],
+    index: number,
+    direction: "up" | "down",
+  ) => {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= items.length) return;
+
+    // Đổi vị trí trong array
+    const newItems = [...items];
+    [newItems[index], newItems[targetIndex]] = [newItems[targetIndex], newItems[index]];
+
+    // Gán order_num tuần tự theo vị trí mới
+    const reordered = newItems.map((item, i) => ({ ...item, order_num: i + 1 }));
+
+    // Optimistic update ngay để UI phản hồi tức thì
+    if (type === "course") setCourses(reordered);
+    else if (type === "topic") setTopics(reordered);
+    else if (type === "lesson") setLessons(reordered);
+    else if (type === "game") setGames(reordered);
+
+    setReordering(true);
+    try {
+      const res = await fetch("/api/admin/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          items: reordered.map((item) => ({ id: item.id })),
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert("Lỗi: " + (err.error || "Không thể đổi vị trí"));
+        // Rollback
+        if (type === "course") setCourses(items);
+        else if (type === "topic") setTopics(items);
+        else if (type === "lesson") setLessons(items);
+        else if (type === "game") setGames(items);
+      }
+    } finally {
+      setReordering(false);
+    }
+  };
+
   const startEdit = (
     type: "course" | "topic" | "lesson" | "game",
     item: any,
@@ -181,18 +245,11 @@ export default function AdminCMSPage() {
 
       alert("Cập nhật thành công!");
 
-      // Reload data
       if (editMode.type === "course") {
         await loadCourses();
-        const updated = courses.find((c) => c.id === editMode.item.id);
-        if (updated) setSelectedCourse(updated);
       } else if (editMode.type === "topic" && selectedCourse) {
         await loadTopics(selectedCourse.slug);
-      } else if (
-        editMode.type === "lesson" &&
-        selectedCourse &&
-        selectedTopic
-      ) {
+      } else if (editMode.type === "lesson" && selectedCourse && selectedTopic) {
         await loadLessons(selectedCourse.slug, selectedTopic.id);
       } else if (editMode.type === "game" && selectedCourse && selectedLesson) {
         await loadGames(selectedCourse.slug, selectedLesson.id);
@@ -215,9 +272,46 @@ export default function AdminCMSPage() {
     );
   }
 
+  // ============================================================
+  // Reorder controls component (up/down arrows + order badge)
+  // ============================================================
+  const ReorderButtons = ({
+    type,
+    items,
+    index,
+  }: {
+    type: "course" | "topic" | "lesson" | "game";
+    items: any[];
+    index: number;
+  }) => (
+    <div className="flex flex-col gap-0.5">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          moveItem(type, items, index, "up");
+        }}
+        disabled={index === 0 || reordering}
+        title="Lên trên"
+        className="w-6 h-6 flex items-center justify-center rounded text-xs font-bold disabled:opacity-25 disabled:cursor-not-allowed bg-gray-200 hover:bg-gray-300 transition-colors"
+      >
+        ▲
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          moveItem(type, items, index, "down");
+        }}
+        disabled={index === items.length - 1 || reordering}
+        title="Xuống dưới"
+        className="w-6 h-6 flex items-center justify-center rounded text-xs font-bold disabled:opacity-25 disabled:cursor-not-allowed bg-gray-200 hover:bg-gray-300 transition-colors"
+      >
+        ▼
+      </button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-pink-50">
-      {/* Modern Gradient Header */}
       <header className="bg-gradient-to-r from-purple-600 via-violet-600 to-pink-600 text-white shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
@@ -227,7 +321,7 @@ export default function AdminCMSPage() {
                 Quản lý Nội dung & Game
               </h1>
               <p className="text-purple-100 text-lg">
-                Chỉnh sửa metadata và nội dung game, bài học
+                Chỉnh sửa metadata, nội dung game và thứ tự hiển thị
               </p>
             </div>
             <button
@@ -241,6 +335,14 @@ export default function AdminCMSPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Hint banner */}
+        <div className="mb-5 p-4 bg-blue-50 border border-blue-200 rounded-xl text-blue-800 text-sm flex items-center gap-3">
+          <span className="text-2xl">💡</span>
+          <span>
+            Dùng nút <strong>▲ ▼</strong> trên mỗi mục để thay đổi thứ tự hiển thị. Số nhỏ hơn sẽ hiển thị trước.
+          </span>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Column 1: Courses */}
           <div className="bg-white rounded-2xl shadow-xl p-6 border border-blue-100">
@@ -251,26 +353,36 @@ export default function AdminCMSPage() {
                 {courses.length}
               </span>
             </h2>
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-              {courses.map((course) => (
+            <div className="space-y-3 max-h-[560px] overflow-y-auto pr-1">
+              {courses.map((course, idx) => (
                 <div
                   key={course.id}
-                  className={`p-4 rounded-xl cursor-pointer transition-all duration-300 group ${
+                  className={`p-3 rounded-xl cursor-pointer transition-all duration-300 group ${
                     selectedCourse?.id === course.id
                       ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-500 shadow-lg"
                       : "bg-gray-50 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 border-2 border-transparent hover:border-blue-200 hover:shadow-md"
                   }`}
                   onClick={() => handleSelectCourse(course)}
                 >
-                  <div className="font-bold text-lg text-gray-900 group-hover:text-blue-700 transition-colors mb-3">
-                    {course.title}
+                  <div className="flex items-start gap-2 mb-2">
+                    <ReorderButtons type="course" items={courses} index={idx} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-xs font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
+                          #{course.order_num ?? idx + 1}
+                        </span>
+                        <span className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors truncate text-sm">
+                          {course.title}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       startEdit("course", course);
                     }}
-                    className="text-sm px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg hover:from-yellow-600 hover:to-orange-700 transition-all font-medium shadow-md hover:shadow-lg hover:scale-105 transform"
+                    className="text-xs px-3 py-1.5 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg hover:from-yellow-600 hover:to-orange-700 transition-all font-medium shadow-md hover:scale-105 transform"
                   >
                     ✏️ Sửa
                   </button>
@@ -302,31 +414,36 @@ export default function AdminCMSPage() {
                 <p>Chọn khóa học</p>
               </div>
             ) : (
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+              <div className="space-y-3 max-h-[560px] overflow-y-auto pr-1">
                 {topics.map((topic, idx) => (
                   <div
                     key={topic.id}
-                    className={`p-4 rounded-xl cursor-pointer transition-all duration-300 group ${
+                    className={`p-3 rounded-xl cursor-pointer transition-all duration-300 group ${
                       selectedTopic?.id === topic.id
                         ? "bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-500 shadow-lg"
                         : "bg-gray-50 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 border-2 border-transparent hover:border-green-200 hover:shadow-md"
                     }`}
                     onClick={() => handleSelectTopic(topic)}
                   >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="bg-green-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">
-                        #{idx + 1}
-                      </span>
-                      <span className="font-bold text-lg text-gray-900 group-hover:text-green-700 transition-colors">
-                        {topic.title}
-                      </span>
+                    <div className="flex items-start gap-2 mb-2">
+                      <ReorderButtons type="topic" items={topics} index={idx} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-xs font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
+                            #{topic.order_num}
+                          </span>
+                          <span className="font-bold text-gray-900 group-hover:text-green-700 transition-colors truncate text-sm">
+                            {topic.title}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         startEdit("topic", topic);
                       }}
-                      className="text-sm px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg hover:from-yellow-600 hover:to-orange-700 transition-all font-medium shadow-md hover:shadow-lg hover:scale-105 transform"
+                      className="text-xs px-3 py-1.5 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg hover:from-yellow-600 hover:to-orange-700 transition-all font-medium shadow-md hover:scale-105 transform"
                     >
                       ✏️ Sửa
                     </button>
@@ -359,31 +476,36 @@ export default function AdminCMSPage() {
                 <p>Chọn chương</p>
               </div>
             ) : (
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+              <div className="space-y-3 max-h-[560px] overflow-y-auto pr-1">
                 {lessons.map((lesson, idx) => (
                   <div
                     key={lesson.id}
-                    className={`p-4 rounded-xl cursor-pointer transition-all duration-300 group ${
+                    className={`p-3 rounded-xl cursor-pointer transition-all duration-300 group ${
                       selectedLesson?.id === lesson.id
                         ? "bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-500 shadow-lg"
                         : "bg-gray-50 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 border-2 border-transparent hover:border-purple-200 hover:shadow-md"
                     }`}
                     onClick={() => handleSelectLesson(lesson)}
                   >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="bg-purple-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">
-                        #{idx + 1}
-                      </span>
-                      <span className="font-bold text-lg text-gray-900 group-hover:text-purple-700 transition-colors">
-                        {lesson.title}
-                      </span>
+                    <div className="flex items-start gap-2 mb-2">
+                      <ReorderButtons type="lesson" items={lessons} index={idx} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-xs font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                            #{lesson.order_num}
+                          </span>
+                          <span className="font-bold text-gray-900 group-hover:text-purple-700 transition-colors truncate text-sm">
+                            {lesson.title}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         startEdit("lesson", lesson);
                       }}
-                      className="text-sm px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg hover:from-yellow-600 hover:to-orange-700 transition-all font-medium shadow-md hover:shadow-lg hover:scale-105 transform"
+                      className="text-xs px-3 py-1.5 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg hover:from-yellow-600 hover:to-orange-700 transition-all font-medium shadow-md hover:scale-105 transform"
                     >
                       ✏️ Sửa
                     </button>
@@ -416,43 +538,46 @@ export default function AdminCMSPage() {
                 <p>Chọn bài học</p>
               </div>
             ) : (
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+              <div className="space-y-3 max-h-[560px] overflow-y-auto pr-1">
                 {games.map((game, idx) => (
                   <div
                     key={game.id}
-                    className="p-4 rounded-xl bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 hover:shadow-lg transition-all duration-300 group"
+                    className="p-3 rounded-xl bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 hover:shadow-lg transition-all duration-300 group"
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-pink-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">
-                        #{idx + 1}
-                      </span>
-                      <span className="font-bold text-lg text-gray-900 group-hover:text-pink-700 transition-colors">
-                        {game.title}
-                      </span>
+                    <div className="flex items-start gap-2 mb-2">
+                      <ReorderButtons type="game" items={games} index={idx} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-xs font-bold bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded">
+                            #{game.order_num}
+                          </span>
+                          <span className="font-bold text-gray-900 group-hover:text-pink-700 transition-colors truncate text-sm">
+                            {game.title}
+                          </span>
+                        </div>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">
+                          {game.game_type}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-medium inline-block mb-3">
-                      {game.game_type}
-                    </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1.5 mt-2">
                       <button
                         onClick={() => startEdit("game", game)}
-                        className="text-sm px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg hover:from-yellow-600 hover:to-orange-700 transition-all font-medium shadow-md hover:shadow-lg hover:scale-105 transform"
+                        className="text-xs px-3 py-1.5 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-lg hover:from-yellow-600 hover:to-orange-700 transition-all font-medium shadow-md hover:scale-105 transform"
                       >
                         ✏️ Sửa metadata
                       </button>
                       <button
                         onClick={() => {
                           if (!game.path) {
-                            alert(
-                              "Game không có path. Vui lòng kiểm tra dữ liệu trong database.",
-                            );
+                            alert("Game không có path. Vui lòng kiểm tra dữ liệu trong database.");
                             return;
                           }
                           router.push(
                             `/admin/cms/game-content/${encodeURIComponent(game.path)}`,
                           );
                         }}
-                        className="text-sm px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all font-medium shadow-md hover:shadow-lg hover:scale-105 transform"
+                        className="text-xs px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all font-medium shadow-md hover:scale-105 transform"
                       >
                         🎨 Sửa nội dung
                       </button>
@@ -470,11 +595,10 @@ export default function AdminCMSPage() {
           </div>
         </div>
 
-        {/* Modern Edit Modal */}
+        {/* Edit Modal */}
         {editMode.type && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-slideUp">
-              {/* Modal Header */}
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
               <div className="bg-gradient-to-r from-purple-600 via-violet-600 to-pink-600 px-6 py-5">
                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                   <span className="text-3xl">✏️</span>
@@ -489,7 +613,6 @@ export default function AdminCMSPage() {
                 </h2>
               </div>
 
-              {/* Modal Body */}
               <div className="p-6 space-y-5">
                 <div>
                   <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -499,10 +622,7 @@ export default function AdminCMSPage() {
                     type="text"
                     value={editFormData.title || ""}
                     onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        title: e.target.value,
-                      })
+                      setEditFormData({ ...editFormData, title: e.target.value })
                     }
                     className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
                     placeholder="Nhập tiêu đề..."
@@ -516,12 +636,9 @@ export default function AdminCMSPage() {
                   <textarea
                     value={editFormData.description || ""}
                     onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        description: e.target.value,
-                      })
+                      setEditFormData({ ...editFormData, description: e.target.value })
                     }
-                    rows={5}
+                    rows={4}
                     className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 resize-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
                     placeholder="Nhập mô tả..."
                   />
@@ -535,10 +652,7 @@ export default function AdminCMSPage() {
                     <select
                       value={editFormData.difficulty || "beginner"}
                       onChange={(e) =>
-                        setEditFormData({
-                          ...editFormData,
-                          difficulty: e.target.value,
-                        })
+                        setEditFormData({ ...editFormData, difficulty: e.target.value })
                       }
                       className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
                     >
@@ -550,7 +664,6 @@ export default function AdminCMSPage() {
                 )}
               </div>
 
-              {/* Modal Footer */}
               <div className="flex gap-3 p-6 bg-gray-50 border-t border-gray-200">
                 <button
                   onClick={cancelEdit}

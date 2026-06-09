@@ -329,7 +329,7 @@ export default function initGame(
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>Scene ${index + 1}</td>
-        <td class="input">${result.input.replace(/\n/g, "\\n")}</td>
+        <td class="input">${result.input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>
         <td class="input">${result.expected}</td>
         <td class="output">${result.actual}</td>
         <td class="${result.passed ? "pass" : "fail"}">${result.passed ? "✓ Pass" : "✗ Fail"}</td>
@@ -503,35 +503,34 @@ export default function initGame(
     const testCase = GAME_CONFIG.testCases[sceneIndex];
 
     try {
-      // Setup stdin for input
-      const inputLines = testCase.input.split("\n");
-      let inputIndex = 0;
+      const inputLines = testCase.input ? testCase.input.split("\n") : [];
 
-      pyodide.setStdin({
-        stdin: () => {
-          if (inputIndex < inputLines.length) {
-            return inputLines[inputIndex++];
-          }
-          return "";
-        },
-      });
+      pyodide.runPython(`
+import sys
+from io import StringIO
+_input_lines = ${JSON.stringify(inputLines)}
+_input_idx = [0]
+def input(prompt=""):
+    idx = _input_idx[0]
+    _input_idx[0] += 1
+    return _input_lines[idx] if idx < len(_input_lines) else ""
+_captured_output = StringIO()
+sys.stdout = _captured_output
+`);
 
-      // Capture stdout
-      let capturedOutput = "";
-      pyodide.setStdout({
-        batched: (text: string) => {
-          capturedOutput += text;
-        },
-      });
-
-      // Run student code
       if (!codeEditor) return;
       const code = codeEditor.getCode();
       withPyodideTimeout(pyodide, () => {
         pyodide.runPython(code);
       });
 
-      // Compare output
+      const capturedOutput = pyodide.runPython(`_captured_output.getvalue()`);
+
+      pyodide.runPython(`
+sys.stdout = sys.__stdout__
+del input
+`);
+
       const actualOutput = capturedOutput.trim();
       const expectedOutput = testCase.expected.trim();
       const passed = actualOutput === expectedOutput;
@@ -550,9 +549,14 @@ export default function initGame(
       logLine(
         `Scene ${sceneIndex + 1}: ${passed ? "✓ Pass" : "✗ Fail"} - ${testCase.description}`,
       );
+      if (actualOutput) {
+        actualOutput.split("\n").filter(Boolean).forEach((line) =>
+          logLine(`  📤 Log: ${line}`),
+        );
+      }
       if (!passed) {
-        logLine(`  Expected: ${expectedOutput}`);
-        logLine(`  Got: ${actualOutput}`);
+        logLine(`  Expected: "${expectedOutput}"`);
+        logLine(`  Got:      "${actualOutput || "(no output)"}"`);
       }
     } catch (error) {
       testResults[sceneIndex] = {

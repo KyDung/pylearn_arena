@@ -55,64 +55,31 @@ export const POST = withAuth(
         return errorResponse("You are not a member of this class", 403);
       }
 
-      // Check if user already submitted - if yes, update, if no, insert
+      // Check if user already submitted - one submission per student per session
       const [existingRows]: any = await pool.query(
-        "SELECT id, attempt_number FROM session_submissions WHERE session_id = ? AND user_id = ?",
+        "SELECT id FROM session_submissions WHERE session_id = ? AND user_id = ?",
         [sessionId, user.id],
       );
 
-      // Check max_submissions limit
-      if (
-        typeof session.max_submissions === "number" &&
-        session.max_submissions > 0
-      ) {
-        const currentAttempts =
-          existingRows.length > 0 ? existingRows[0].attempt_number : 0;
-        if (currentAttempts >= session.max_submissions) {
-          return errorResponse(
-            `You have reached the maximum number of submissions (${session.max_submissions})`,
-            403,
-          );
-        }
-      }
-
-      let submissionId: number;
-
       if (existingRows.length > 0) {
-        // Update existing submission
-        await pool.query(
-          `UPDATE session_submissions 
-           SET code = ?, score = ?, passed_tests = ?, total_tests = ?, 
-               is_correct = ?, submitted_at = CURRENT_TIMESTAMP, attempt_number = attempt_number + 1
-           WHERE session_id = ? AND user_id = ?`,
-          [
-            code,
-            score || 0,
-            passed_tests,
-            total_tests,
-            passed_tests === total_tests,
-            sessionId,
-            user.id,
-          ],
-        );
-        submissionId = existingRows[0].id;
-      } else {
-        // Insert new submission
-        const [result] = await pool.query<ResultSetHeader>(
-          `INSERT INTO session_submissions (session_id, user_id, code, score, passed_tests, total_tests, is_correct, submitted_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-          [
-            sessionId,
-            user.id,
-            code,
-            score || 0,
-            passed_tests,
-            total_tests,
-            passed_tests === total_tests,
-          ],
-        );
-        submissionId = result.insertId;
+        return errorResponse("Bạn đã nộp bài cho session này rồi", 403);
       }
+
+      // Insert new submission
+      const [result] = await pool.query<ResultSetHeader>(
+        `INSERT INTO session_submissions (session_id, user_id, code, score, passed_tests, total_tests, is_correct, submitted_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+        [
+          sessionId,
+          user.id,
+          code,
+          score || 0,
+          passed_tests,
+          total_tests,
+          passed_tests === total_tests,
+        ],
+      );
+      const submissionId = result.insertId;
 
       // Update session stats
       await SessionService.updateSessionStats(sessionId);

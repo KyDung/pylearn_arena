@@ -53,10 +53,11 @@ export default function CourseAccessManagementPage() {
       );
       if (res.ok) {
         const data = await res.json();
-        setTopics(data.topics || []);
-        setLessons(data.lessons || []);
-        if (data.topics?.length > 0 && !selectedTopic) {
-          setSelectedTopic(data.topics[0].id);
+        const payload = data.data ?? data;
+        setTopics(payload.topics || []);
+        setLessons(payload.lessons || []);
+        if (payload.topics?.length > 0 && !selectedTopic) {
+          setSelectedTopic(payload.topics[0].id);
         }
       }
     } catch (err) {

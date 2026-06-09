@@ -729,6 +729,14 @@ export default function TeacherClassesPage() {
                             </Link>
                           </div>
                           <div className="flex gap-2">
+                            <Link
+                              href={`/teacher/class/${cls.id}/courses`}
+                              className="flex-1 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition font-medium text-sm text-center"
+                            >
+                              📚 Mở bài học
+                            </Link>
+                          </div>
+                          <div className="flex gap-2">
                             <button
                               onClick={() => handleEditClass(cls)}
                               className="flex-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition text-xs font-medium"

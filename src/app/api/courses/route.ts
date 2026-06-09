@@ -4,8 +4,12 @@ import { getCurrentUser } from "@/lib/apiAuth";
 
 export async function GET(request: NextRequest) {
   try {
-    // Luôn trả về tất cả khóa học published - phân quyền sẽ xử lý ở các trang chi tiết
-    const courses = await CourseService.getPublishedCourses();
+    const user = await getCurrentUser(request);
+    // Admins see all courses (including unpublished); others only see published
+    const courses =
+      user?.role === "admin"
+        ? await CourseService.getAllCourses()
+        : await CourseService.getPublishedCourses();
 
     return NextResponse.json({
       success: true,

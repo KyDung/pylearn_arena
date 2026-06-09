@@ -50,14 +50,14 @@ export default function ClassCoursesPage() {
       const coursesRes = await fetch(`/api/classes/${classId}/courses`);
       if (coursesRes.ok) {
         const data = await coursesRes.json();
-        setClassCourses(data);
+        setClassCourses(data.data ?? []);
       }
 
       // Load all courses
       const allRes = await fetch("/api/courses");
       if (allRes.ok) {
         const data = await allRes.json();
-        setAllCourses(data);
+        setAllCourses(data.courses ?? []);
       }
     } catch (err) {
       console.error(err);
