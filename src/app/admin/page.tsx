@@ -14,6 +14,8 @@ interface UserStats {
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const showLocalContentTools =
+    process.env.NEXT_PUBLIC_LOCAL_CONTENT_TOOLS === "true";
   const [users, setUsers] = useState<PaginatedResponse<User> | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -218,6 +220,7 @@ export default function AdminDashboard() {
               </button>
               <button
                 onClick={() => router.push("/dev/content-manager")}
+                style={{ display: showLocalContentTools ? undefined : "none" }}
                 className="px-3 py-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all duration-300 text-white text-sm font-medium border border-white/30"
               >
                 📦 Nội dung
@@ -438,6 +441,7 @@ export default function AdminDashboard() {
             {/* CMS - Content Management */}
             <button
               onClick={() => router.push("/admin/cms")}
+              style={{ display: showLocalContentTools ? undefined : "none" }}
               className="group bg-gradient-to-br from-purple-50 to-violet-50 hover:from-purple-100 hover:to-violet-100 rounded-xl p-6 text-left shadow-md hover:shadow-xl transition-all duration-300 border border-purple-200 hover:border-violet-300 hover:scale-105 transform"
             >
               <div className="flex items-start justify-between mb-3">
@@ -531,6 +535,7 @@ export default function AdminDashboard() {
             {/* Dev Tools */}
             <button
               onClick={() => router.push("/dev/content-manager")}
+              style={{ display: showLocalContentTools ? undefined : "none" }}
               className="group bg-gradient-to-br from-cyan-50 to-teal-50 hover:from-cyan-100 hover:to-teal-100 rounded-xl p-6 text-left shadow-md hover:shadow-xl transition-all duration-300 border border-cyan-200 hover:border-teal-300 hover:scale-105 transform"
             >
               <div className="flex items-start justify-between mb-3">

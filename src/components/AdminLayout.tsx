@@ -19,6 +19,8 @@ export default function AdminLayout({
   actions,
 }: AdminLayoutProps) {
   const router = useRouter();
+  const showLocalContentTools =
+    process.env.NEXT_PUBLIC_LOCAL_CONTENT_TOOLS === "true";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -67,6 +69,7 @@ export default function AdminLayout({
                 </button>
                 <button
                   onClick={() => router.push("/dev/content-manager")}
+                  style={{ display: showLocalContentTools ? undefined : "none" }}
                   className="px-3 py-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-all duration-300 text-white text-sm font-medium border border-white/30"
                   title="Quản lý nội dung"
                 >

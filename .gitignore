@@ -47,3 +47,5 @@ nul
 # dev-only pages (not for production)
 src/app/dev/**
 src/app/api/dev/**
+src/app/admin/cms/**
+src/app/api/admin/game-content/**
