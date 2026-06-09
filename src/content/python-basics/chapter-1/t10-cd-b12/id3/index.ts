@@ -523,8 +523,9 @@ export default function initGame(
 
       // Tìm vị trí sai và loại sai nếu failed
       if (!passed) {
-        const actualLength = this.playerActions.length;
-        const expectedLength = this.expectedActions.length;
+        const actualLength = (testResults[this.sceneIndex]?.actual || "").trim()
+          .length;
+        const expectedLength = (testCase.expected || "").trim().length;
         failMode =
           actualLength > expectedLength
             ? "fall"
