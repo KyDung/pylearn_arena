@@ -514,6 +514,11 @@ export default function initGame(
       let playerFailed = false;
       let failPosition = -1;
       let failMode = "";
+      const getRandomFailPosition = (total: number) => {
+        if (total <= 1) return 0;
+        const minIndex = Math.max(1, Math.floor(total * 0.45));
+        return Phaser.Math.Between(minIndex, total - 1);
+      };
       let failType = ""; // "vatcan" hoặc "duongdi" - để biết loại lỗi
 
       // Tìm vị trí sai và loại sai nếu failed
@@ -538,6 +543,8 @@ export default function initGame(
           failPosition = Math.max(0, inputObstacles.length - 1);
           failType = inputObstacles[failPosition];
         }
+        failPosition = getRandomFailPosition(inputObstacles.length);
+        failType = inputObstacles[failPosition];
 
         console.log(
           `Fail at position ${failPosition}, type: ${failType}, mode: ${failMode}`,
