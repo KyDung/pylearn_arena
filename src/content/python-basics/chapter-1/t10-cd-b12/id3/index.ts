@@ -337,6 +337,16 @@ export default function initGame(
     output.textContent = "";
   };
 
+  const playFeedbackSound = (sound: Phaser.Sound.BaseSound | null) => {
+    try {
+      if (!sound) return;
+      if (sound.isPlaying) sound.stop();
+      sound.play();
+    } catch (error) {
+      console.warn("Could not play feedback sound:", error);
+    }
+  };
+
   const updateSceneProgress = () => {
     sceneProgress.textContent = `Scene ${currentScene + 1}/${GAME_CONFIG.testCases.length}`;
   };
@@ -467,7 +477,7 @@ export default function initGame(
 
       // Get actual output từ testResults
       const actualOutput = testResults[this.sceneIndex]?.actual || "";
-      this.playerActions = actualOutput.split("-");
+      this.playerActions = actualOutput ? actualOutput.split("-") : [];
 
       // Clear waiting text
       this.children.list.forEach((child) => {
@@ -503,10 +513,20 @@ export default function initGame(
       let currentIndex = 0;
       let playerFailed = false;
       let failPosition = -1;
+      let failMode = "";
       let failType = ""; // "vatcan" hoặc "duongdi" - để biết loại lỗi
 
       // Tìm vị trí sai và loại sai nếu failed
       if (!passed) {
+        const actualLength = this.playerActions.length;
+        const expectedLength = this.expectedActions.length;
+        failMode =
+          actualLength > expectedLength
+            ? "fall"
+            : actualLength === expectedLength
+              ? "crash"
+              : "fall";
+
         for (let i = 0; i < this.expectedActions.length; i++) {
           if (this.playerActions[i] !== this.expectedActions[i]) {
             failPosition = i;
@@ -514,7 +534,14 @@ export default function initGame(
             break;
           }
         }
-        console.log(`Fail at position ${failPosition}, type: ${failType}`);
+        if (failPosition === -1) {
+          failPosition = Math.max(0, inputObstacles.length - 1);
+          failType = inputObstacles[failPosition];
+        }
+
+        console.log(
+          `Fail at position ${failPosition}, type: ${failType}, mode: ${failMode}`,
+        );
       }
 
       // Player position lưu lại để biết vị trí gốc
@@ -542,13 +569,17 @@ export default function initGame(
         // Chỉ spawn vật cản nếu là "vatcan"
         let playerObstacle: Phaser.GameObjects.Image | null = null;
         let botObstacle: Phaser.GameObjects.Image | null = null;
+        const shouldForceCrashRock =
+          !passed && failMode === "crash" && elementIndex === failPosition;
 
-        if (element === "vatcan") {
+        if (element === "vatcan" || shouldForceCrashRock) {
           // Vật cản - rock2 sprite
           playerObstacle = this.add.image(obstacleX, playerOriginalY, "rock");
           playerObstacle.setScale(0.7);
-          botObstacle = this.add.image(obstacleX, botOriginalY, "rock");
-          botObstacle.setScale(0.7);
+          if (element === "vatcan") {
+            botObstacle = this.add.image(obstacleX, botOriginalY, "rock");
+            botObstacle.setScale(0.7);
+          }
         }
 
         // Tạo marker để track vị trí (invisible)
@@ -565,10 +596,7 @@ export default function initGame(
         let botHasDodged = false;
 
         // Di chuyển marker (và obstacles nếu có)
-        const targets =
-          playerObstacle && botObstacle
-            ? [marker, playerObstacle, botObstacle]
-            : [marker];
+        const targets = [marker, playerObstacle, botObstacle].filter(Boolean);
 
         if (!this.tweens) return; // Safety check
 
@@ -610,7 +638,7 @@ export default function initGame(
                 // Player sai tại vị trí này
                 playerFailed = true;
 
-                if (failType === "vatcan" && playerObstacle) {
+                if (failMode === "crash" && playerObstacle) {
                   // Sai tại vật cản → bị đẩy đi theo vật cản
                   this.playerHitByObstacle(playerObstacle);
                 } else {
@@ -1049,6 +1077,7 @@ del input
       const actualOutput = capturedOutput.trim();
       const expectedOutput = (testCase.expected || "").trim();
       const passed = actualOutput === expectedOutput;
+      playFeedbackSound(passed ? correctSound : wrongSound);
 
       testResults[sceneIndex] = {
         input: testCase.input || "",
@@ -1074,6 +1103,7 @@ del input
         logLine(`  Got:      "${actualOutput || "(no output)"}"`);
       }
     } catch (error) {
+      playFeedbackSound(wrongSound);
       testResults[sceneIndex] = {
         input: testCase.input || "",
         expected: testCase.expected || "",
