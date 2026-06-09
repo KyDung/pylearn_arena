@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { getUser, login } from "@/lib/auth";
 
 function LoginContent() {
@@ -11,7 +10,7 @@ function LoginContent() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState(
-    "Tài khoản demo: admin/123456 hoặc testuser/123456",
+    "Vui lòng đăng nhập bằng tài khoản được cấp.",
   );
   const [statusType, setStatusType] = useState<"info" | "error" | "success">(
     "info",
@@ -107,7 +106,7 @@ function LoginContent() {
           <div className="mb-8">
             <h2 className="text-4xl font-bold mb-4">Đăng nhập</h2>
             <p className="text-gray-700">
-              Hiện tại là tài khoản mock. Xác thực thật sẽ có sau.
+              Nhập thông tin tài khoản để tiếp tục học qua game.
             </p>
           </div>
 
@@ -123,7 +122,7 @@ function LoginContent() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="testuser"
+                placeholder="Tên đăng nhập"
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff7a50]"
               />
@@ -134,7 +133,7 @@ function LoginContent() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="123456"
+                placeholder="Mật khẩu"
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff7a50]"
               />

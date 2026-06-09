@@ -107,17 +107,9 @@ public/
 ✅ Sound Effects
 ✅ Game Template System - dễ dàng tạo game mới
 
-## 🔐 Demo Accounts
+## 🔐 Accounts
 
-**Admin:**
-
-- Username: `admin`
-- Password: `123456`
-
-**Student:**
-
-- Username: `testuser`
-- Password: `123456`
+Tài khoản được quản lý trong database. Không commit thông tin đăng nhập thật vào repository.
 
 ## 📚 Thêm Khóa Học & Bài Học Mới
 
