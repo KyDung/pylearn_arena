@@ -525,7 +525,7 @@ export default function initGame(
       if (!passed) {
         const actualLength = (testResults[this.sceneIndex]?.actual || "").trim()
           .length;
-        const expectedLength = (testCase.expected || "").trim().length;
+        const expectedLength = this.expectedActions.join("-").trim().length;
         failMode =
           actualLength > expectedLength
             ? "fall"
