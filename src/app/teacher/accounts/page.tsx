@@ -59,6 +59,10 @@ export default function AccountsManagementPage() {
   const [bulkContent, setBulkContent] = useState("");
   const [bulkClassId, setBulkClassId] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [bulkAction, setBulkAction] = useState<
+    "addToClass" | "deleteSelected" | null
+  >(null);
+  const [bulkMessage, setBulkMessage] = useState("");
 
   useEffect(() => {
     const user = getUser();
@@ -379,8 +383,10 @@ export default function AccountsManagementPage() {
   };
 
   const handleAddToClass = async (classId: number) => {
-    if (selectedUsers.length === 0) return;
+    if (selectedUsers.length === 0 || bulkAction) return;
 
+    setBulkAction("addToClass");
+    setBulkMessage(`Đang thêm ${selectedUsers.length} tài khoản vào lớp...`);
     try {
       const res = await fetch(`/api/classes/${classId}/members`, {
         method: "POST",
@@ -389,14 +395,89 @@ export default function AccountsManagementPage() {
         body: JSON.stringify({ userIds: selectedUsers }),
       });
 
-      if (!res.ok) throw new Error("Lỗi thêm vào lớp");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Lỗi thêm vào lớp");
 
       setShowAddToClassModal(false);
       setSelectedUsers([]);
       await loadUsers();
-      alert("Đã thêm vào lớp thành công!");
+      const added = data.data?.added ?? selectedUsers.length;
+      const errors = data.data?.errors ?? 0;
+      alert(
+        `Đã thêm ${added} tài khoản vào lớp${errors ? `, ${errors} lỗi/bị trùng` : ""}.`,
+      );
     } catch (error: any) {
       alert(error.message);
+    } finally {
+      setBulkAction(null);
+      setBulkMessage("");
+    }
+  };
+
+  const handleDeleteSelectedUsers = async (permanent: boolean) => {
+    if (selectedUsers.length === 0 || bulkAction) return;
+
+    const selectedUserList = users.filter((user) =>
+      selectedUsers.includes(user.id),
+    );
+    const deleteCount = selectedUserList.length;
+
+    if (deleteCount === 0) return;
+
+    const confirmed = permanent
+      ? prompt(
+          `Bạn sắp XÓA VĨNH VIỄN ${deleteCount} tài khoản đã chọn.\n\nHành động này không thể hoàn tác.\n\nNhập "XOA" để xác nhận:`,
+        ) === "XOA"
+      : confirm(
+          `Bạn có chắc muốn xóa/vô hiệu hóa ${deleteCount} tài khoản đã chọn?`,
+        );
+
+    if (!confirmed) return;
+
+    setBulkAction("deleteSelected");
+
+    let deleted = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    try {
+      for (const [index, user] of selectedUserList.entries()) {
+        setBulkMessage(
+          `Đang xóa ${index + 1}/${deleteCount}: ${user.username}...`,
+        );
+
+        try {
+          const url = permanent
+            ? `/api/admin/users/${user.id}?permanent=true`
+            : `/api/admin/users/${user.id}`;
+          const res = await fetch(url, {
+            method: "DELETE",
+            credentials: "include",
+          });
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            failed++;
+            errors.push(`${user.username}: ${data.error || "Lỗi xóa tài khoản"}`);
+          } else {
+            deleted++;
+          }
+        } catch (error: any) {
+          failed++;
+          errors.push(`${user.username}: ${error.message || "Lỗi xóa tài khoản"}`);
+        }
+      }
+
+      setSelectedUsers([]);
+      await loadUsers();
+
+      alert(
+        `Đã xóa ${deleted} tài khoản${failed ? `, ${failed} lỗi` : ""}.` +
+          (errors.length ? `\n\n${errors.slice(0, 5).join("\n")}` : ""),
+      );
+    } finally {
+      setBulkAction(null);
+      setBulkMessage("");
     }
   };
 
@@ -434,6 +515,7 @@ export default function AccountsManagementPage() {
   };
 
   const toggleSelectUser = (userId: number) => {
+    if (bulkAction) return;
     setSelectedUsers((prev) =>
       prev.includes(userId)
         ? prev.filter((id) => id !== userId)
@@ -442,6 +524,7 @@ export default function AccountsManagementPage() {
   };
 
   const toggleSelectAll = () => {
+    if (bulkAction) return;
     if (selectedUsers.length === users.length) {
       setSelectedUsers([]);
     } else {
@@ -576,12 +659,30 @@ export default function AccountsManagementPage() {
 
             <div className="flex gap-2">
               {selectedUsers.length > 0 && (
-                <button
-                  onClick={() => setShowAddToClassModal(true)}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                >
-                  ➕ Thêm {selectedUsers.length} vào lớp
-                </button>
+                <>
+                  <button
+                    onClick={() => setShowAddToClassModal(true)}
+                    disabled={!!bulkAction}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {bulkAction === "addToClass"
+                      ? "Đang thêm..."
+                      : `➕ Thêm ${selectedUsers.length} vào lớp`}
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleDeleteSelectedUsers(currentUser?.role === "admin")
+                    }
+                    disabled={!!bulkAction}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {bulkAction === "deleteSelected"
+                      ? "Đang xóa..."
+                      : currentUser?.role === "admin"
+                        ? `🗑️ Xóa vĩnh viễn ${selectedUsers.length}`
+                        : `🗑️ Xóa ${selectedUsers.length}`}
+                  </button>
+                </>
               )}
               <button
                 onClick={() => setShowBulkImportModal(true)}
@@ -597,6 +698,11 @@ export default function AccountsManagementPage() {
               </button>
             </div>
           </div>
+          {bulkMessage && (
+            <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700">
+              {bulkMessage}
+            </div>
+          )}
         </div>
 
         {/* Users Table */}
@@ -613,7 +719,8 @@ export default function AccountsManagementPage() {
                         users.length > 0
                       }
                       onChange={toggleSelectAll}
-                      className="w-4 h-4"
+                      disabled={!!bulkAction}
+                      className="w-4 h-4 disabled:cursor-not-allowed"
                     />
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
@@ -659,7 +766,8 @@ export default function AccountsManagementPage() {
                           type="checkbox"
                           checked={selectedUsers.includes(user.id)}
                           onChange={() => toggleSelectUser(user.id)}
-                          className="w-4 h-4"
+                          disabled={!!bulkAction}
+                          className="w-4 h-4 disabled:cursor-not-allowed"
                         />
                       </td>
                       <td className="px-4 py-3">
@@ -1076,7 +1184,8 @@ hs03,123456`}
                   <button
                     key={cls.id}
                     onClick={() => handleAddToClass(cls.id)}
-                    className="w-full text-left px-4 py-3 border rounded-lg hover:bg-green-50 hover:border-green-500 transition"
+                    disabled={!!bulkAction}
+                    className="w-full text-left px-4 py-3 border rounded-lg hover:bg-green-50 hover:border-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className="font-medium">{cls.name}</div>
                     <div className="text-sm text-gray-500">
@@ -1085,9 +1194,15 @@ hs03,123456`}
                   </button>
                 ))}
               </div>
+              {bulkMessage && (
+                <div className="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                  {bulkMessage}
+                </div>
+              )}
               <button
                 onClick={() => setShowAddToClassModal(false)}
-                className="w-full mt-4 px-4 py-2 border rounded-lg hover:bg-gray-50"
+                disabled={!!bulkAction}
+                className="w-full mt-4 px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Hủy
               </button>

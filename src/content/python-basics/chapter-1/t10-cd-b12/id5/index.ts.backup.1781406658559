@@ -18,7 +18,7 @@ import { setupContestSubmission } from "@/lib/contestIntegration";
 // ============================================================
 // Format: "[course]/[topic]/[lesson]/[game-id]"
 // Ví dụ: "python-basics/chapter-1/t10-cd-b12/id1"
-const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
+const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id5";
 
 // ============================================================
 // CẤU HÌNH GAME TYPE 2 - CODERUNNER STYLE
@@ -26,19 +26,8 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
 
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
-  title: "Game 1: Kiểm tra xâu con",
-  description: `-- Cốt truyện("Có thể bỏ qua")
-Một cửa hàng kem đang mở sự kiện mua kem trúng thưởng, trên thân mỗi que kem sẽ ghi một đồ vật bất kì nều đồ vật này có trong danh sách các đồ vật trên vỏ của que kem thì người đó sẽ được nhận món quà đó nhưng ngặt nỗi các nhân vật trong game này chưa được lập trình chức năng kiểm tra chuỗi con vậy nên bạn hay viết một chương trình python giúp họ kiểm tra xem mình có trúng thưởng không nhé !!!
-
--- Yêu cầu
-Viết chương trình nhập vào hai dòng:
-Dòng 1: Một xâu s là danh sách các giải thưởng của cửa hàng kem.
-Dòng 2: Một xâu sub là dòng chữ in trên que kem của khách hàng.
-Hãy kiểm tra xem sub có xuất hiện trong s hay không.
-Nếu có, in ra:
-CÓ
-Nếu không có, in ra:
-KHÔNG`,
+  title: "Game 5: Mật mã Atbash",
+  description: `Mô tả game của bạn`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
@@ -46,64 +35,75 @@ KHÔNG`,
   // Ví dụ: input = "5\n10" → input() lần 1 = "5", input() lần 2 = "10"
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
   ioExamples: [
-    {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÚT CHÌ MÀU",
-      output: "CÓ",
-    },
-    {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nKEM DÂU",
-      output: "KHÔNG",
-    },
+    { input: "them sau", output: "them sau" }
   ],
 
   testCases: [
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nÁO KHOÁC",
-      expected: "CÓ",
+      input: "hoc lap trinh that vui\n3",
+      expected: "krf ods wulqk wkdw yxl",
       description: "Test case 1",
-      sceneText: "Vị khách đầu tiên",
+      sceneText: "Level 1",
     },
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nROBOT ĐỒ CHƠI",
-      expected: "KHÔNG",
+      input: "Hoc Python\n2",
+      expected: "Jqe Ravjqp",
       description: "Test case 2",
-      sceneText: "Vị khách thứ 2",
+      sceneText: "Level 2",
     },
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÌNH NƯỚC",
-      expected: "CÓ",
-      description: "Test  3",
-      sceneText: "Vị khách thứ 3",
+      input: "Truong THPT AAA\n6",
+      expected: "Zxautm ZNVZ GGG",
+      description: "Test case 3",
+      sceneText: "Level 3",
     },
+    {
+      input: "Phai lam sao de hoc gioi tin hoc ?\n9",
+      expected: "Yqjr ujv bjx mn qxl prxr crw qxl ?",
+      description: "Test case 4",
+      sceneText: "Level 4",
+    },
+    {
+      input: "Toi rat thich lap trinh bang python. I love python......\n12",
+      expected: "Fau dmf ftuot xmb fduzt nmzs bkftaz. U xahq bkftaz......",
+      description: "Test case 5",
+      sceneText: "Level 5",
+    },
+    {
+      input: "Bien so xe 29A - 123.45\n18",
+      expected: "Tawf kg pw 29S - 123.45",
+      description: "Test case 6",
+      sceneText: "Level 6",
+    },
+    {
+      input: "#userID24--@\n20",
+      expected: "#omylCX24--@",
+      description: "Test case 7",
+      sceneText: "Level 7",
+    },
+    {
+      input: "testuser27@gmail.com\n24",
+      expected: "rcqrsqcp27@ekygj.amk",
+      description: "Test case 8",
+      sceneText: "Level 8",
+    }
   ],
   // Code Python mẫu cho học sinh (sử dụng input() và print())
-  starterCode: ``,
+  starterCode: `# Đọc input
+a = int(input())
+b = int(input())
+
+# Xử lý và print kết quả
+result = a + b
+print(result)`,
 
   // Assets cho từng scene (optional)
   // Path format: /[course]/[topic]/[lesson]/[game]/scene1.png
   // Example: /python-basics/chapter-1/t10-cd-b12/id1/scene1.png
   sceneAssets: [
-    {
-      background: "/python-basics/chapter-1/t10-cd-b12/id1/cuahangkemrsz.png",
-      quekem: "/python-basics/chapter-1/t10-cd-b12/id1/quekemrmb.png",
-      vokem: "/python-basics/chapter-1/t10-cd-b12/id1/vokem.png",
-      passOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene1-pass.png",
-      failOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene1-fail.png",
-    },
-    {
-      background: "/python-basics/chapter-1/t10-cd-b12/id1/cuahangkemrsz.png",
-      quekem: "/python-basics/chapter-1/t10-cd-b12/id1/quekemrmb.png",
-      vokem: "/python-basics/chapter-1/t10-cd-b12/id1/vokem.png",
-      passOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene2-pass.png",
-      failOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene2-fail.png",
-    },
-    {
-      background: "/python-basics/chapter-1/t10-cd-b12/id1/cuahangkemrsz.png",
-      quekem: "/python-basics/chapter-1/t10-cd-b12/id1/quekemrmb.png",
-      vokem: "/python-basics/chapter-1/t10-cd-b12/id1/vokem.png",
-      passOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene3-pass.png",
-      failOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene3-fail.png",
-    },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id5/scene1.png" },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id5/scene2.png" },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id5/scene3.png" },
   ],
 
   // Phaser config
@@ -358,28 +358,15 @@ export default function initGame(
   };
 
   // Event listener cho nút Next Scene
-  nextSceneBtn.addEventListener("click", async () => {
+  nextSceneBtn.addEventListener("click", () => {
     nextSceneBtn.style.display = "none";
     currentScene++;
     updateSceneProgress();
-    status.textContent = "Dang chuyen scene...";
 
     // Chuyển sang scene Phaser tiếp theo
     if (currentSceneInstance && phaserGame) {
       const nextSceneKey = `GameScene${currentScene}`;
-      const activeScene = currentSceneInstance;
-      currentSceneInstance = null;
-      activeScene.scene.start(nextSceneKey);
-    }
-
-    try {
-      await waitForSceneReady();
-      status.textContent = "Dang cham bai va chay game...";
-    } catch (error) {
-      status.textContent = "Loi khoi tao scene. Vui long thu lai.";
-      logLine("Scene initialization failed. Please refresh and try again.");
-      console.error(error);
-      return;
+      currentSceneInstance.scene.start(nextSceneKey);
     }
 
     runTestForScene(currentScene);
@@ -424,10 +411,6 @@ export default function initGame(
     private sceneIndex: number;
     private displayText: any;
     private sceneText: any;
-    private continueButton?: Phaser.GameObjects.Container;
-    private continuePulse?: Phaser.Tweens.Tween;
-    private preparedResultOverlay?: Phaser.GameObjects.Image;
-    private hasOpenedResultOverlay = false;
 
     constructor(sceneIndex: number) {
       super({ key: `GameScene${sceneIndex}` });
@@ -442,7 +425,6 @@ export default function initGame(
       }
 
       currentSceneInstance = this;
-      this.hasOpenedResultOverlay = false;
 
       // Load background if exists
       const bgKey = `BG${this.sceneIndex}`;
@@ -461,7 +443,7 @@ export default function initGame(
         {
           fontFamily: "Space Grotesk, sans-serif",
           fontSize: "32px",
-          color: "#e5067d",
+          color: "#ffffff",
           align: "center",
         },
       );
@@ -478,141 +460,10 @@ export default function initGame(
 
       displayText = this.displayText;
       sceneText = this.sceneText;
-      let quekem = this.add
-        .image(-100, this.scale.gameSize.height + 200, `QK${this.sceneIndex}`)
-        .setOrigin(0, 1)
-        .setScale(1.5);
-      let vokem = this.add
-        .image(
-          this.scale.gameSize.width / 10,
-          this.scale.gameSize.height / 4,
-          `VK${this.sceneIndex}`,
-        )
-        .setOrigin(0, 0)
-        .setScale(0.7);
-      const testCase = GAME_CONFIG.testCases[this.sceneIndex];
-      const [s, sub] = testCase.input.split("\n");
-      this.SubText = this.add.text(quekem.x + 310, quekem.y - 325, sub, {
-        fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "32px",
-        color: "#5b0a0a",
-        align: "center",
-      });
-      this.SubText = this.add.text(vokem.x + 90, vokem.y + 65, s, {
-        fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "20px",
-        color: "#042e5b",
-        align: "center",
-      });
     }
 
-    private prepareResultOverlay(passed: boolean) {
-      const overlayKey = `${passed ? "PASS" : "FAIL"}${this.sceneIndex}`;
-
-      if (!this.textures.exists(overlayKey)) {
-        console.warn(`Result overlay not loaded: ${overlayKey}`);
-        return;
-      }
-
-      const existingOverlay = this.children.getByName("result-overlay");
-      existingOverlay?.destroy();
-      this.preparedResultOverlay?.destroy();
-
-      const overlay = this.add.image(0, 0, overlayKey).setOrigin(0);
-      overlay.setName("result-overlay");
-      overlay.displayWidth = this.scale.gameSize.width;
-      overlay.displayHeight = this.scale.gameSize.height;
-      overlay.setDepth(1000);
-      overlay.setAlpha(0.001);
-      this.preparedResultOverlay = overlay;
-    }
-
-    private showResultOverlay(passed: boolean) {
-      if (!this.preparedResultOverlay) {
-        this.prepareResultOverlay(passed);
-      }
-
-      this.preparedResultOverlay?.setAlpha(1);
-    }
-
-    private showContinueButton(passed: boolean, onContinue: () => void) {
-      this.continuePulse?.stop();
-      this.continueButton?.destroy();
-
-      const buttonWidth = 158;
-      const buttonHeight = 42;
-      const margin = 18;
-      const x = this.scale.gameSize.width - buttonWidth / 2 - margin;
-      const y = this.scale.gameSize.height - buttonHeight / 2 - margin;
-      const accentColor = passed ? 0x22c55e : 0xef4444;
-      const hoverFillColor = passed ? 0x16a34a : 0xdc2626;
-
-      const glow = this.add
-        .rectangle(0, 0, buttonWidth + 12, buttonHeight + 12, accentColor, 0.34)
-        .setName("continue-glow");
-      const background = this.add
-        .rectangle(0, 0, buttonWidth, buttonHeight, 0x111827, 0.94)
-        .setStrokeStyle(3, accentColor, 1);
-      const label = this.add.text(0, 0, "to be continued", {
-        fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "14px",
-        color: "#ffffff",
-        align: "center",
-      });
-      label.setOrigin(0.5);
-
-      this.continueButton = this.add.container(x, y, [glow, background, label]);
-      this.continueButton.setSize(buttonWidth, buttonHeight);
-      this.continueButton.setDepth(1100);
-      this.continueButton.setInteractive(
-        new Phaser.Geom.Rectangle(
-          -buttonWidth / 2,
-          -buttonHeight / 2,
-          buttonWidth,
-          buttonHeight,
-        ),
-        Phaser.Geom.Rectangle.Contains,
-      );
-      this.continueButton.input!.cursor = "pointer";
-
-      this.continueButton.on("pointerover", () => {
-        background.setFillStyle(hoverFillColor, 1);
-        background.setStrokeStyle(4, 0xffffff, 1);
-        glow.setAlpha(0.72);
-        this.continueButton?.setScale(1.06);
-      });
-      this.continueButton.on("pointerout", () => {
-        background.setFillStyle(0x111827, 0.94);
-        background.setStrokeStyle(3, accentColor, 1);
-        glow.setAlpha(0.34);
-        this.continueButton?.setScale(1);
-      });
-      this.continueButton.once("pointerdown", () => {
-        if (this.hasOpenedResultOverlay) return;
-
-        this.hasOpenedResultOverlay = true;
-        this.continuePulse?.stop();
-        this.continueButton?.disableInteractive();
-        this.continueButton?.destroy();
-        this.continueButton = undefined;
-        this.showResultOverlay(passed);
-        onContinue();
-      });
-
-      this.continuePulse = this.tweens.add({
-        targets: glow,
-        alpha: { from: 0.22, to: 0.62 },
-        scaleX: { from: 1, to: 1.06 },
-        scaleY: { from: 1, to: 1.12 },
-        duration: 500,
-        yoyo: true,
-        repeat: -1,
-        ease: "Sine.easeInOut",
-      });
-    }
-
-    showResult(passed: boolean, onContinue: () => void) {
-      this.displayText.setText(passed ? "✓ PASS" : "✗ FAIL").setDepth(5);
+    showResult(passed: boolean) {
+      this.displayText.setText(passed ? "✓ PASS" : "✗ FAIL");
       this.displayText.setColor(passed ? "#00ff00" : "#ff0000");
 
       if (passed) {
@@ -620,9 +471,6 @@ export default function initGame(
       } else {
         wrongSound && wrongSound.play();
       }
-
-      this.prepareResultOverlay(passed);
-      this.showContinueButton(passed, onContinue);
     }
   }
 
@@ -637,18 +485,6 @@ export default function initGame(
       GAME_CONFIG.sceneAssets?.forEach((asset, index) => {
         if (asset.background) {
           this.load.image(`BG${index}`, asset.background);
-        }
-        if (asset.quekem) {
-          this.load.image(`QK${index}`, asset.quekem);
-        }
-        if (asset.vokem) {
-          this.load.image(`VK${index}`, asset.vokem);
-        }
-        if (asset.passOverlay) {
-          this.load.image(`PASS${index}`, asset.passOverlay);
-        }
-        if (asset.failOverlay) {
-          this.load.image(`FAIL${index}`, asset.failOverlay);
         }
       });
       this.load.audio("correct", "/sound_global/correct.mp3");
@@ -727,17 +563,22 @@ export default function initGame(
 
     return {
       showResult: (sceneIndex: number, result: any) => {
-        if (!phaserGame) return;
+        if (!currentSceneInstance || !phaserGame) return;
 
         const passed = result.passed;
-        const sceneKey = `GameScene${sceneIndex}`;
-        const targetScene =
-          phaserGame.scene.getScene(sceneKey) || currentSceneInstance;
 
-        const showNextStep = () => {
+        // Call the scene's showResult method
+        if (currentSceneInstance.showResult) {
+          currentSceneInstance.showResult(passed);
+        }
+
+        // Show Next button or final results
+        setTimeout(() => {
           if (sceneIndex < GAME_CONFIG.testCases.length - 1) {
+            // Còn scene tiếp theo - hiển thị nút Next
             nextSceneBtn.style.display = "block";
 
+            // Auto-scroll to game canvas for better UX
             const phaserRoot = document.getElementById("phaser-root");
             if (phaserRoot) {
               phaserRoot.scrollIntoView({
@@ -746,17 +587,13 @@ export default function initGame(
               });
             }
           } else {
+            // Đã hết scenes - hiển thị kết quả
             status.textContent = testResults.every((r) => r.passed)
               ? "🎉 Hoàn thành tất cả scenes!"
               : "❌ Một số test cases sai";
             testcaseTable.classList.add("visible");
           }
-        };
-
-        // Call the result method on the scene that owns this test case.
-        if (targetScene && "showResult" in targetScene) {
-          (targetScene as any).showResult(passed, showNextStep);
-        }
+        }, 1500);
       },
     };
   };
@@ -814,7 +651,9 @@ export default function initGame(
 
     try {
       // Setup input/output mock using Python-level override (same as generate-tests for consistency)
-      const inputLines = testCase.input ? testCase.input.split("\n") : [];
+      const inputLines = testCase.input
+        ? testCase.input.split("\n")
+        : [];
 
       pyodide.runPython(`
 import sys
@@ -865,10 +704,9 @@ del input
         `Scene ${sceneIndex + 1}: ${passed ? "✓ Pass" : "✗ Fail"} - ${testCase.description}`,
       );
       if (actualOutput) {
-        actualOutput
-          .split("\n")
-          .filter(Boolean)
-          .forEach((line) => logLine(`  📤 Log: ${line}`));
+        actualOutput.split("\n").filter(Boolean).forEach((line) =>
+          logLine(`  📤 Log: ${line}`),
+        );
       }
       if (!passed) {
         logLine(`  Expected: "${expectedOutput}"`);

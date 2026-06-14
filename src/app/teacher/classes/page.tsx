@@ -496,7 +496,8 @@ export default function TeacherClassesPage() {
         throw new Error(error.error || "Failed to import");
       }
 
-      const result = await createRes.json();
+      const response = await createRes.json();
+      const result = response.data || response;
 
       // Step 2: Add all to class if modal opened from class
       if (selectedClass && result.users) {
@@ -512,7 +513,9 @@ export default function TeacherClassesPage() {
       setBulkContent("");
       setShowBulkImportModal(false);
       await fetchClasses();
-      alert(`Đã import ${result.created} tài khoản!`);
+      alert(
+        `Đã import ${result.success || 0} tài khoản${result.failed ? `, ${result.failed} lỗi` : ""}!`,
+      );
     } catch (err: any) {
       console.error("Error bulk import:", err);
       alert(err.message);

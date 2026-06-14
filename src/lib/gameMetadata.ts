@@ -11,6 +11,13 @@ const escapeHtml = (value: string) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
+const normalizeTableText = (value: string) =>
+  String(value ?? "")
+    .replace(/\\r\\n/g, "\n")
+    .replace(/\\n/g, "\n")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n");
+
 export const buildGameMetadataStyles = () => `
   .game-description { color: #4b5563; line-height: 1.625; white-space: pre-line; margin: 0; }
   .game-io-table-wrap { margin-top: 1rem; overflow-x: auto; border: 1px solid #dbeafe; border-radius: 0.75rem; background: #ffffff; }
@@ -25,7 +32,10 @@ export const renderGameMetadata = (
   ioExamples: GameIOExample[] = [],
 ) => {
   const rows = ioExamples.filter(
-    (row) => row && (String(row.input ?? "").trim() || String(row.output ?? "").trim()),
+    (row) =>
+      row &&
+      (normalizeTableText(row.input).trim() ||
+        normalizeTableText(row.output).trim()),
   );
 
   const tableHtml = rows.length
@@ -41,8 +51,8 @@ export const renderGameMetadata = (
             ${rows
               .map(
                 (row) => `<tr>
-                  <td>${escapeHtml(row.input ?? "")}</td>
-                  <td>${escapeHtml(row.output ?? "")}</td>
+                  <td>${escapeHtml(normalizeTableText(row.input))}</td>
+                  <td>${escapeHtml(normalizeTableText(row.output))}</td>
                 </tr>`,
               )
               .join("")}

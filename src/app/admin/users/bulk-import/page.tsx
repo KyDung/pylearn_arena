@@ -27,7 +27,7 @@ export default function BulkImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const parseCSV = (text: string): PreviewUser[] => {
-    const lines = text.trim().split("\n");
+    const lines = text.replace(/^\uFEFF/, "").trim().split(/\r?\n/);
     const users: PreviewUser[] = [];
 
     // Skip header if exists
@@ -45,7 +45,7 @@ export default function BulkImportPage() {
         password: parts[1],
         fullName: parts[2] || undefined,
         email: parts[3] || undefined,
-        role: parts[4] || "student",
+        role: parts[4]?.toLowerCase() || "student",
       });
     }
 
@@ -53,7 +53,7 @@ export default function BulkImportPage() {
   };
 
   const parseTXT = (text: string): PreviewUser[] => {
-    const lines = text.trim().split("\n");
+    const lines = text.replace(/^\uFEFF/, "").trim().split(/\r?\n/);
     const users: PreviewUser[] = [];
 
     for (const line of lines) {
@@ -68,7 +68,7 @@ export default function BulkImportPage() {
         password: parts[1],
         fullName: parts[2] || undefined,
         email: parts[3] || undefined,
-        role: parts[4] || "student",
+        role: parts[4]?.toLowerCase() || "student",
       });
     }
 
@@ -114,12 +114,16 @@ export default function BulkImportPage() {
         throw new Error(data.error || "Import thất bại");
       }
 
-      setResult(data);
+      const importResult: ImportResult = data.data || data;
+      setResult(importResult);
 
       // Clear preview if all success
-      if (data.failed === 0) {
+      if (importResult.failed === 0) {
         setPreview([]);
         setTextInput("");
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
       }
     } catch (error: any) {
       alert(error.message);

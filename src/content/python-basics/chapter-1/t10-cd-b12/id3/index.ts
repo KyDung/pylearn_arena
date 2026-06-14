@@ -25,23 +25,20 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id3";
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
   title: "Cuộc đua vượt chướng ngại vật",
-  description: `
-    Hãy giúp nhân vật vượt qua các chướng ngại vật!
-    - Nếu là "duongdi" → in "chay"
-    - Nếu là "vatcan" → in "ne"
-    Ghép các hành động bằng dấu "-"
-  `,
+  description: `-- Cốt truyện (Có thể bỏ qua)
+Cá mập cho rằng chạy bộ trên cạn sẽ nhanh hơn bơi dưới nước, vì khi chạy sẽ không phải chịu lực cản của nước. Còn cừu lại cho rằng bơi dễ hơn, vì không phải đạp chân trên đất đá đau rát. Vì vậy, cả hai quyết định tổ chức một cuộc thi đặc biệt: cá mập sẽ chạy trên cạn, còn cừu sẽ bơi dưới nước, xem ai đến được chỗ hai tòa tháp ở cuối đường đua trước. Tất nhiên, trên đường đua sẽ có rất nhiều vật cản. Do cá mập biết mình chỉ là một nhân vật trong game, cậu ấy đã nhờ bạn viết một chương trình chuyển đổi hành động theo yêu cầu bên dưới để giúp cậu ấy có thể chiến thắng cuộc đua này.
+
+-- Yêu cầu
+Viết chương trình nhập vào một xâu mô tả đường đua của cá mập. Xâu này gồm các từ khóa duongdi và vatcan, được ngăn cách với nhau bằng dấu gạch ngang -.
+Hãy tạo một xâu mới bằng cách thay thế theo quy tắc sau:
+- Các xâu con duongdi sẽ được thay bằng xâu chay
+- Các xâu con vatcan sẽ được thay bằng xâu ne 
+In ra xâu mới sau khi thay thế.
+`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
-  ioExamples: [
-    { input: "duongdi-vatcan-duongdi", output: "chay-ne-chay" },
-    { input: "duongdi-vatcan-vatcan-duongdi-vatcan", output: "chay-ne-ne-chay-ne" },
-    {
-      input: "vatcan-duongdi-vatcan-duongdi-vatcan-duongdi-duongdi",
-      output: "ne-chay-ne-chay-ne-chay-chay",
-    },
-  ],
+  ioExamples: [{ input: "duongdi-vatcan-duongdi", output: "chay-ne-chay" }],
 
   testCases: [
     {
@@ -65,23 +62,7 @@ const GAME_CONFIG = {
   ],
 
   // Code Python mẫu cho học sinh (sử dụng input() và print())
-  starterCode: `# Đọc chuỗi chướng ngại vật
-obstacles = input()
-
-# Tách chuỗi thành list
-items = obstacles.split("-")
-
-# Tạo list hành động
-actions = []
-for item in items:
-    if item == "duongdi":
-        actions.append("chay")
-    elif item == "vatcan":
-        actions.append("ne")
-
-# Ghép và in kết quả
-result = "-".join(actions)
-print(result)`,
+  starterCode: ``,
 
   // Assets cho từng scene (optional)
   // Path format: /[course]/[topic]/[lesson]/[game]/scene1.png
@@ -440,7 +421,7 @@ export default function initGame(
         .setOrigin(0.5);
 
       // Player (paddlefish sprite)
-      this.player = this.add.sprite(150, 400, "player-sprite");
+      this.player = this.add.sprite(150, 400, "player-sprite").setDepth(10);
       this.player.setScale(0.8);
       this.player.play("player-run");
 
@@ -800,12 +781,12 @@ export default function initGame(
       }
 
       // Tower cho player xuất hiện từ phải, dừng lại ở vị trí đích
-      this.tower = this.add.image(800, 350, "tower");
-      this.tower.setScale(0.5);
+      this.tower = this.add.image(800, 300, "tower");
+      this.tower.setScale(1);
 
       // Tower cho bot (song song với tower player)
-      this.botTower = this.add.image(800, 200, "tower");
-      this.botTower.setScale(0.5);
+      this.botTower = this.add.image(800, 100, "tower");
+      this.botTower.setScale(1);
 
       // Cả 2 tower chạy vào và dừng lại ở x = 550
       this.tweens.add({
@@ -1116,9 +1097,10 @@ del input
         `Scene ${sceneIndex + 1}: ${passed ? "✓ Pass" : "✗ Fail"} - ${testCase.description || ""}`,
       );
       if (actualOutput) {
-        actualOutput.split("\n").filter(Boolean).forEach((line) =>
-          logLine(`  📤 Log: ${line}`),
-        );
+        actualOutput
+          .split("\n")
+          .filter(Boolean)
+          .forEach((line) => logLine(`  📤 Log: ${line}`));
       }
       if (!passed) {
         logLine(`  Expected: "${expectedOutput}"`);

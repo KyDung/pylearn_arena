@@ -7,6 +7,10 @@ import {
   initCodeEditor,
   setupCodeFullscreen,
 } from "@/lib/codeEditor";
+import {
+  buildGameMetadataStyles,
+  renderGameMetadata,
+} from "@/lib/gameMetadata";
 import { setupContestSubmission } from "@/lib/contestIntegration";
 
 // ============================================================
@@ -14,7 +18,7 @@ import { setupContestSubmission } from "@/lib/contestIntegration";
 // ============================================================
 // Format: "[course]/[topic]/[lesson]/[game-id]"
 // Ví dụ: "python-basics/chapter-1/t10-cd-b12/id1"
-const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
+const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id5";
 
 // ============================================================
 // CẤU HÌNH GAME TYPE 2 - CODERUNNER STYLE
@@ -22,34 +26,77 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
 
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
-  title: "G1: Kiểm tra xâu con và tìm vị trí xuất hiện",
-  description: `Đề bài
-
-Viết chương trình nhập vào hai dòng:
-
-Dòng 1: một xâu mẹ s
-Dòng 2: một xâu con sub
-
-Hãy kiểm tra sub có xuất hiện trong s hay không.
-
-Nếu có, in ra:
-Co
-vi_tri`,
+  title: "Game 5: Mật mã Caesar",
+  description: `Viết chương trình nhập vào hai dòng:
+Dòng 1: Một xâu s.
+Dòng 2: Một số nguyên k.
+Hãy mã hóa xâu s theo mã Caesar bằng cách dịch mỗi chữ cái sang phải k vị trí trong bảng chữ cái.
+Quy tắc:
+Chữ thường giữ nguyên là chữ thường.
+Chữ hoa giữ nguyên là chữ hoa.
+Nếu vượt quá z hoặc Z thì quay lại từ a hoặc A.
+Các kí tự không phải chữ cái được giữ nguyên.
+In ra xâu sau khi mã hóa.`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
   // Dùng "\n" để phân tách nhiều lần gọi input() trong 1 test case
   // Ví dụ: input = "5\n10" → input() lần 1 = "5", input() lần 2 = "10"
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
-  testCases: [
+    ioExamples: [
+    { input: "them sau", output: "them sau" }
+  ],
+
+    testCases: [
     {
-      input: "", // Nhập dữ liệu stdin (dùng \n giữa các lần gọi input())
-      expected: "", // Kết quả mong đợi
+      input: "hoc lap trinh that vui\n3",
+      expected: "krf ods wulqk wkdw yxl",
       description: "Test case 1",
       sceneText: "Level 1",
     },
+    {
+      input: "Hoc Python\n2",
+      expected: "Jqe Ravjqp",
+      description: "Test case 2",
+      sceneText: "Level 2",
+    },
+    {
+      input: "Truong THPT AAA\n6",
+      expected: "Zxautm ZNVZ GGG",
+      description: "Test case 3",
+      sceneText: "Level 3",
+    },
+    {
+      input: "Phai lam sao de hoc gioi tin hoc ?\n9",
+      expected: "Yqjr ujv bjx mn qxl prxr crw qxl ?",
+      description: "Test case 4",
+      sceneText: "Level 4",
+    },
+    {
+      input: "Toi rat thich lap trinh bang python. I love python......\n12",
+      expected: "Fau dmf ftuot xmb fduzt nmzs bkftaz. U xahq bkftaz......",
+      description: "Test case 5",
+      sceneText: "Level 5",
+    },
+    {
+      input: "Bien so xe 29A - 123.45\n18",
+      expected: "Tawf kg pw 29S - 123.45",
+      description: "Test case 6",
+      sceneText: "Level 6",
+    },
+    {
+      input: "#userID24--@\n20",
+      expected: "#omylCX24--@",
+      description: "Test case 7",
+      sceneText: "Level 7",
+    },
+    {
+      input: "testuser27@gmail.com\n24",
+      expected: "rcqrsqcp27@ekygj.amk",
+      description: "Test case 8",
+      sceneText: "Level 8",
+    }
   ],
-
   // Code Python mẫu cho học sinh (sử dụng input() và print())
   starterCode: `# Đọc input
 a = int(input())
@@ -63,9 +110,9 @@ print(result)`,
   // Path format: /[course]/[topic]/[lesson]/[game]/scene1.png
   // Example: /python-basics/chapter-1/t10-cd-b12/id1/scene1.png
   sceneAssets: [
-    { background: "/game-id/scene1.png" },
-    { background: "/game-id/scene2.png" },
-    { background: "/game-id/scene3.png" },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id5/scene1.png" },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id5/scene2.png" },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id5/scene3.png" },
   ],
 
   // Phaser config
@@ -83,6 +130,7 @@ print(result)`,
 const buildLayout = () => `
   <style>
     ${buildCodeEditorStyles()}
+    ${buildGameMetadataStyles()}
     
     .lesson-header { margin-bottom: 1rem; }
     .lesson-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #1f2937; }
@@ -209,7 +257,7 @@ const buildLayout = () => `
   </style>
   <div class="lesson-header">
     <h2>${GAME_CONFIG.title}</h2>
-    <p>${GAME_CONFIG.description}</p>
+    ${renderGameMetadata(GAME_CONFIG.description, GAME_CONFIG.ioExamples)}
   </div>
   <div class="lesson-layout">
     <div class="lesson-game">

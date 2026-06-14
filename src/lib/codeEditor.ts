@@ -835,10 +835,13 @@ export const initCodeEditor = (root: HTMLElement, starterCode: string) => {
   // Handle Backspace for bracket pair deletion
   const handleBackspace = (e: KeyboardEvent) => {
     if (e.key !== "Backspace") return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
 
     const start = codeInput.selectionStart;
+    const end = codeInput.selectionEnd;
     const value = codeInput.value;
 
+    if (start !== end) return;
     if (start === 0) return;
 
     const prevChar = value[start - 1];

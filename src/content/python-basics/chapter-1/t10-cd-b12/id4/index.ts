@@ -18,7 +18,7 @@ import { setupContestSubmission } from "@/lib/contestIntegration";
 // ============================================================
 // Format: "[course]/[topic]/[lesson]/[game-id]"
 // Ví dụ: "python-basics/chapter-1/t10-cd-b12/id1"
-const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
+const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id4";
 
 // ============================================================
 // CẤU HÌNH GAME TYPE 2 - CODERUNNER STYLE
@@ -26,19 +26,15 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
 
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
-  title: "Game 1: Kiểm tra xâu con",
+  title: "Game 4: Hiệp sĩ quả cảm",
   description: `-- Cốt truyện("Có thể bỏ qua")
-Một cửa hàng kem đang mở sự kiện mua kem trúng thưởng, trên thân mỗi que kem sẽ ghi một đồ vật bất kì nều đồ vật này có trong danh sách các đồ vật trên vỏ của que kem thì người đó sẽ được nhận món quà đó nhưng ngặt nỗi các nhân vật trong game này chưa được lập trình chức năng kiểm tra chuỗi con vậy nên bạn hay viết một chương trình python giúp họ kiểm tra xem mình có trúng thưởng không nhé !!!
+Một vị hiệp sĩ đang chiến đấu với một tên hắc pháp sư ác độc, hắc pháp sư bắn ra rất nhiều quả cầu ma pháp liên tục gồm 2 loại là cầu lửa và cầu băng hãy giúp hiệp sĩ này bật đúng loại ma pháp khiên cho từng loại quả cầu ma pháp được bắn tới để anh ta có thể đỡ được hết toàn bộ các chiêu và chờ tới cuối khi tên pháp sư hết năng lượng.
 
 -- Yêu cầu
-Viết chương trình nhập vào hai dòng:
-Dòng 1: Một xâu s là danh sách các giải thưởng của cửa hàng kem.
-Dòng 2: Một xâu sub là dòng chữ in trên que kem của khách hàng.
-Hãy kiểm tra xem sub có xuất hiện trong s hay không.
-Nếu có, in ra:
-CÓ
-Nếu không có, in ra:
-KHÔNG`,
+Viết chương trình nhập vào một xâu s là thứ tự các chiêu thức của tên pháp sư.
+Gặp cau_lua thì thay bằng khien_lua
+Gặp cau_bang thì thay bằng khien_bang
+In ra màn hình chuỗi kết quả sau khi đã thay thế `,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
@@ -47,63 +43,55 @@ KHÔNG`,
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
   ioExamples: [
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÚT CHÌ MÀU",
-      output: "CÓ",
-    },
-    {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nKEM DÂU",
-      output: "KHÔNG",
+      input: "cau_lua*cau_bang*cau_lua*cau_bang",
+      output: "khien_lua*khien_bang*khien_lua*khien_bang",
     },
   ],
 
   testCases: [
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nÁO KHOÁC",
-      expected: "CÓ",
+      input: "cau_lua*cau_bang*cau_lua",
+      expected: "khien_lua*khien_bang*khien_lua",
       description: "Test case 1",
-      sceneText: "Vị khách đầu tiên",
+      sceneText: "Level 1",
     },
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nROBOT ĐỒ CHƠI",
-      expected: "KHÔNG",
+      input: "cau_bang*cau_bang*cau_lua*cau_bang",
+      expected: "khien_bang*khien_bang*khien_lua*khien_bang",
       description: "Test case 2",
-      sceneText: "Vị khách thứ 2",
+      sceneText: "Level 2",
     },
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÌNH NƯỚC",
-      expected: "CÓ",
-      description: "Test  3",
-      sceneText: "Vị khách thứ 3",
+      input: "cau_lua*cau_lua*cau_bang*cau_lua*cau_bang",
+      expected: "khien_lua*khien_lua*khien_bang*khien_lua*khien_bang",
+      description: "Test case 3",
+      sceneText: "Level 3",
+    },
+    {
+      input: "cau_bang*cau_lua*cau_bang*cau_lua*cau_bang*cau_lua*cau_lua",
+      expected:
+        "khien_bang*khien_lua*khien_bang*khien_lua*khien_bang*khien_lua*khien_lua",
+      description: "Test case 4",
+      sceneText: "Level 4",
     },
   ],
   // Code Python mẫu cho học sinh (sử dụng input() và print())
-  starterCode: ``,
+  starterCode: `# Đọc input
+a = int(input())
+b = int(input())
+
+# Xử lý và print kết quả
+result = a + b
+print(result)`,
 
   // Assets cho từng scene (optional)
   // Path format: /[course]/[topic]/[lesson]/[game]/scene1.png
   // Example: /python-basics/chapter-1/t10-cd-b12/id1/scene1.png
   sceneAssets: [
-    {
-      background: "/python-basics/chapter-1/t10-cd-b12/id1/cuahangkemrsz.png",
-      quekem: "/python-basics/chapter-1/t10-cd-b12/id1/quekemrmb.png",
-      vokem: "/python-basics/chapter-1/t10-cd-b12/id1/vokem.png",
-      passOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene1-pass.png",
-      failOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene1-fail.png",
-    },
-    {
-      background: "/python-basics/chapter-1/t10-cd-b12/id1/cuahangkemrsz.png",
-      quekem: "/python-basics/chapter-1/t10-cd-b12/id1/quekemrmb.png",
-      vokem: "/python-basics/chapter-1/t10-cd-b12/id1/vokem.png",
-      passOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene2-pass.png",
-      failOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene2-fail.png",
-    },
-    {
-      background: "/python-basics/chapter-1/t10-cd-b12/id1/cuahangkemrsz.png",
-      quekem: "/python-basics/chapter-1/t10-cd-b12/id1/quekemrmb.png",
-      vokem: "/python-basics/chapter-1/t10-cd-b12/id1/vokem.png",
-      passOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene3-pass.png",
-      failOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene3-fail.png",
-    },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id4/bg.png" },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id4/bg.png" },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id4/bg.png" },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id4/bg.png" },
   ],
 
   // Phaser config
@@ -126,9 +114,9 @@ const buildLayout = () => `
     .lesson-header { margin-bottom: 1rem; }
     .lesson-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #1f2937; }
     .lesson-header p { color: #4b5563; line-height: 1.6; white-space: pre-line; font-size: 0.875rem; }
-    .lesson-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .lesson-game { display: flex; flex-direction: column; }
-    .game-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .lesson-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+    .lesson-game { display: flex; flex-direction: column; min-width: 0; }
+    .game-card { min-width: 0; background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .phaser-frame { 
       background: #121425; 
       border-radius: 0.5rem; 
@@ -136,6 +124,7 @@ const buildLayout = () => `
       aspect-ratio: 720/520; 
       width: 100%; 
       max-width: 100%;
+      min-width: 0;
       height: auto;
       position: relative;
     }
@@ -147,7 +136,7 @@ const buildLayout = () => `
     }
     .game-status { margin-top: 0.75rem; text-align: center; color: #6b7280; font-size: 0.8rem; }
     .scene-progress { margin-top: 0.25rem; text-align: center; font-weight: 600; color: #3b82f6; font-size: 0.9rem; }
-    .lesson-side { display: flex; flex-direction: column; gap: 0.75rem; }
+    .lesson-side { display: flex; flex-direction: column; gap: 0.75rem; min-width: 0; }
     .lesson-panel { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .code-panel { padding: 0; overflow: hidden; }
     .output-panel { 
@@ -168,11 +157,11 @@ const buildLayout = () => `
     }
     
     /* Test Case Table */
-    .testcase-table { margin-top: 1rem; display: none; }
+    .testcase-table { margin-top: 1rem; display: none; min-width: 0; overflow-x: auto; }
     .testcase-table.visible { display: block; }
     .testcase-table h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: #1f2937; }
-    .testcase-table table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-    .testcase-table th, .testcase-table td { padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; text-align: left; }
+    .testcase-table table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.8rem; }
+    .testcase-table th, .testcase-table td { padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; text-align: left; overflow-wrap: anywhere; word-break: break-word; }
     .testcase-table th { background: #f1f5f9; font-weight: 600; color: #475569; }
     .testcase-table .pass { color: #10b981; font-weight: 600; }
     .testcase-table .fail { color: #ef4444; font-weight: 600; }
@@ -257,23 +246,6 @@ const buildLayout = () => `
         <p class="game-status" id="status">Đang tải Pyodide...</p>
         <p class="scene-progress" id="scene-progress"></p>
       </div>
-      
-      <!-- Test Case Table -->
-      <div class="lesson-panel testcase-table" id="testcase-table">
-        <h3>📊 Kết quả Test Cases</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Scene</th>
-              <th>Input</th>
-              <th>Expected</th>
-              <th>Your Output</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody id="testcase-body"></tbody>
-        </table>
-      </div>
     </div>
     <aside class="lesson-side">
       <div class="lesson-panel code-panel">
@@ -286,7 +258,24 @@ const buildLayout = () => `
       <div class="lesson-panel output-panel" id="output"></div>
     </aside>
   </div>
-  
+
+  <!-- Full-width result table, independent from the game/editor grid -->
+  <div class="lesson-panel testcase-table" id="testcase-table">
+    <h3>📊 Kết quả Test Cases</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Scene</th>
+          <th>Input</th>
+          <th>Expected</th>
+          <th>Your Output</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody id="testcase-body"></tbody>
+    </table>
+  </div>
+
   <!-- Floating Next Scene Button (outside layout for fixed positioning) -->
   <button class="next-scene-btn" id="next-scene-btn" style="display: none;">🚀 Next Scene ➜</button>
 `;
@@ -319,50 +308,16 @@ export default function initGame(
   let currentScene = 0;
   let testResults: any[] = [];
   let currentSceneInstance: any = null;
-  let displayText: Phaser.GameObjects.Text | null = null;
-  let sceneText: Phaser.GameObjects.Text | null = null;
   let correctSound: Phaser.Sound.BaseSound | null = null;
   let wrongSound: Phaser.Sound.BaseSound | null = null;
-
-  // Hàm load scene content
-  const loadSceneContent = (scene: any, sceneIndex: number) => {
-    scene.children.removeAll();
-
-    const bgKey = `BG${sceneIndex}`;
-    if (scene.textures.exists(bgKey)) {
-      const bg = scene.add.image(0, 0, bgKey).setOrigin(0);
-      bg.displayWidth = scene.scale.gameSize.width;
-      bg.displayHeight = scene.scale.gameSize.height;
-    }
-
-    sceneText = scene.add.text(
-      360,
-      100,
-      GAME_CONFIG.testCases[sceneIndex]?.sceneText || `Level ${sceneIndex + 1}`,
-      {
-        fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "32px",
-        color: "#ffffff",
-        align: "center",
-      },
-    );
-    sceneText.setOrigin(0.5);
-
-    displayText = scene.add.text(360, 260, "Chờ kết quả...", {
-      fontFamily: "Space Grotesk, sans-serif",
-      fontSize: "24px",
-      color: "#ffffff",
-      align: "center",
-    });
-    displayText.setOrigin(0.5);
-  };
+  let attackSound: Phaser.Sound.BaseSound | null = null;
 
   // Event listener cho nút Next Scene
   nextSceneBtn.addEventListener("click", async () => {
     nextSceneBtn.style.display = "none";
     currentScene++;
     updateSceneProgress();
-    status.textContent = "Dang chuyen scene...";
+    status.textContent = "Đang chuyển scene...";
 
     // Chuyển sang scene Phaser tiếp theo
     if (currentSceneInstance && phaserGame) {
@@ -374,9 +329,9 @@ export default function initGame(
 
     try {
       await waitForSceneReady();
-      status.textContent = "Dang cham bai va chay game...";
+      status.textContent = "Đang chấm bài và chạy game...";
     } catch (error) {
-      status.textContent = "Loi khoi tao scene. Vui long thu lai.";
+      status.textContent = "Lỗi khởi tạo scene. Vui lòng thử lại.";
       logLine("Scene initialization failed. Please refresh and try again.");
       console.error(error);
       return;
@@ -424,10 +379,13 @@ export default function initGame(
     private sceneIndex: number;
     private displayText: any;
     private sceneText: any;
-    private continueButton?: Phaser.GameObjects.Container;
-    private continuePulse?: Phaser.Tweens.Tween;
-    private preparedResultOverlay?: Phaser.GameObjects.Image;
-    private hasOpenedResultOverlay = false;
+    private spellText: any;
+    private warrior?: Phaser.GameObjects.Sprite;
+    private wizard?: Phaser.GameObjects.Sprite;
+    private shield?: Phaser.GameObjects.Image;
+    private resultHandled = false;
+    private readonly characterScale = 1.15;
+    private readonly groundY = 380;
 
     constructor(sceneIndex: number) {
       super({ key: `GameScene${sceneIndex}` });
@@ -435,194 +393,398 @@ export default function initGame(
     }
 
     create() {
-      // Safety check for Phaser APIs
       if (!this.add || !this.tweens || !this.cameras) {
         console.error("Phaser APIs not ready in create()");
         return;
       }
 
       currentSceneInstance = this;
-      this.hasOpenedResultOverlay = false;
+      this.resultHandled = false;
 
-      // Load background if exists
       const bgKey = `BG${this.sceneIndex}`;
-      if (this.textures.exists(bgKey)) {
-        const bg = this.add.image(0, 0, bgKey).setOrigin(0);
+      const activeBgKey = this.textures.exists(bgKey) ? bgKey : "BG0";
+      if (this.textures.exists(activeBgKey)) {
+        const bg = this.add.image(0, 0, activeBgKey).setOrigin(0);
         bg.displayWidth = this.scale.gameSize.width;
         bg.displayHeight = this.scale.gameSize.height;
       }
 
-      // Scene title
       this.sceneText = this.add.text(
         360,
-        100,
+        28,
         GAME_CONFIG.testCases[this.sceneIndex]?.sceneText ||
           `Level ${this.sceneIndex + 1}`,
         {
           fontFamily: "Space Grotesk, sans-serif",
-          fontSize: "32px",
-          color: "#e5067d",
+          fontSize: "25px",
+          fontStyle: "bold",
+          color: "#ffffff",
           align: "center",
+          stroke: "#24113f",
+          strokeThickness: 5,
         },
       );
-      this.sceneText.setOrigin(0.5);
+      this.sceneText.setOrigin(0.5).setDepth(20);
 
-      // Result display
-      this.displayText = this.add.text(360, 260, "Chờ kết quả...", {
+      this.displayText = this.add.text(360, 63, "Chờ kết quả...", {
         fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "24px",
-        color: "#ffffff",
+        fontSize: "18px",
+        fontStyle: "bold",
+        color: "#f8fafc",
         align: "center",
+        stroke: "#171126",
+        strokeThickness: 4,
       });
-      this.displayText.setOrigin(0.5);
+      this.displayText.setOrigin(0.5).setDepth(20);
 
-      displayText = this.displayText;
-      sceneText = this.sceneText;
-      let quekem = this.add
-        .image(-100, this.scale.gameSize.height + 200, `QK${this.sceneIndex}`)
-        .setOrigin(0, 1)
-        .setScale(1.5);
-      let vokem = this.add
-        .image(
-          this.scale.gameSize.width / 10,
-          this.scale.gameSize.height / 4,
-          `VK${this.sceneIndex}`,
-        )
-        .setOrigin(0, 0)
-        .setScale(0.7);
-      const testCase = GAME_CONFIG.testCases[this.sceneIndex];
-      const [s, sub] = testCase.input.split("\n");
-      this.SubText = this.add.text(quekem.x + 310, quekem.y - 325, sub, {
+      this.spellText = this.add.text(360, 92, "", {
         fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "32px",
-        color: "#5b0a0a",
+        fontSize: "15px",
+        color: "#e2e8f0",
         align: "center",
+        stroke: "#171126",
+        strokeThickness: 3,
       });
-      this.SubText = this.add.text(vokem.x + 90, vokem.y + 65, s, {
-        fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "20px",
-        color: "#042e5b",
-        align: "center",
+      this.spellText.setOrigin(0.5).setDepth(20);
+
+      this.warrior = this.add.sprite(135, this.groundY, "warrior-idle");
+      this.warrior
+        .setScale(this.characterScale)
+        .setDepth(6)
+        .play("warrior-idle");
+
+      this.wizard = this.add.sprite(585, this.groundY, "wizard-idle");
+      this.wizard
+        .setScale(this.characterScale)
+        .setFlipX(true)
+        .setDepth(6)
+        .play("wizard-idle");
+
+      this.shield = this.add
+        .image(this.warrior.x + 68, this.warrior.y + 2, "shield")
+        .setScale(0.2)
+        .setAlpha(0)
+        .setVisible(false)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setDepth(10);
+    }
+
+    private delay(duration: number): Promise<void> {
+      return new Promise((resolve) => {
+        this.time.delayedCall(duration, resolve);
       });
     }
 
-    private prepareResultOverlay(passed: boolean) {
-      const overlayKey = `${passed ? "PASS" : "FAIL"}${this.sceneIndex}`;
-
-      if (!this.textures.exists(overlayKey)) {
-        console.warn(`Result overlay not loaded: ${overlayKey}`);
-        return;
-      }
-
-      const existingOverlay = this.children.getByName("result-overlay");
-      existingOverlay?.destroy();
-      this.preparedResultOverlay?.destroy();
-
-      const overlay = this.add.image(0, 0, overlayKey).setOrigin(0);
-      overlay.setName("result-overlay");
-      overlay.displayWidth = this.scale.gameSize.width;
-      overlay.displayHeight = this.scale.gameSize.height;
-      overlay.setDepth(1000);
-      overlay.setAlpha(0.001);
-      this.preparedResultOverlay = overlay;
-    }
-
-    private showResultOverlay(passed: boolean) {
-      if (!this.preparedResultOverlay) {
-        this.prepareResultOverlay(passed);
-      }
-
-      this.preparedResultOverlay?.setAlpha(1);
-    }
-
-    private showContinueButton(passed: boolean, onContinue: () => void) {
-      this.continuePulse?.stop();
-      this.continueButton?.destroy();
-
-      const buttonWidth = 158;
-      const buttonHeight = 42;
-      const margin = 18;
-      const x = this.scale.gameSize.width - buttonWidth / 2 - margin;
-      const y = this.scale.gameSize.height - buttonHeight / 2 - margin;
-      const accentColor = passed ? 0x22c55e : 0xef4444;
-      const hoverFillColor = passed ? 0x16a34a : 0xdc2626;
-
-      const glow = this.add
-        .rectangle(0, 0, buttonWidth + 12, buttonHeight + 12, accentColor, 0.34)
-        .setName("continue-glow");
-      const background = this.add
-        .rectangle(0, 0, buttonWidth, buttonHeight, 0x111827, 0.94)
-        .setStrokeStyle(3, accentColor, 1);
-      const label = this.add.text(0, 0, "to be continued", {
-        fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "14px",
-        color: "#ffffff",
-        align: "center",
+    private tweenTo(config: Phaser.Types.Tweens.TweenBuilderConfig) {
+      return new Promise<void>((resolve) => {
+        this.tweens.add({
+          ...config,
+          onComplete: () => resolve(),
+        });
       });
-      label.setOrigin(0.5);
+    }
 
-      this.continueButton = this.add.container(x, y, [glow, background, label]);
-      this.continueButton.setSize(buttonWidth, buttonHeight);
-      this.continueButton.setDepth(1100);
-      this.continueButton.setInteractive(
-        new Phaser.Geom.Rectangle(
-          -buttonWidth / 2,
-          -buttonHeight / 2,
-          buttonWidth,
-          buttonHeight,
-        ),
-        Phaser.Geom.Rectangle.Contains,
+    private parseSequence(value: string): string[] {
+      const sequence = String(value ?? "");
+      return sequence === "" ? [] : sequence.split("*");
+    }
+
+    private getSpellType(value: string): "fire" | "ice" {
+      return value === "cau_bang" ? "ice" : "fire";
+    }
+
+    private getShieldType(value: string | undefined): "fire" | "ice" | null {
+      if (value === "khien_lua") return "fire";
+      if (value === "khien_bang") return "ice";
+      return null;
+    }
+
+    private getShieldName(type: "fire" | "ice") {
+      return type === "fire" ? "KHIÊN LỬA" : "KHIÊN BĂNG";
+    }
+
+    private getInvalidActionLabel(value: string | undefined) {
+      if (value === undefined || value === "") return "KHÔNG CÓ KHIÊN";
+      const compactValue =
+        value.length > 20 ? `${value.slice(0, 20)}...` : value;
+      return `LỆNH LẠ: ${compactValue}`;
+    }
+
+    private async activateShield(type: "fire" | "ice") {
+      if (!this.shield || !this.warrior) return;
+
+      const tint = type === "fire" ? 0xff6b35 : 0x65dcff;
+      this.shield
+        .setPosition(this.warrior.x + 68, this.warrior.y + 2)
+        .setTint(tint)
+        .setVisible(true)
+        .setAlpha(0)
+        .setScale(0.25);
+
+      await this.tweenTo({
+        targets: this.shield,
+        alpha: 0.95,
+        scale: 1.35,
+        duration: 150,
+        ease: "Back.easeOut",
+      });
+    }
+
+    private async dismissShield() {
+      if (!this.shield?.visible) return;
+
+      await this.tweenTo({
+        targets: this.shield,
+        alpha: 0,
+        scale: 1.65,
+        duration: 150,
+        ease: "Quad.easeOut",
+      });
+      this.shield.setVisible(false);
+    }
+
+    private playHitEffect(x: number, y: number, tint?: number) {
+      const hit = this.add
+        .sprite(x, y, "hit-effect")
+        .setScale(2.4)
+        .setDepth(15);
+      if (tint) hit.setTint(tint);
+      hit.play("hit-effect");
+      hit.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+        hit.destroy();
+      });
+    }
+
+    private async castSpell(
+      spell: string,
+      shieldAction: string | undefined,
+      turn: number,
+      total: number,
+    ): Promise<boolean> {
+      if (!this.wizard || !this.warrior) return false;
+
+      const spellType = this.getSpellType(spell);
+      const shieldType = this.getShieldType(shieldAction);
+      const shouldBlock = shieldType === spellType;
+      const spellName = spellType === "fire" ? "CẦU LỬA" : "CẦU BĂNG";
+      const shieldLabel = shieldType
+        ? `${this.getShieldName(shieldType)}${shouldBlock ? "" : " (SAI LOẠI)"}`
+        : this.getInvalidActionLabel(shieldAction);
+      this.spellText.setText(
+        `Đòn ${turn + 1}/${total}: ${spellName} → ${shieldLabel}`,
       );
-      this.continueButton.input!.cursor = "pointer";
+      this.spellText.setColor(spellType === "fire" ? "#ffb36b" : "#9fe8ff");
 
-      this.continueButton.on("pointerover", () => {
-        background.setFillStyle(hoverFillColor, 1);
-        background.setStrokeStyle(4, 0xffffff, 1);
-        glow.setAlpha(0.72);
-        this.continueButton?.setScale(1.06);
-      });
-      this.continueButton.on("pointerout", () => {
-        background.setFillStyle(0x111827, 0.94);
-        background.setStrokeStyle(3, accentColor, 1);
-        glow.setAlpha(0.34);
-        this.continueButton?.setScale(1);
-      });
-      this.continueButton.once("pointerdown", () => {
-        if (this.hasOpenedResultOverlay) return;
-
-        this.hasOpenedResultOverlay = true;
-        this.continuePulse?.stop();
-        this.continueButton?.disableInteractive();
-        this.continueButton?.destroy();
-        this.continueButton = undefined;
-        this.showResultOverlay(passed);
-        onContinue();
-      });
-
-      this.continuePulse = this.tweens.add({
-        targets: glow,
-        alpha: { from: 0.22, to: 0.62 },
-        scaleX: { from: 1, to: 1.06 },
-        scaleY: { from: 1, to: 1.12 },
-        duration: 500,
-        yoyo: true,
-        repeat: -1,
-        ease: "Sine.easeInOut",
-      });
-    }
-
-    showResult(passed: boolean, onContinue: () => void) {
-      this.displayText.setText(passed ? "✓ PASS" : "✗ FAIL").setDepth(5);
-      this.displayText.setColor(passed ? "#00ff00" : "#ff0000");
-
-      if (passed) {
-        correctSound && correctSound.play();
+      if (shieldType) {
+        await this.activateShield(shieldType);
       } else {
-        wrongSound && wrongSound.play();
+        this.shield?.setVisible(false).setAlpha(0);
       }
 
-      this.prepareResultOverlay(passed);
-      this.showContinueButton(passed, onContinue);
+      if (attackSound) attackSound.play({ volume: 0.55 });
+      this.wizard.play("wizard-attack", true);
+      await this.delay(260);
+
+      const projectile = this.add
+        .sprite(
+          this.wizard.x - 64,
+          this.wizard.y - 2,
+          spellType === "fire" ? "fireball-1" : "iceball-1",
+        )
+        .setScale(2.2)
+        .setFlipX(true)
+        .setDepth(12);
+      projectile.play(spellType === "fire" ? "fireball-fly" : "iceball-fly");
+
+      const impactX = shouldBlock ? this.warrior.x + 68 : this.warrior.x + 10;
+      await this.tweenTo({
+        targets: projectile,
+        x: impactX,
+        y: this.warrior.y,
+        duration: 620,
+        ease: "Linear",
+      });
+
+      projectile.destroy();
+      this.playHitEffect(
+        impactX,
+        this.warrior.y,
+        spellType === "fire" ? 0xff8a3d : 0x8be9ff,
+      );
+
+      if (shouldBlock) {
+        this.cameras.main.shake(90, 0.0025);
+        await this.tweenTo({
+          targets: this.shield,
+          alpha: 0.45,
+          scale: 1.5,
+          duration: 90,
+          yoyo: true,
+        });
+        await this.dismissShield();
+      } else {
+        this.cameras.main.shake(180, 0.008);
+        if (shieldType) {
+          await this.dismissShield();
+        }
+      }
+
+      this.wizard.play("wizard-idle", true);
+      await this.delay(180);
+      return shouldBlock;
+    }
+
+    private async makeCharacterFall(
+      target: Phaser.GameObjects.Sprite,
+      direction: number,
+      tint: number,
+    ) {
+      target.stop();
+      target.setTint(tint);
+      await this.tweenTo({
+        targets: target,
+        x: target.x + direction * 55,
+        y: this.scale.gameSize.height + 130,
+        angle: direction * 30,
+        alpha: 0.35,
+        duration: 780,
+        ease: "Quad.easeIn",
+      });
+      target.setVisible(false);
+    }
+
+    private async killWarrior() {
+      if (!this.warrior) return;
+      await this.makeCharacterFall(this.warrior, -1, 0xff8c8c);
+    }
+
+    private async failFromExtraAction(action: string | undefined) {
+      if (!this.warrior) return;
+
+      const shieldType = this.getShieldType(action);
+      const actionLabel = shieldType
+        ? this.getShieldName(shieldType)
+        : this.getInvalidActionLabel(action);
+      this.spellText.setText(`Hành động thừa: ${actionLabel}`);
+      this.spellText.setColor("#ff8fa3");
+
+      if (shieldType) {
+        await this.activateShield(shieldType);
+        await this.tweenTo({
+          targets: this.shield,
+          scale: 2.1,
+          alpha: 0.25,
+          angle: 20,
+          duration: 260,
+          ease: "Back.easeIn",
+        });
+      } else {
+        await this.delay(300);
+      }
+
+      this.playHitEffect(
+        this.warrior.x + 35,
+        this.warrior.y,
+        shieldType === "ice" ? 0x8be9ff : 0xff8a6b,
+      );
+      this.cameras.main.shake(220, 0.01);
+      this.shield?.setVisible(false).setAlpha(0);
+      await this.killWarrior();
+    }
+
+    private async warriorDefeatsWizard() {
+      if (!this.warrior || !this.wizard) return;
+
+      await this.dismissShield();
+      this.spellText.setText("Hiệp sĩ phản công!");
+      this.spellText.setColor("#fde68a");
+
+      await this.tweenTo({
+        targets: this.warrior,
+        alpha: 0,
+        scale: 0.65,
+        duration: 170,
+        ease: "Quad.easeIn",
+      });
+      this.warrior.setPosition(this.wizard.x - 86, this.wizard.y);
+      await this.tweenTo({
+        targets: this.warrior,
+        alpha: 1,
+        scale: this.characterScale,
+        duration: 180,
+        ease: "Back.easeOut",
+      });
+
+      if (attackSound) attackSound.play({ volume: 0.55 });
+      this.warrior.play("warrior-attack", true);
+      await this.delay(310);
+      this.playHitEffect(this.wizard.x - 8, this.wizard.y, 0xfff0a8);
+      this.cameras.main.shake(160, 0.007);
+      await this.makeCharacterFall(this.wizard, 1, 0xffb0b0);
+      this.warrior.play("warrior-idle", true);
+    }
+
+    private async runBattle(result: any): Promise<boolean> {
+      const testCase = GAME_CONFIG.testCases[this.sceneIndex];
+      const spells = this.parseSequence(testCase?.input || "");
+      const actualActions = this.parseSequence(result?.actual || "");
+
+      if (spells.length === 0) {
+        if (actualActions.length === 0 && result?.passed) {
+          await this.warriorDefeatsWizard();
+          return true;
+        }
+        await this.failFromExtraAction(actualActions[0]);
+        return false;
+      }
+
+      for (let index = 0; index < spells.length; index++) {
+        const blocked = await this.castSpell(
+          spells[index],
+          actualActions[index],
+          index,
+          spells.length,
+        );
+
+        if (!blocked) {
+          await this.killWarrior();
+          return false;
+        }
+      }
+
+      if (actualActions.length > spells.length) {
+        await this.failFromExtraAction(actualActions[spells.length]);
+        return false;
+      }
+
+      if (!result?.passed) {
+        this.spellText.setText("Kết quả in ra không khớp chính xác");
+        this.spellText.setColor("#ff8fa3");
+        await this.killWarrior();
+        return false;
+      }
+
+      await this.warriorDefeatsWizard();
+      return true;
+    }
+
+    async showResult(result: any) {
+      if (this.resultHandled) return;
+      this.resultHandled = true;
+
+      this.displayText.setText("⚔ ĐANG GIAO CHIẾN");
+      this.displayText.setColor("#f8fafc");
+      await this.delay(250);
+
+      const survived = await this.runBattle(result);
+      this.displayText.setText(survived ? "✓ PASS" : "✗ FAIL");
+      this.displayText.setColor(survived ? "#55ef8b" : "#ff6b6b");
+
+      if (survived) {
+        if (correctSound) correctSound.play();
+      } else {
+        if (wrongSound) wrongSound.play();
+      }
     }
   }
 
@@ -633,30 +795,49 @@ export default function initGame(
     }
 
     preload() {
-      // Load assets for all scenes
       GAME_CONFIG.sceneAssets?.forEach((asset, index) => {
         if (asset.background) {
           this.load.image(`BG${index}`, asset.background);
         }
-        if (asset.quekem) {
-          this.load.image(`QK${index}`, asset.quekem);
-        }
-        if (asset.vokem) {
-          this.load.image(`VK${index}`, asset.vokem);
-        }
-        if (asset.passOverlay) {
-          this.load.image(`PASS${index}`, asset.passOverlay);
-        }
-        if (asset.failOverlay) {
-          this.load.image(`FAIL${index}`, asset.failOverlay);
-        }
       });
+
+      const basePath = "/python-basics/chapter-1/t10-cd-b12/id4";
+      this.load.spritesheet("warrior-idle", `${basePath}/Warrior_Idle.png`, {
+        frameWidth: 192,
+        frameHeight: 192,
+      });
+      this.load.spritesheet(
+        "warrior-attack",
+        `${basePath}/Warrior_Attack1.png`,
+        {
+          frameWidth: 192,
+          frameHeight: 192,
+        },
+      );
+      this.load.spritesheet("wizard-idle", `${basePath}/Wizard_Idle.png`, {
+        frameWidth: 192,
+        frameHeight: 192,
+      });
+      this.load.spritesheet("wizard-attack", `${basePath}/Wizard_Attack.png`, {
+        frameWidth: 192,
+        frameHeight: 192,
+      });
+      this.load.spritesheet("hit-effect", `${basePath}/hit_effect_sheet.png`, {
+        frameWidth: 32,
+        frameHeight: 32,
+      });
+      this.load.image("shield", `${basePath}/shield.png`);
+      this.load.image("fireball-1", `${basePath}/improved_fireball_001.png`);
+      this.load.image("fireball-2", `${basePath}/improved_fireball_002.png`);
+      this.load.image("fireball-3", `${basePath}/improved_fireball_003.png`);
+      this.load.image("iceball-1", `${basePath}/iceball_001.png`);
+      this.load.image("iceball-2", `${basePath}/iceball_002.png`);
+      this.load.audio("attack", `${basePath}/attacksound.wav`);
       this.load.audio("correct", "/sound_global/correct.mp3");
       this.load.audio("wrong", "/sound_global/wrong.mp3");
     }
 
     create() {
-      // Initialize sounds with proper AudioContext state checking
       try {
         if (this.sound && this.sound.context) {
           const audioContext = this.sound.context;
@@ -665,6 +846,7 @@ export default function initGame(
           if (audioContext.state !== "closed") {
             correctSound = this.sound.add("correct");
             wrongSound = this.sound.add("wrong");
+            attackSound = this.sound.add("attack");
 
             // Resume AudioContext if suspended
             if (audioContext.state === "suspended") {
@@ -682,7 +864,68 @@ export default function initGame(
         console.warn("Sound initialization failed:", error);
       }
 
-      // Start first game scene
+      this.anims.create({
+        key: "warrior-idle",
+        frames: this.anims.generateFrameNumbers("warrior-idle", {
+          start: 0,
+          end: 7,
+        }),
+        frameRate: 8,
+        repeat: -1,
+      });
+      this.anims.create({
+        key: "warrior-attack",
+        frames: this.anims.generateFrameNumbers("warrior-attack", {
+          start: 0,
+          end: 3,
+        }),
+        frameRate: 9,
+        repeat: 0,
+      });
+      this.anims.create({
+        key: "wizard-idle",
+        frames: this.anims.generateFrameNumbers("wizard-idle", {
+          start: 0,
+          end: 5,
+        }),
+        frameRate: 7,
+        repeat: -1,
+      });
+      this.anims.create({
+        key: "wizard-attack",
+        frames: this.anims.generateFrameNumbers("wizard-attack", {
+          start: 0,
+          end: 5,
+        }),
+        frameRate: 10,
+        repeat: 0,
+      });
+      this.anims.create({
+        key: "fireball-fly",
+        frames: [
+          { key: "fireball-1" },
+          { key: "fireball-2" },
+          { key: "fireball-3" },
+        ],
+        frameRate: 12,
+        repeat: -1,
+      });
+      this.anims.create({
+        key: "iceball-fly",
+        frames: [{ key: "iceball-1" }, { key: "iceball-2" }],
+        frameRate: 10,
+        repeat: -1,
+      });
+      this.anims.create({
+        key: "hit-effect",
+        frames: this.anims.generateFrameNumbers("hit-effect", {
+          start: 0,
+          end: 4,
+        }),
+        frameRate: 16,
+        repeat: 0,
+      });
+
       this.scene.start("GameScene0");
     }
   }
@@ -704,6 +947,7 @@ export default function initGame(
     currentSceneInstance = null;
     correctSound = null;
     wrongSound = null;
+    attackSound = null;
     updateSceneProgress();
 
     // Create scene instances for all test cases
@@ -729,12 +973,15 @@ export default function initGame(
       showResult: (sceneIndex: number, result: any) => {
         if (!phaserGame) return;
 
-        const passed = result.passed;
         const sceneKey = `GameScene${sceneIndex}`;
         const targetScene =
           phaserGame.scene.getScene(sceneKey) || currentSceneInstance;
+        const battle =
+          targetScene && "showResult" in targetScene
+            ? (targetScene as any).showResult(result)
+            : Promise.resolve();
 
-        const showNextStep = () => {
+        Promise.resolve(battle).finally(() => {
           if (sceneIndex < GAME_CONFIG.testCases.length - 1) {
             nextSceneBtn.style.display = "block";
 
@@ -751,12 +998,7 @@ export default function initGame(
               : "❌ Một số test cases sai";
             testcaseTable.classList.add("visible");
           }
-        };
-
-        // Call the result method on the scene that owns this test case.
-        if (targetScene && "showResult" in targetScene) {
-          (targetScene as any).showResult(passed, showNextStep);
-        }
+        });
       },
     };
   };
@@ -845,9 +1087,15 @@ sys.stdout = sys.__stdout__
 del input
 `);
 
-      // Compare output
-      const actualOutput = capturedOutput.trim();
-      const expectedOutput = testCase.expected.trim();
+      // print() adds one final newline. Remove only that newline so spaces,
+      // casing, empty tokens and additional output remain meaningful.
+      const normalizePrintedOutput = (value: unknown) =>
+        String(value ?? "")
+          .replace(/\r\n/g, "\n")
+          .replace(/\r/g, "\n")
+          .replace(/\n$/, "");
+      const actualOutput = normalizePrintedOutput(capturedOutput);
+      const expectedOutput = normalizePrintedOutput(testCase.expected);
       const passed = actualOutput === expectedOutput;
 
       testResults[sceneIndex] = {
@@ -972,9 +1220,57 @@ del input
   // EXPOSE GAME INSTANCE FOR SESSION SUBMISSION
   // ============================================================
   // Session system cần gameInstance để lấy kết quả test
-  (window as any).gameInstance = {
+  const exposedGameInstance = {
     getTestResults: getTestResults,
     getScore: getScore,
     getCode: () => codeInput?.value || "",
   };
+  (window as any).gameInstance = exposedGameInstance;
+
+  // Next.js giữ JavaScript đang chạy khi chuyển route. Chỉ cleanup khi
+  // component game thực sự bị tháo khỏi DOM; chuyển tab không ảnh hưởng.
+  let gameDisposed = false;
+  const disposeGame = () => {
+    if (gameDisposed) return;
+    gameDisposed = true;
+    routeObserver.disconnect();
+
+    for (const sound of [attackSound, correctSound, wrongSound]) {
+      if (!sound) continue;
+      try {
+        sound.stop();
+        sound.destroy();
+      } catch (error) {
+        console.warn("Error stopping game sound:", error);
+      }
+    }
+    attackSound = null;
+    correctSound = null;
+    wrongSound = null;
+
+    if (phaserGame) {
+      try {
+        phaserGame.sound?.stopAll();
+        phaserGame.destroy(true);
+      } catch (error) {
+        console.warn("Error destroying game on route change:", error);
+      }
+      phaserGame = null;
+    }
+    currentSceneInstance = null;
+
+    if ((window as any).gameInstance === exposedGameInstance) {
+      delete (window as any).gameInstance;
+    }
+  };
+
+  const routeObserver = new MutationObserver(() => {
+    if (!root.isConnected) {
+      disposeGame();
+    }
+  });
+  routeObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
 }

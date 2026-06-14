@@ -18,7 +18,7 @@ import { setupContestSubmission } from "@/lib/contestIntegration";
 // ============================================================
 // Format: "[course]/[topic]/[lesson]/[game-id]"
 // Ví dụ: "python-basics/chapter-1/t10-cd-b12/id1"
-const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
+const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id2";
 
 // ============================================================
 // CẤU HÌNH GAME TYPE 2 - CODERUNNER STYLE
@@ -26,84 +26,75 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
 
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
-  title: "Game 1: Kiểm tra xâu con",
+  title: "Game2: Bảo vệ bầy cừu",
   description: `-- Cốt truyện("Có thể bỏ qua")
-Một cửa hàng kem đang mở sự kiện mua kem trúng thưởng, trên thân mỗi que kem sẽ ghi một đồ vật bất kì nều đồ vật này có trong danh sách các đồ vật trên vỏ của que kem thì người đó sẽ được nhận món quà đó nhưng ngặt nỗi các nhân vật trong game này chưa được lập trình chức năng kiểm tra chuỗi con vậy nên bạn hay viết một chương trình python giúp họ kiểm tra xem mình có trúng thưởng không nhé !!!
+Người chăn cừu đang phải đau đầu vì một chú sói ranh mãnh đã biết đội lốt cừu để cải trang, rồi một ngày anh chăn cừu bỗng nhận ra một điều kì lạ là mình có thể nhìn thấy những con số trên đầu những chú cừu và dường như những số này có thể giúp anh ta tìm ra chú sói kia, hãy giúp anh chăn cừu tìm ra con chú ranh mãnh này nhé !
 
--- Yêu cầu
-Viết chương trình nhập vào hai dòng:
-Dòng 1: Một xâu s là danh sách các giải thưởng của cửa hàng kem.
-Dòng 2: Một xâu sub là dòng chữ in trên que kem của khách hàng.
-Hãy kiểm tra xem sub có xuất hiện trong s hay không.
+-- Yêu cầu:
+Một đàn cừu đang đi thành hàng. Danh sách các con vật trong đàn được biểu diễn bằng một xâu kí tự, trong đó các "cuu" và "soi" được viết cách nhau bởi dấu phẩy và dấu cách. Trong đàn có thể có hoặc không có một con sói đang lẩn trốn. Sói được biểu diễn bằng xâu "soi" Cừu được biểu diễn bằng xâu "cuu"
+
+Bạn hãy viết chương trình kiểm tra xem trong xâu nhập vào có xuất hiện xâu "soi" hay không.
+
 Nếu có, in ra:
-CÓ
+CO
+vi_tri
+
+Trong đó vi_tri là vị trí của kí tự đầu tiên của từ "soi" trong xâu ban đầu.
+
 Nếu không có, in ra:
-KHÔNG`,
+KHONG
+-1
+Dữ liệu vào
+
+Một dòng duy nhất chứa xâu mô tả đàn cừu.
+
+Dữ liệu ra
+Nếu tìm thấy "soi", in ra CO và vị trí xuất hiện đầu tiên của "soi".
+Nếu không tìm thấy "soi", in ra KHONG và -1.`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
   // Dùng "\n" để phân tách nhiều lần gọi input() trong 1 test case
   // Ví dụ: input = "5\n10" → input() lần 1 = "5", input() lần 2 = "10"
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
-  ioExamples: [
-    {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÚT CHÌ MÀU",
-      output: "CÓ",
-    },
-    {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nKEM DÂU",
-      output: "KHÔNG",
-    },
+    ioExamples: [
+    { input: "soi, cuu, cuu", output: "CO\n0" }
   ],
 
-  testCases: [
+    testCases: [
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nÁO KHOÁC",
-      expected: "CÓ",
+      input: "cuu, soi, cuu, cuu, cuu, cuu, cuu, cuu",
+      expected: "CO\n5",
       description: "Test case 1",
-      sceneText: "Vị khách đầu tiên",
+      sceneText: "Level 1",
     },
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nROBOT ĐỒ CHƠI",
-      expected: "KHÔNG",
+      input: "cuu, cuu, cuu, soi, cuu, cuu ,cuu, cuu, cuu, cuu",
+      expected: "CO\n15",
       description: "Test case 2",
-      sceneText: "Vị khách thứ 2",
+      sceneText: "Level 2",
     },
     {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÌNH NƯỚC",
-      expected: "CÓ",
-      description: "Test  3",
-      sceneText: "Vị khách thứ 3",
-    },
+      input: "cuu, cuu, cuu, cuu, cuu, cuu, cuu, cuu, cuu ",
+      expected: "KHONG\n-1",
+      description: "Test case 3",
+      sceneText: "Level 3",
+    }
   ],
   // Code Python mẫu cho học sinh (sử dụng input() và print())
-  starterCode: ``,
+  starterCode: `# Đọc input
+a = int(input())
+b = int(input())
+
+# Xử lý và print kết quả
+result = a + b
+print(result)`,
 
   // Assets cho từng scene (optional)
   // Path format: /[course]/[topic]/[lesson]/[game]/scene1.png
   // Example: /python-basics/chapter-1/t10-cd-b12/id1/scene1.png
   sceneAssets: [
-    {
-      background: "/python-basics/chapter-1/t10-cd-b12/id1/cuahangkemrsz.png",
-      quekem: "/python-basics/chapter-1/t10-cd-b12/id1/quekemrmb.png",
-      vokem: "/python-basics/chapter-1/t10-cd-b12/id1/vokem.png",
-      passOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene1-pass.png",
-      failOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene1-fail.png",
-    },
-    {
-      background: "/python-basics/chapter-1/t10-cd-b12/id1/cuahangkemrsz.png",
-      quekem: "/python-basics/chapter-1/t10-cd-b12/id1/quekemrmb.png",
-      vokem: "/python-basics/chapter-1/t10-cd-b12/id1/vokem.png",
-      passOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene2-pass.png",
-      failOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene2-fail.png",
-    },
-    {
-      background: "/python-basics/chapter-1/t10-cd-b12/id1/cuahangkemrsz.png",
-      quekem: "/python-basics/chapter-1/t10-cd-b12/id1/quekemrmb.png",
-      vokem: "/python-basics/chapter-1/t10-cd-b12/id1/vokem.png",
-      passOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene3-pass.png",
-      failOverlay: "/python-basics/chapter-1/t10-cd-b12/id1/scene3-fail.png",
-    },
+    { background: "/python-basics/chapter-1/t10-cd-b12/id2/bg.png" },
   ],
 
   // Phaser config
@@ -424,10 +415,11 @@ export default function initGame(
     private sceneIndex: number;
     private displayText: any;
     private sceneText: any;
-    private continueButton?: Phaser.GameObjects.Container;
-    private continuePulse?: Phaser.Tweens.Tween;
-    private preparedResultOverlay?: Phaser.GameObjects.Image;
-    private hasOpenedResultOverlay = false;
+    private wolves: Phaser.GameObjects.Sprite[] = [];
+    private sheeps: Phaser.GameObjects.Sprite[] = [];
+    private pawn?: Phaser.GameObjects.Sprite;
+    private characterTweens: Phaser.Tweens.Tween[] = [];
+    private resultHandled = false;
 
     constructor(sceneIndex: number) {
       super({ key: `GameScene${sceneIndex}` });
@@ -442,10 +434,14 @@ export default function initGame(
       }
 
       currentSceneInstance = this;
-      this.hasOpenedResultOverlay = false;
+      this.wolves = [];
+      this.sheeps = [];
+      this.characterTweens = [];
+      this.resultHandled = false;
 
       // Load background if exists
-      const bgKey = `BG${this.sceneIndex}`;
+      const sceneBgKey = `BG${this.sceneIndex}`;
+      const bgKey = this.textures.exists(sceneBgKey) ? sceneBgKey : "BG0";
       if (this.textures.exists(bgKey)) {
         const bg = this.add.image(0, 0, bgKey).setOrigin(0);
         bg.displayWidth = this.scale.gameSize.width;
@@ -461,7 +457,7 @@ export default function initGame(
         {
           fontFamily: "Space Grotesk, sans-serif",
           fontSize: "32px",
-          color: "#e5067d",
+          color: "#ffffff",
           align: "center",
         },
       );
@@ -478,141 +474,292 @@ export default function initGame(
 
       displayText = this.displayText;
       sceneText = this.sceneText;
-      let quekem = this.add
-        .image(-100, this.scale.gameSize.height + 200, `QK${this.sceneIndex}`)
-        .setOrigin(0, 1)
-        .setScale(1.5);
-      let vokem = this.add
-        .image(
-          this.scale.gameSize.width / 10,
-          this.scale.gameSize.height / 4,
-          `VK${this.sceneIndex}`,
-        )
-        .setOrigin(0, 0)
-        .setScale(0.7);
-      const testCase = GAME_CONFIG.testCases[this.sceneIndex];
-      const [s, sub] = testCase.input.split("\n");
-      this.SubText = this.add.text(quekem.x + 310, quekem.y - 325, sub, {
-        fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "32px",
-        color: "#5b0a0a",
-        align: "center",
-      });
-      this.SubText = this.add.text(vokem.x + 90, vokem.y + 65, s, {
-        fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "20px",
-        color: "#042e5b",
-        align: "center",
-      });
+
+      this.createCharactersFromInput();
     }
 
-    private prepareResultOverlay(passed: boolean) {
-      const overlayKey = `${passed ? "PASS" : "FAIL"}${this.sceneIndex}`;
+    private createCharactersFromInput() {
+      const { width, height } = this.scale.gameSize;
+      const maxY = height - 150;
+      const animals = this.getAnimalsFromInput();
+      let sheepIndex = 0;
+      let wolfIndex = 0;
 
-      if (!this.textures.exists(overlayKey)) {
-        console.warn(`Result overlay not loaded: ${overlayKey}`);
-        return;
+      for (const animal of animals) {
+        if (animal.type !== "sheep") continue;
+
+        const lane = sheepIndex % 4;
+        const x = 95 + ((sheepIndex * 145) % (width - 190));
+        const y = Math.min(maxY, 150 + lane * 52);
+        const sheep = this.add.sprite(x, y, "sheep");
+        sheep.setScale(0.55);
+        sheep.setDepth(2 + lane * 0.01);
+        sheep.play("sheep-move");
+        this.addIndexLabel(sheep, animal.index, "#1d4ed8", 48);
+        this.sheeps.push(sheep);
+        this.addWanderTween(
+          sheep,
+          x,
+          y,
+          85 + (sheepIndex % 3) * 38,
+          3300 + sheepIndex * 180,
+        );
+        sheepIndex++;
       }
 
-      const existingOverlay = this.children.getByName("result-overlay");
-      existingOverlay?.destroy();
-      this.preparedResultOverlay?.destroy();
+      for (const animal of animals) {
+        if (animal.type !== "wolf") continue;
 
-      const overlay = this.add.image(0, 0, overlayKey).setOrigin(0);
-      overlay.setName("result-overlay");
-      overlay.displayWidth = this.scale.gameSize.width;
-      overlay.displayHeight = this.scale.gameSize.height;
-      overlay.setDepth(1000);
-      overlay.setAlpha(0.001);
-      this.preparedResultOverlay = overlay;
-    }
-
-    private showResultOverlay(passed: boolean) {
-      if (!this.preparedResultOverlay) {
-        this.prepareResultOverlay(passed);
+        const lane = wolfIndex % 3;
+        const x = width - 110 - ((wolfIndex * 155) % (width - 220));
+        const y = Math.min(maxY, 185 + lane * 58);
+        const wolf = this.add.sprite(x, y, "wolf");
+        wolf.setScale(0.3);
+        wolf.setDepth(3 + lane * 0.01);
+        wolf.play("wolf-walk");
+        this.addIndexLabel(wolf, animal.index, "#b91c1c", 58);
+        this.wolves.push(wolf);
+        this.addWanderTween(
+          wolf,
+          x,
+          y,
+          105 + (wolfIndex % 3) * 42,
+          4200 + wolfIndex * 220,
+        );
+        wolfIndex++;
       }
 
-      this.preparedResultOverlay?.setAlpha(1);
+      this.pawn = this.add.sprite(width / 2, maxY, "pawn-idle");
+      this.pawn.setScale(0.56);
+      this.pawn.setDepth(4);
+      this.pawn.play("pawn-idle");
     }
 
-    private showContinueButton(passed: boolean, onContinue: () => void) {
-      this.continuePulse?.stop();
-      this.continueButton?.destroy();
+    private getAnimalCounts() {
+      const input = GAME_CONFIG.testCases[this.sceneIndex]?.input || "";
+      const normalized = input
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+      const tokens = normalized.split(/[^a-z0-9]+/).filter(Boolean);
 
-      const buttonWidth = 158;
-      const buttonHeight = 42;
-      const margin = 18;
-      const x = this.scale.gameSize.width - buttonWidth / 2 - margin;
-      const y = this.scale.gameSize.height - buttonHeight / 2 - margin;
-      const accentColor = passed ? 0x22c55e : 0xef4444;
-      const hoverFillColor = passed ? 0x16a34a : 0xdc2626;
+      let sheepCount = tokens.filter((token) =>
+        ["cuu", "sheep", "c"].includes(token),
+      ).length;
+      let wolfCount = tokens.filter((token) =>
+        ["soi", "wolf", "w"].includes(token),
+      ).length;
 
-      const glow = this.add
-        .rectangle(0, 0, buttonWidth + 12, buttonHeight + 12, accentColor, 0.34)
-        .setName("continue-glow");
-      const background = this.add
-        .rectangle(0, 0, buttonWidth, buttonHeight, 0x111827, 0.94)
-        .setStrokeStyle(3, accentColor, 1);
-      const label = this.add.text(0, 0, "to be continued", {
+      sheepCount += (input.match(/🐑/g) || []).length;
+      wolfCount += (input.match(/🐺/g) || []).length;
+
+      return { sheepCount, wolfCount };
+    }
+
+    private getAnimalsFromInput() {
+      const input = GAME_CONFIG.testCases[this.sceneIndex]?.input || "";
+      const animals: { type: "sheep" | "wolf"; index: number }[] = [];
+      const animalRegex = /cuu|cừu|sheep|soi|sói|wolf/giu;
+      let match: RegExpExecArray | null;
+
+      while ((match = animalRegex.exec(input)) !== null) {
+        const normalized = match[0]
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+        const type =
+          normalized === "soi" || normalized === "wolf" ? "wolf" : "sheep";
+        animals.push({ type, index: match.index });
+      }
+
+      return animals;
+    }
+
+    private addIndexLabel(
+      sprite: Phaser.GameObjects.Sprite,
+      index: number,
+      color: string,
+      offsetY: number,
+    ) {
+      const label = this.add.text(sprite.x, sprite.y - offsetY, String(index), {
         fontFamily: "Space Grotesk, sans-serif",
-        fontSize: "14px",
-        color: "#ffffff",
+        fontSize: "18px",
+        fontStyle: "bold",
+        color,
         align: "center",
       });
       label.setOrigin(0.5);
+      label.setStroke("#ffffff", 4);
+      label.setDepth(sprite.depth + 1);
+      sprite.setData("indexLabel", label);
+      sprite.setData("labelOffsetY", offsetY);
+    }
 
-      this.continueButton = this.add.container(x, y, [glow, background, label]);
-      this.continueButton.setSize(buttonWidth, buttonHeight);
-      this.continueButton.setDepth(1100);
-      this.continueButton.setInteractive(
-        new Phaser.Geom.Rectangle(
-          -buttonWidth / 2,
-          -buttonHeight / 2,
-          buttonWidth,
-          buttonHeight,
-        ),
-        Phaser.Geom.Rectangle.Contains,
-      );
-      this.continueButton.input!.cursor = "pointer";
+    private syncAnimalLabels() {
+      [...this.sheeps, ...this.wolves].forEach((sprite) => {
+        const label = sprite.getData("indexLabel") as
+          | Phaser.GameObjects.Text
+          | undefined;
+        if (!sprite.active || !label?.active) return;
 
-      this.continueButton.on("pointerover", () => {
-        background.setFillStyle(hoverFillColor, 1);
-        background.setStrokeStyle(4, 0xffffff, 1);
-        glow.setAlpha(0.72);
-        this.continueButton?.setScale(1.06);
-      });
-      this.continueButton.on("pointerout", () => {
-        background.setFillStyle(0x111827, 0.94);
-        background.setStrokeStyle(3, accentColor, 1);
-        glow.setAlpha(0.34);
-        this.continueButton?.setScale(1);
-      });
-      this.continueButton.once("pointerdown", () => {
-        if (this.hasOpenedResultOverlay) return;
-
-        this.hasOpenedResultOverlay = true;
-        this.continuePulse?.stop();
-        this.continueButton?.disableInteractive();
-        this.continueButton?.destroy();
-        this.continueButton = undefined;
-        this.showResultOverlay(passed);
-        onContinue();
-      });
-
-      this.continuePulse = this.tweens.add({
-        targets: glow,
-        alpha: { from: 0.22, to: 0.62 },
-        scaleX: { from: 1, to: 1.06 },
-        scaleY: { from: 1, to: 1.12 },
-        duration: 500,
-        yoyo: true,
-        repeat: -1,
-        ease: "Sine.easeInOut",
+        const offsetY = sprite.getData("labelOffsetY") || 52;
+        label.setPosition(sprite.x, sprite.y - offsetY);
       });
     }
 
-    showResult(passed: boolean, onContinue: () => void) {
-      this.displayText.setText(passed ? "✓ PASS" : "✗ FAIL").setDepth(5);
+    private addWanderTween(
+      sprite: Phaser.GameObjects.Sprite,
+      startX: number,
+      startY: number,
+      distance: number,
+      duration: number,
+    ) {
+      const maxY = this.scale.gameSize.height - 150;
+      const targetX =
+        startX < this.scale.gameSize.width / 2
+          ? Math.min(this.scale.gameSize.width - 70, startX + distance)
+          : Math.max(70, startX - distance);
+      const targetY = Math.min(maxY, startY);
+      sprite.setFlipX(targetX < startX);
+
+      const tween = this.tweens.add({
+        targets: sprite,
+        x: targetX,
+        y: targetY,
+        duration,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+        onYoyo: () => sprite.setFlipX(targetX > startX),
+        onRepeat: () => sprite.setFlipX(targetX < startX),
+      });
+
+      this.characterTweens.push(tween);
+    }
+
+    private stopCharacterMovement() {
+      this.characterTweens.forEach((tween) => tween.stop());
+      this.characterTweens = [];
+    }
+
+    private moveSpriteTo(
+      sprite: Phaser.GameObjects.Sprite,
+      x: number,
+      y: number,
+      duration = 650,
+    ): Promise<void> {
+      return new Promise((resolve) => {
+        sprite.setFlipX(x < sprite.x);
+        this.tweens.add({
+          targets: sprite,
+          x,
+          y: Math.min(y, this.scale.gameSize.height - 150),
+          duration,
+          ease: "Sine.easeInOut",
+          onComplete: () => resolve(),
+        });
+      });
+    }
+
+    private playPawnAttack(): Promise<void> {
+      return new Promise((resolve) => {
+        if (!this.pawn) {
+          resolve();
+          return;
+        }
+
+        this.pawn.play("pawn-interact");
+        this.time.delayedCall(520, () => {
+          this.pawn?.play("pawn-idle");
+          resolve();
+        });
+      });
+    }
+
+    private vanishSprite(sprite: Phaser.GameObjects.Sprite): Promise<void> {
+      return new Promise((resolve) => {
+        const label = sprite.getData("indexLabel") as
+          | Phaser.GameObjects.Text
+          | undefined;
+        const targets = label?.active ? [sprite, label] : [sprite];
+
+        this.tweens.add({
+          targets,
+          alpha: 0,
+          scale: 0,
+          angle: 90,
+          duration: 280,
+          ease: "Quad.easeIn",
+          onComplete: () => {
+            label?.destroy();
+            sprite.destroy();
+            resolve();
+          },
+        });
+      });
+    }
+
+    private async pawnKillsTargets(targets: Phaser.GameObjects.Sprite[]) {
+      if (!this.pawn) return;
+
+      for (const target of targets.filter((item) => item.active)) {
+        this.pawn.play("pawn-run");
+        await this.moveSpriteTo(this.pawn, this.getPawnAttackX(target), target.y, 620);
+        await this.playPawnAttack();
+        await this.vanishSprite(target);
+      }
+
+      this.pawn.play("pawn-idle");
+    }
+
+    private async wolvesEatSheep() {
+      const livingWolves = this.wolves.filter((wolf) => wolf.active);
+      const livingSheep = this.sheeps.filter((sheep) => sheep.active);
+      if (livingWolves.length === 0 || livingSheep.length === 0) return;
+
+      for (const [index, sheep] of livingSheep.entries()) {
+        const wolf = livingWolves[index % livingWolves.length];
+        if (!wolf?.active || !sheep.active) continue;
+
+        wolf.play("wolf-walk");
+        await this.moveSpriteTo(wolf, sheep.x - 18, sheep.y, 720);
+        await this.vanishSprite(sheep);
+      }
+    }
+
+    private runPassAnimation() {
+      if (this.wolves.length === 0) return;
+
+      this.stopCharacterMovement();
+      this.wolves.forEach((wolf) => wolf.play("wolf-walk"));
+
+      this.pawnKillsTargets(this.wolves);
+    }
+
+    private runFailAnimation() {
+      this.stopCharacterMovement();
+
+      if (this.wolves.length > 0) {
+        this.wolvesEatSheep();
+        return;
+      }
+
+      this.pawnKillsTargets(this.sheeps);
+    }
+
+    private getPawnAttackX(target: Phaser.GameObjects.Sprite) {
+      if (!this.pawn) return target.x - 45;
+
+      const offset = 45;
+      const rawX = target.x < this.pawn.x ? target.x + offset : target.x - offset;
+      return Phaser.Math.Clamp(rawX, 40, this.scale.gameSize.width - 40);
+    }
+
+    showResult(passed: boolean) {
+      if (this.resultHandled) return;
+      this.resultHandled = true;
+
+      this.displayText.setText(passed ? "✓ PASS" : "✗ FAIL");
       this.displayText.setColor(passed ? "#00ff00" : "#ff0000");
 
       if (passed) {
@@ -621,8 +768,15 @@ export default function initGame(
         wrongSound && wrongSound.play();
       }
 
-      this.prepareResultOverlay(passed);
-      this.showContinueButton(passed, onContinue);
+      if (passed) {
+        this.runPassAnimation();
+      } else {
+        this.runFailAnimation();
+      }
+    }
+
+    update() {
+      this.syncAnimalLabels();
     }
   }
 
@@ -638,19 +792,32 @@ export default function initGame(
         if (asset.background) {
           this.load.image(`BG${index}`, asset.background);
         }
-        if (asset.quekem) {
-          this.load.image(`QK${index}`, asset.quekem);
-        }
-        if (asset.vokem) {
-          this.load.image(`VK${index}`, asset.vokem);
-        }
-        if (asset.passOverlay) {
-          this.load.image(`PASS${index}`, asset.passOverlay);
-        }
-        if (asset.failOverlay) {
-          this.load.image(`FAIL${index}`, asset.failOverlay);
-        }
       });
+      const basePath = "/python-basics/chapter-1/t10-cd-b12/id2";
+      this.load.spritesheet("wolf", `${basePath}/wolf_in_clo_sheep.png`, {
+        frameWidth: 192,
+        frameHeight: 180,
+      });
+      this.load.spritesheet("sheep", `${basePath}/Sheep_Move.png`, {
+        frameWidth: 128,
+        frameHeight: 128,
+      });
+      this.load.spritesheet("pawn-idle", `${basePath}/Pawn_Idle Axe.png`, {
+        frameWidth: 192,
+        frameHeight: 192,
+      });
+      this.load.spritesheet("pawn-run", `${basePath}/Pawn_Run Axe.png`, {
+        frameWidth: 192,
+        frameHeight: 192,
+      });
+      this.load.spritesheet(
+        "pawn-interact",
+        `${basePath}/Pawn_Interact Axe.png`,
+        {
+          frameWidth: 192,
+          frameHeight: 192,
+        },
+      );
       this.load.audio("correct", "/sound_global/correct.mp3");
       this.load.audio("wrong", "/sound_global/wrong.mp3");
     }
@@ -681,6 +848,56 @@ export default function initGame(
       } catch (error) {
         console.warn("Sound initialization failed:", error);
       }
+
+      this.anims.create({
+        key: "wolf-walk",
+        frames: this.anims.generateFrameNumbers("wolf", {
+          start: 0,
+          end: 7,
+        }),
+        frameRate: 8,
+        repeat: -1,
+      });
+
+      this.anims.create({
+        key: "sheep-move",
+        frames: this.anims.generateFrameNumbers("sheep", {
+          start: 0,
+          end: 3,
+        }),
+        frameRate: 7,
+        repeat: -1,
+      });
+
+      this.anims.create({
+        key: "pawn-idle",
+        frames: this.anims.generateFrameNumbers("pawn-idle", {
+          start: 0,
+          end: 7,
+        }),
+        frameRate: 8,
+        repeat: -1,
+      });
+
+      this.anims.create({
+        key: "pawn-run",
+        frames: this.anims.generateFrameNumbers("pawn-run", {
+          start: 0,
+          end: 5,
+        }),
+        frameRate: 10,
+        repeat: -1,
+      });
+
+      this.anims.create({
+        key: "pawn-interact",
+        frames: this.anims.generateFrameNumbers("pawn-interact", {
+          start: 0,
+          end: 5,
+        }),
+        frameRate: 12,
+        repeat: 0,
+      });
 
       // Start first game scene
       this.scene.start("GameScene0");
@@ -734,10 +951,18 @@ export default function initGame(
         const targetScene =
           phaserGame.scene.getScene(sceneKey) || currentSceneInstance;
 
-        const showNextStep = () => {
+        // Call the scene's showResult method
+        if (targetScene && "showResult" in targetScene) {
+          (targetScene as any).showResult(passed);
+        }
+
+        // Show Next button or final results
+        setTimeout(() => {
           if (sceneIndex < GAME_CONFIG.testCases.length - 1) {
+            // Còn scene tiếp theo - hiển thị nút Next
             nextSceneBtn.style.display = "block";
 
+            // Auto-scroll to game canvas for better UX
             const phaserRoot = document.getElementById("phaser-root");
             if (phaserRoot) {
               phaserRoot.scrollIntoView({
@@ -746,17 +971,13 @@ export default function initGame(
               });
             }
           } else {
+            // Đã hết scenes - hiển thị kết quả
             status.textContent = testResults.every((r) => r.passed)
               ? "🎉 Hoàn thành tất cả scenes!"
               : "❌ Một số test cases sai";
             testcaseTable.classList.add("visible");
           }
-        };
-
-        // Call the result method on the scene that owns this test case.
-        if (targetScene && "showResult" in targetScene) {
-          (targetScene as any).showResult(passed, showNextStep);
-        }
+        }, 1500);
       },
     };
   };
