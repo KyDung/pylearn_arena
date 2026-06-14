@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { enhanceGameOutputDiffTables } from "@/lib/gameOutputDiff";
 
 // Declare global loadPyodide from CDN
 declare global {
@@ -20,6 +21,7 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
 
   useEffect(() => {
     let mounted = true;
+    let cleanupOutputDiff: (() => void) | null = null;
 
     const loadGame = async () => {
       if (!gameRootRef.current) return;
@@ -68,6 +70,9 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
 
           if (gameRootRef.current) {
             initGame(gameRootRef.current, { pyodide });
+            cleanupOutputDiff = enhanceGameOutputDiffTables(
+              gameRootRef.current,
+            );
             setStatus("Game đã sẵn sàng!");
           }
         } catch (importError: any) {
@@ -85,6 +90,7 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
 
     return () => {
       mounted = false;
+      cleanupOutputDiff?.();
     };
   }, [pathParam]);
 
