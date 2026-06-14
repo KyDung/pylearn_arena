@@ -873,8 +873,8 @@ export default function initCodingSet(
           <tr>
             <th>#</th>
             <th>Input</th>
-            <th>Output mong đợi</th>
-            <th>Output thực tế</th>
+            <th>Expected</th>
+            <th>Output</th>
             <th>Trạng thái</th>
           </tr>
         </thead>
