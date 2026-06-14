@@ -22,6 +22,7 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
   useEffect(() => {
     let mounted = true;
     let cleanupOutputDiff: (() => void) | null = null;
+    let cleanupGame: (() => void) | null = null;
 
     const loadGame = async () => {
       if (!gameRootRef.current) return;
@@ -69,7 +70,10 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
           if (!mounted) return;
 
           if (gameRootRef.current) {
-            initGame(gameRootRef.current, { pyodide });
+            const cleanup = initGame(gameRootRef.current, { pyodide });
+            if (typeof cleanup === "function") {
+              cleanupGame = cleanup;
+            }
             cleanupOutputDiff = enhanceGameOutputDiffTables(
               gameRootRef.current,
             );
@@ -91,6 +95,7 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
     return () => {
       mounted = false;
       cleanupOutputDiff?.();
+      cleanupGame?.();
     };
   }, [pathParam]);
 

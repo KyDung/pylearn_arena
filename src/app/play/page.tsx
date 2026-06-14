@@ -30,6 +30,20 @@ interface ActiveSession {
   duration_minutes: number;
 }
 
+interface SessionGameInstance {
+  canSubmit?: () => boolean;
+  getIncompleteMessage?: () => string;
+  getCode?: () => string;
+  getScore?: () => number;
+  getTestResults: () => {
+    passed?: number;
+    total?: number;
+    passedTests?: number;
+    totalTests?: number;
+    score?: number;
+  };
+}
+
 function PlayContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -144,23 +158,39 @@ function PlayContent() {
   const handleSubmitCode = async () => {
     if (!activeSession) return;
 
-    // Get code from custom code editor
+    const gameInstance = (
+      window as Window & { gameInstance?: SessionGameInstance }
+    ).gameInstance;
+
+    if (gameInstance?.canSubmit && !gameInstance.canSubmit()) {
+      setSubmitError(
+        gameInstance.getIncompleteMessage?.() ||
+          "Vui lòng chấm tất cả bài trước khi nộp.",
+      );
+      return;
+    }
+
+    // Coding sets serialize all answers through getCode(). Games continue
+    // using the visible editor value as before.
     const codeInput = document.querySelector(
       "#code-input",
     ) as HTMLTextAreaElement;
-    if (!codeInput) {
+    const code =
+      typeof gameInstance?.getCode === "function"
+        ? gameInstance.getCode()
+        : codeInput?.value;
+
+    if (typeof code !== "string") {
       setSubmitError("Không tìm thấy code editor");
       return;
     }
 
-    const code = codeInput.value;
     if (!code.trim()) {
       setSubmitError("Vui lòng nhập code trước khi nộp bài");
       return;
     }
 
     // Get test results from game
-    const gameInstance = (window as any).gameInstance;
     if (!gameInstance || !gameInstance.getTestResults) {
       setSubmitError(
         "Vui lòng chạy code và kiểm tra test cases trước khi nộp bài!",
@@ -169,10 +199,24 @@ function PlayContent() {
     }
 
     const testResults = gameInstance.getTestResults();
-    if (testResults.total === 0) {
+    const passedTests = Number(
+      testResults.passedTests ?? testResults.passed ?? 0,
+    );
+    const totalTests = Number(
+      testResults.totalTests ?? testResults.total ?? 0,
+    );
+
+    if (totalTests === 0) {
       setSubmitError("Vui lòng chạy code để kiểm tra test cases trước!");
       return;
     }
+
+    const score =
+      typeof gameInstance.getScore === "function"
+        ? Number(gameInstance.getScore())
+        : Number.isFinite(Number(testResults.score))
+          ? Number(testResults.score)
+          : Math.round((passedTests / totalTests) * 100);
 
     setSubmitting(true);
     setSubmitError(null);
@@ -186,9 +230,9 @@ function PlayContent() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             code,
-            passed_tests: testResults.passed,
-            total_tests: testResults.total,
-            score: Math.round((testResults.passed / testResults.total) * 100),
+            passed_tests: passedTests,
+            total_tests: totalTests,
+            score,
           }),
         },
       );
