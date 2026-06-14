@@ -808,9 +808,9 @@ del input
   };
 
   // Setup contest - nếu GAME_PATH đúng, sẽ tự hiển thị nút nộp bài
-  if (GAME_PATH !== "CHANGE_ME") {
+  if (GAME_PATH !== "CHANGE_ME" && codeEditor) {
     setupContestSubmission(root, GAME_PATH, {
-      getCode: () => codeInput.value,
+      getCode: () => codeEditor.getCode(),
       getScore: getScore,
       getTestResults: getTestResults,
       onSubmitted: (result) => {
@@ -830,6 +830,6 @@ del input
   (window as any).gameInstance = {
     getTestResults: getTestResults,
     getScore: getScore,
-    getCode: () => codeInput?.value || "",
+    getCode: () => codeEditor?.getCode() || "",
   };
 }
