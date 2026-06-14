@@ -31,6 +31,7 @@ interface ActiveSession {
 }
 
 interface SessionGameInstance {
+  prepareSubmission?: () => void | Promise<void>;
   canSubmit?: () => boolean;
   getIncompleteMessage?: () => string;
   getCode?: () => string;
@@ -164,14 +165,6 @@ function PlayContent() {
       window as Window & { gameInstance?: SessionGameInstance }
     ).gameInstance;
 
-    if (gameInstance?.canSubmit && !gameInstance.canSubmit()) {
-      setSubmitError(
-        gameInstance.getIncompleteMessage?.() ||
-          "Vui lòng chấm tất cả bài trước khi nộp.",
-      );
-      return;
-    }
-
     // Coding sets serialize all answers through getCode(). Games continue
     // using the visible editor value as before.
     const codeInput = document.querySelector(
@@ -192,7 +185,6 @@ function PlayContent() {
       return;
     }
 
-    // Get test results from game
     if (!gameInstance || !gameInstance.getTestResults) {
       setSubmitError(
         "Vui lòng chạy code và kiểm tra test cases trước khi nộp bài!",
@@ -200,31 +192,49 @@ function PlayContent() {
       return;
     }
 
-    const testResults = gameInstance.getTestResults();
-    const passedTests = Number(
-      testResults.passedTests ?? testResults.passed ?? 0,
-    );
-    const totalTests = Number(
-      testResults.totalTests ?? testResults.total ?? 0,
-    );
-
-    if (totalTests === 0) {
-      setSubmitError("Vui lòng chạy code để kiểm tra test cases trước!");
-      return;
-    }
-
-    const score =
-      typeof gameInstance.getScore === "function"
-        ? Number(gameInstance.getScore())
-        : Number.isFinite(Number(testResults.score))
-          ? Number(testResults.score)
-          : Math.round((passedTests / totalTests) * 100);
-
     setSubmitting(true);
     setSubmitError(null);
     setSubmitSuccess(false);
 
     try {
+      try {
+        await gameInstance.prepareSubmission?.();
+      } catch (error) {
+        console.error("Session grading error:", error);
+        setSubmitError(
+          "Không thể chấm toàn bộ test case. Vui lòng kiểm tra code và thử lại.",
+        );
+        return;
+      }
+
+      if (gameInstance.canSubmit && !gameInstance.canSubmit()) {
+        setSubmitError(
+          gameInstance.getIncompleteMessage?.() ||
+            "Không thể chấm đầy đủ bài làm để nộp.",
+        );
+        return;
+      }
+
+      const testResults = gameInstance.getTestResults();
+      const passedTests = Number(
+        testResults.passedTests ?? testResults.passed ?? 0,
+      );
+      const totalTests = Number(
+        testResults.totalTests ?? testResults.total ?? 0,
+      );
+
+      if (totalTests === 0) {
+        setSubmitError("Game chưa cung cấp test case để chấm bài.");
+        return;
+      }
+
+      const score =
+        typeof gameInstance.getScore === "function"
+          ? Number(gameInstance.getScore())
+          : Number.isFinite(Number(testResults.score))
+            ? Number(testResults.score)
+            : Math.round((passedTests / totalTests) * 100);
+
       const res = await fetch(
         `/api/student/sessions/${activeSession.id}/submit`,
         {

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import * as Phaser from "phaser";
 import { isPyodideTimeout, withPyodideTimeout } from "@/lib/pyodideTimeout";
+import { gradeCodeRunnerForSession } from "@/lib/sessionGrading";
 import {
   buildCodeEditorStyles,
   buildCodeEditorHTML,
@@ -964,6 +965,15 @@ del input
   // ============================================================
   // Session system cần gameInstance để lấy kết quả test
   (window as any).gameInstance = {
+    prepareSubmission: () => {
+      if (!codeEditor) return;
+      testResults = gradeCodeRunnerForSession(
+        pyodide,
+        codeEditor.getCode(),
+        GAME_CONFIG.testCases,
+      );
+      updateTestCaseTable();
+    },
     getTestResults: getTestResults,
     getScore: getScore,
     getCode: () => codeEditor?.getCode() || "",

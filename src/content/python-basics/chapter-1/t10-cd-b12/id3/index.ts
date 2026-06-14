@@ -1,6 +1,7 @@
 // @ts-nocheck
 import * as Phaser from "phaser";
 import { isPyodideTimeout, withPyodideTimeout } from "@/lib/pyodideTimeout";
+import { gradeCodeRunnerForSession } from "@/lib/sessionGrading";
 import {
   buildCodeEditorStyles,
   buildCodeEditorHTML,
@@ -1195,6 +1196,14 @@ del input
 
   // Expose game instance globally for session submission
   (window as any).gameInstance = {
+    prepareSubmission: () => {
+      testResults = gradeCodeRunnerForSession(
+        pyodide,
+        codeInput.value,
+        GAME_CONFIG.testCases,
+      );
+      updateTestCaseTable();
+    },
     getTestResults: getTestResults,
     getScore: getScore,
     getCode: () => codeInput.value,

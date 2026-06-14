@@ -57,6 +57,7 @@ interface StoredCodingSetState {
 }
 
 interface CodingSetGameInstance {
+  prepareSubmission: () => Promise<void>;
   getCode: () => string;
   getScore: () => number;
   getTestResults: () => {
@@ -1111,6 +1112,7 @@ export default function initCodingSet(
   resetAllButton.addEventListener("click", resetAllExercises);
 
   const gameInstance: CodingSetGameInstance = {
+    prepareSubmission: gradeAllExercises,
     getCode: () => {
       codes[config.exercises[currentIndex].id] = codeEditor.getCode();
       return JSON.stringify({

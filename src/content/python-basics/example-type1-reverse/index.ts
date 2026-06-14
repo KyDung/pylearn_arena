@@ -1,6 +1,7 @@
 // @ts-nocheck
 import * as Phaser from "phaser";
 import { isPyodideTimeout, withPyodideTimeout } from "@/lib/pyodideTimeout";
+import { gradeFunctionForSession } from "@/lib/sessionGrading";
 import {
   buildCodeEditorStyles,
   buildCodeEditorHTML,
@@ -480,6 +481,16 @@ export default function initGame(
   };
 
   (window as any).gameInstance = {
+    prepareSubmission: () => {
+      if (!codeEditor) return;
+      testResults = gradeFunctionForSession(
+        pyodide,
+        codeEditor.getCode(),
+        GAME_CONFIG.pythonFunction,
+        GAME_CONFIG.testCases,
+      );
+      updateTestCaseTable();
+    },
     getTestResults: getTestResults,
     getScore: getScore,
     getCode: () => codeEditor?.getCode() || "",

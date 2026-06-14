@@ -1,6 +1,7 @@
 // @ts-nocheck
 import * as Phaser from "phaser";
 import { isPyodideTimeout, withPyodideTimeout } from "@/lib/pyodideTimeout";
+import { gradeFunctionForSession } from "@/lib/sessionGrading";
 import {
   buildCodeEditorStyles,
   buildCodeEditorHTML,
@@ -221,6 +222,15 @@ export default function initGame(
 
   // Expose gameInstance globally for session submission
   (window as any).gameInstance = {
+    prepareSubmission: () => {
+      const results = gradeFunctionForSession(
+        pyodide,
+        getCode(),
+        GAME_CONFIG.pythonFunction,
+        GAME_CONFIG.testCases,
+      );
+      testResults.splice(0, testResults.length, ...results);
+    },
     getTestResults: () => {
       const passed = testResults.filter((r) => r.passed).length;
       const total = GAME_CONFIG.testCases.length;
