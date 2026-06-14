@@ -36,6 +36,40 @@ interface Session {
   unique_submitters: number;
 }
 
+interface CodingSetSubmission {
+  type: "coding-set";
+  answers: Array<{
+    exerciseId: string;
+    code: string;
+  }>;
+}
+
+const formatSubmissionCode = (code: string) => {
+  try {
+    const parsed = JSON.parse(code) as Partial<CodingSetSubmission>;
+    if (parsed.type !== "coding-set" || !Array.isArray(parsed.answers)) {
+      return code;
+    }
+
+    return parsed.answers
+      .map((answer, index) => {
+        const exerciseId =
+          typeof answer?.exerciseId === "string"
+            ? answer.exerciseId
+            : `bai-${index + 1}`;
+        const exerciseCode =
+          typeof answer?.code === "string" && answer.code.trim()
+            ? answer.code
+            : "# Chưa có code";
+
+        return `# Bài ${index + 1}: ${exerciseId}\n${exerciseCode}`;
+      })
+      .join("\n\n# ============================================================\n\n");
+  } catch {
+    return code;
+  }
+};
+
 export default function SessionSubmissionsPage() {
   const router = useRouter();
   const params = useParams();
@@ -105,11 +139,12 @@ export default function SessionSubmissionsPage() {
   const handleCopyCode = async (code: string, submissionId: number) => {
     try {
       let copySuccess = false;
+      const formattedCode = formatSubmissionCode(code);
 
       // Try modern Clipboard API first
       if (navigator.clipboard && navigator.clipboard.writeText) {
         try {
-          await navigator.clipboard.writeText(code);
+          await navigator.clipboard.writeText(formattedCode);
           copySuccess = true;
         } catch (clipboardErr) {
           console.warn("Clipboard API failed, trying fallback:", clipboardErr);
@@ -119,7 +154,7 @@ export default function SessionSubmissionsPage() {
       // Fallback for browsers without Clipboard API
       if (!copySuccess) {
         const textarea = document.createElement("textarea");
-        textarea.value = code;
+        textarea.value = formattedCode;
         textarea.style.position = "fixed";
         textarea.style.left = "-999999px";
         document.body.appendChild(textarea);
@@ -221,7 +256,7 @@ export default function SessionSubmissionsPage() {
 # Nộp lúc: ${formatDate(submission.submitted_at)}
 # Lần thử: ${submission.attempt_number}
 
-${submission.code}`;
+${formatSubmissionCode(submission.code)}`;
 
     downloadFile(
       content,
@@ -261,7 +296,7 @@ ${"=".repeat(80)}
 # Nộp lúc: ${formatDate(sub.submitted_at)}
 ${sub.error_message ? `# Lỗi: ${sub.error_message}` : ""}
 
-${sub.code}
+${formatSubmissionCode(sub.code)}
 
 `;
       });
@@ -297,7 +332,7 @@ ${"=".repeat(80)}
 # Nộp lúc: ${formatDate(submission.submitted_at)}
 # Lần thử: ${submission.attempt_number}
 
-${submission.code}
+${formatSubmissionCode(submission.code)}
 
 `;
     });
@@ -351,7 +386,7 @@ ${"=".repeat(80)}
 # Nộp lúc: ${formatDate(sub.submitted_at)}
 ${sub.error_message ? `# Lỗi: ${sub.error_message}` : ""}
 
-${sub.code}
+${formatSubmissionCode(sub.code)}
 
 `;
         });
@@ -714,7 +749,7 @@ ${sub.code}
                       </div>
                       <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-y-auto">
                         <pre className="text-sm text-gray-800 font-mono whitespace-pre-wrap">
-                          {submission.code}
+                          {formatSubmissionCode(submission.code)}
                         </pre>
                       </div>
                     </div>
@@ -770,7 +805,7 @@ ${sub.code}
                                   </div>
                                   <div className="bg-white rounded p-2 max-h-32 overflow-y-auto">
                                     <pre className="text-xs text-gray-800 font-mono whitespace-pre-wrap">
-                                      {sub.code}
+                                      {formatSubmissionCode(sub.code)}
                                     </pre>
                                   </div>
                                   {sub.error_message && (
