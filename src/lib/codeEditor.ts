@@ -8,61 +8,6 @@ export interface CodeEditorOptions {
   placeholder?: string;
 }
 
-// Python keywords for syntax highlighting
-const PYTHON_KEYWORDS = [
-  "def",
-  "class",
-  "if",
-  "elif",
-  "else",
-  "for",
-  "while",
-  "try",
-  "except",
-  "finally",
-  "with",
-  "as",
-  "import",
-  "from",
-  "return",
-  "yield",
-  "break",
-  "continue",
-  "pass",
-  "raise",
-  "global",
-  "nonlocal",
-  "lambda",
-  "and",
-  "or",
-  "not",
-  "in",
-  "is",
-  "True",
-  "False",
-  "None",
-  "async",
-  "await",
-  "assert",
-  "del",
-  "print",
-  "input",
-  "len",
-  "range",
-  "int",
-  "str",
-  "float",
-  "list",
-  "dict",
-  "set",
-  "tuple",
-  "bool",
-  "type",
-  "isinstance",
-  "open",
-  "self",
-];
-
 // Build the code editor HTML and CSS
 export const buildCodeEditorStyles = () => `
   /* Code Editor Container */
@@ -362,7 +307,7 @@ export const highlightPython = (code: string): string => {
   const lines = code.split("\n");
   const highlightedLines = lines.map((line) => {
     // Escape HTML first
-    let html = line
+    const html = line
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
@@ -539,7 +484,7 @@ const highlightCodeSegment = (code: string): string => {
   // We'll use a different approach: split by HTML tags and only process non-tag parts
   const parts = result.split(/(<span[^>]*>|<\/span>)/g);
   result = parts
-    .map((part, i) => {
+    .map((part) => {
       // Skip HTML tags (odd indices after split with capturing group)
       if (part.startsWith("<span") || part === "</span>") {
         return part;
@@ -568,7 +513,7 @@ const highlightCodeSegment = (code: string): string => {
         return part;
       }
       return part.replace(
-        /([+\-*\/%=&|^~!]+|&lt;|&gt;)/g,
+        /(&lt;|&gt;|&amp;|[+\-*\/%=&|^~!]+)/g,
         '<span class="syntax-operator">$1</span>',
       );
     })
