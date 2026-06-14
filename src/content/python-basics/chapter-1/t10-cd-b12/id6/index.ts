@@ -13,7 +13,7 @@ export const CODING_SET_CONFIG: CodingSetConfig = {
   exercises: [
     {
       id: "bai-1-tach-ho-ten",
-      title: "Nhiệm vụ 1. Tách họ tên",
+      title: "Bài1. Tách họ tên",
       description: "YÊU CẦU\nViết chương trình nhập họ tên đầy đủ của một người. Hãy xác định tên và phần họ đệm của người đó.\n\nDỮ LIỆU VÀO\nMột dòng chứa họ tên đầy đủ. Họ tên có ít nhất hai từ; giữa các từ có thể có một hoặc nhiều dấu cách.\n\nDỮ LIỆU RA\n- Dòng 1 in thông báo theo mẫu: Ten: <tên>.\n- Dòng 2 in thông báo theo mẫu: Ho dem: <họ và tên đệm>.\n\nYÊU CẦU LẬP TRÌNH\nSử dụng split() để tách họ tên thành một list và join() để ghép phần họ đệm.",
       starterCode: "ho_ten = input()\n\n# Tách họ tên thành các từ\n\n# In tên và họ đệm theo đúng định dạng\n",
       points: 10,

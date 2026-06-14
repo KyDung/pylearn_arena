@@ -26,7 +26,7 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
 
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
-  title: "Game 1: Kiểm tra xâu con",
+  title: "Game 1: Que kem trúng thưởng",
   description: `BÀI TOÁN
 Cho xâu s chứa danh sách các phần thưởng và xâu sub là tên phần thưởng cần kiểm tra. Hãy xác định sub có xuất hiện liên tiếp trong s hay không. Phép so sánh có phân biệt chữ hoa và chữ thường.
 
@@ -42,18 +42,12 @@ In ra CÓ nếu sub xuất hiện trong s; ngược lại, in ra KHÔNG.`,
   // Dùng "\n" để phân tách nhiều lần gọi input() trong 1 test case
   // Ví dụ: input = "5\n10" → input() lần 1 = "5", input() lần 2 = "10"
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
-  ioExamples: [
-    {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÚT CHÌ MÀU",
-      output: "CÓ",
-    },
-    {
-      input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nKEM DÂU",
-      output: "KHÔNG",
-    },
+    ioExamples: [
+    { input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÚT CHÌ MÀU", output: "CÓ" },
+    { input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nKEM DÂU", output: "KHÔNG" }
   ],
 
-  testCases: [
+    testCases: [
     {
       input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nÁO KHOÁC",
       expected: "CÓ",
@@ -71,7 +65,7 @@ In ra CÓ nếu sub xuất hiện trong s; ngược lại, in ra KHÔNG.`,
       expected: "CÓ",
       description: "Test  3",
       sceneText: "Vị khách thứ 3",
-    },
+    }
   ],
   // Code Python mẫu cho học sinh (sử dụng input() và print())
   starterCode: ``,
