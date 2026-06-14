@@ -27,28 +27,30 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id4";
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
   title: "Game 4: Hiệp sĩ quả cảm",
-  description: `-- Cốt truyện("Có thể bỏ qua")
-Một vị hiệp sĩ đang chiến đấu với một tên hắc pháp sư ác độc, hắc pháp sư bắn ra rất nhiều quả cầu ma pháp liên tục gồm 2 loại là cầu lửa và cầu băng hãy giúp hiệp sĩ này bật đúng loại ma pháp khiên cho từng loại quả cầu ma pháp được bắn tới để anh ta có thể đỡ được hết toàn bộ các chiêu và chờ tới cuối khi tên pháp sư hết năng lượng.
+  description: `BÀI TOÁN
+Cho xâu s mô tả một dãy phép thuật. Mỗi phép thuật là cau_lua hoặc cau_bang, hai phép thuật liên tiếp được phân cách bằng dấu sao (*).
 
--- Yêu cầu
-Viết chương trình nhập vào một xâu s là thứ tự các chiêu thức của tên pháp sư.
-Gặp cau_lua thì thay bằng khien_lua
-Gặp cau_bang thì thay bằng khien_bang
-In ra màn hình chuỗi kết quả sau khi đã thay thế `,
+Hãy tạo dãy khiên tương ứng theo các quy tắc:
+- cau_lua được đổi thành khien_lua.
+- cau_bang được đổi thành khien_bang.
+- Giữ nguyên thứ tự và dấu sao giữa các phần tử.
+
+DỮ LIỆU VÀO
+Một dòng duy nhất chứa xâu s.
+
+DỮ LIỆU RA
+In ra xâu biểu diễn dãy khiên tương ứng.`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
   // Dùng "\n" để phân tách nhiều lần gọi input() trong 1 test case
   // Ví dụ: input = "5\n10" → input() lần 1 = "5", input() lần 2 = "10"
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
-  ioExamples: [
-    {
-      input: "cau_lua*cau_bang*cau_lua*cau_bang",
-      output: "khien_lua*khien_bang*khien_lua*khien_bang",
-    },
+    ioExamples: [
+    { input: "cau_lua*cau_bang*cau_lua*cau_bang", output: "khien_lua*khien_bang*khien_lua*khien_bang" }
   ],
 
-  testCases: [
+    testCases: [
     {
       input: "cau_lua*cau_bang*cau_lua",
       expected: "khien_lua*khien_bang*khien_lua",
@@ -69,20 +71,13 @@ In ra màn hình chuỗi kết quả sau khi đã thay thế `,
     },
     {
       input: "cau_bang*cau_lua*cau_bang*cau_lua*cau_bang*cau_lua*cau_lua",
-      expected:
-        "khien_bang*khien_lua*khien_bang*khien_lua*khien_bang*khien_lua*khien_lua",
+      expected: "khien_bang*khien_lua*khien_bang*khien_lua*khien_bang*khien_lua*khien_lua",
       description: "Test case 4",
       sceneText: "Level 4",
-    },
+    }
   ],
   // Code Python mẫu cho học sinh (sử dụng input() và print())
-  starterCode: `# Đọc input
-a = int(input())
-b = int(input())
-
-# Xử lý và print kết quả
-result = a + b
-print(result)`,
+  starterCode: ``,
 
   // Assets cho từng scene (optional)
   // Path format: /[course]/[topic]/[lesson]/[game]/scene1.png

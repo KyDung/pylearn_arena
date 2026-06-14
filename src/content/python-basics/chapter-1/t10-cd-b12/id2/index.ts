@@ -26,42 +26,28 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id2";
 
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
-  title: "Game2: Bảo vệ bầy cừu",
-  description: `-- Cốt truyện("Có thể bỏ qua")
-Người chăn cừu đang phải đau đầu vì một chú sói ranh mãnh đã biết đội lốt cừu để cải trang, rồi một ngày anh chăn cừu bỗng nhận ra một điều kì lạ là mình có thể nhìn thấy những con số trên đầu những chú cừu và dường như những số này có thể giúp anh ta tìm ra chú sói kia, hãy giúp anh chăn cừu tìm ra con chú ranh mãnh này nhé !
+  title: "Game 2: Bảo vệ bầy cừu",
+  description: `BÀI TOÁN
+Một đàn cừu được biểu diễn bởi xâu s, trong đó mỗi con cừu được ghi là cuu và con sói được ghi là soi. Hãy kiểm tra xâu s có chứa soi hay không và xác định vị trí ký tự đầu tiên của lần xuất hiện đầu tiên.
 
--- Yêu cầu:
-Một đàn cừu đang đi thành hàng. Danh sách các con vật trong đàn được biểu diễn bằng một xâu kí tự, trong đó các "cuu" và "soi" được viết cách nhau bởi dấu phẩy và dấu cách. Trong đàn có thể có hoặc không có một con sói đang lẩn trốn. Sói được biểu diễn bằng xâu "soi" Cừu được biểu diễn bằng xâu "cuu"
+DỮ LIỆU VÀO
+Một dòng duy nhất chứa xâu s mô tả đàn cừu.
 
-Bạn hãy viết chương trình kiểm tra xem trong xâu nhập vào có xuất hiện xâu "soi" hay không.
-
-Nếu có, in ra:
-CO
-vi_tri
-
-Trong đó vi_tri là vị trí của kí tự đầu tiên của từ "soi" trong xâu ban đầu.
-
-Nếu không có, in ra:
-KHONG
--1
-Dữ liệu vào
-
-Một dòng duy nhất chứa xâu mô tả đàn cừu.
-
-Dữ liệu ra
-Nếu tìm thấy "soi", in ra CO và vị trí xuất hiện đầu tiên của "soi".
-Nếu không tìm thấy "soi", in ra KHONG và -1.`,
+DỮ LIỆU RA
+- Nếu tìm thấy soi, in CO ở dòng thứ nhất và vị trí tìm được ở dòng thứ hai.
+- Nếu không tìm thấy soi, in KHONG ở dòng thứ nhất và -1 ở dòng thứ hai.
+`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
   // Dùng "\n" để phân tách nhiều lần gọi input() trong 1 test case
   // Ví dụ: input = "5\n10" → input() lần 1 = "5", input() lần 2 = "10"
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
-    ioExamples: [
+        ioExamples: [
     { input: "soi, cuu, cuu", output: "CO\n0" }
-  ],
+    ],
 
-    testCases: [
+        testCases: [
     {
       input: "cuu, soi, cuu, cuu, cuu, cuu, cuu, cuu",
       expected: "CO\n5",
@@ -80,7 +66,7 @@ Nếu không tìm thấy "soi", in ra KHONG và -1.`,
       description: "Test case 3",
       sceneText: "Level 3",
     }
-  ],
+    ],
   // Code Python mẫu cho học sinh (sử dụng input() và print())
   starterCode: `# Đọc input
 a = int(input())

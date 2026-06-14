@@ -27,24 +27,32 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id5";
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
   title: "Game 5: Mật mã Caesar",
-  description: `Viết chương trình nhập vào hai dòng:
-Dòng 1: Một xâu s.
-Dòng 2: Một số nguyên k.
-Hãy mã hóa xâu s theo mã Caesar bằng cách dịch mỗi chữ cái sang phải k vị trí trong bảng chữ cái.
-Quy tắc:
-Chữ thường giữ nguyên là chữ thường.
-Chữ hoa giữ nguyên là chữ hoa.
-Nếu vượt quá z hoặc Z thì quay lại từ a hoặc A.
-Các kí tự không phải chữ cái được giữ nguyên.
-In ra xâu sau khi mã hóa.`,
+  description: `BÀI TOÁN
+Cho xâu s và số nguyên k. Hãy mã hóa s bằng mã Caesar: mỗi chữ cái được dịch sang phải k vị trí trong bảng chữ cái tiếng Anh.
+
+Quy tắc mã hóa:
+- Chữ thường sau khi mã hóa vẫn là chữ thường.
+- Chữ hoa sau khi mã hóa vẫn là chữ hoa.
+- Sau z tiếp tục quay lại từ a; sau Z tiếp tục quay lại từ A.
+- Các ký tự không phải chữ cái được giữ nguyên.
+
+DỮ LIỆU VÀO
+- Dòng 1 chứa xâu s.
+- Dòng 2 chứa số nguyên k.
+
+DỮ LIỆU RA
+In ra xâu s sau khi mã hóa.`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
   // Dùng "\n" để phân tách nhiều lần gọi input() trong 1 test case
   // Ví dụ: input = "5\n10" → input() lần 1 = "5", input() lần 2 = "10"
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
-    ioExamples: [
-    { input: "them sau", output: "them sau" }
+  ioExamples: [
+    {
+      input: "Abc XyZ!\n2",
+      output: "Cde ZaB!",
+    },
   ],
 
     testCases: [

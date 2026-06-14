@@ -25,16 +25,19 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id3";
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
   title: "Cuộc đua vượt chướng ngại vật",
-  description: `-- Cốt truyện (Có thể bỏ qua)
-Cá mập cho rằng chạy bộ trên cạn sẽ nhanh hơn bơi dưới nước, vì khi chạy sẽ không phải chịu lực cản của nước. Còn cừu lại cho rằng bơi dễ hơn, vì không phải đạp chân trên đất đá đau rát. Vì vậy, cả hai quyết định tổ chức một cuộc thi đặc biệt: cá mập sẽ chạy trên cạn, còn cừu sẽ bơi dưới nước, xem ai đến được chỗ hai tòa tháp ở cuối đường đua trước. Tất nhiên, trên đường đua sẽ có rất nhiều vật cản. Do cá mập biết mình chỉ là một nhân vật trong game, cậu ấy đã nhờ bạn viết một chương trình chuyển đổi hành động theo yêu cầu bên dưới để giúp cậu ấy có thể chiến thắng cuộc đua này.
+  description: `BÀI TOÁN
+Cho xâu s mô tả một đường đua. Xâu gồm các từ khóa duongdi và vatcan, các từ khóa liên tiếp được phân cách bằng dấu gạch ngang (-).
 
--- Yêu cầu
-Viết chương trình nhập vào một xâu mô tả đường đua của cá mập. Xâu này gồm các từ khóa duongdi và vatcan, được ngăn cách với nhau bằng dấu gạch ngang -.
-Hãy tạo một xâu mới bằng cách thay thế theo quy tắc sau:
-- Các xâu con duongdi sẽ được thay bằng xâu chay
-- Các xâu con vatcan sẽ được thay bằng xâu ne 
-In ra xâu mới sau khi thay thế.
-`,
+Hãy tạo xâu kết quả theo các quy tắc:
+- Thay mỗi duongdi bằng chay.
+- Thay mỗi vatcan bằng ne.
+- Giữ nguyên thứ tự và dấu gạch ngang giữa các hành động.
+
+DỮ LIỆU VÀO
+Một dòng duy nhất chứa xâu s.
+
+DỮ LIỆU RA
+In ra xâu hành động sau khi chuyển đổi.`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game

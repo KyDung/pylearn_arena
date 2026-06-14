@@ -80,7 +80,11 @@ declare global {
   }
 }
 
-const normalizeOutput = (value: unknown) => String(value ?? "").trim();
+const normalizeOutput = (value: unknown) =>
+  String(value ?? "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\n+$/, "");
 
 const escapeHtml = (value: unknown) =>
   String(value ?? "")
@@ -357,6 +361,7 @@ export default function initCodingSet(
       .coding-set-navigation {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 8px;
       }
 
@@ -393,17 +398,35 @@ export default function initCodingSet(
         border-color: #1d4ed8;
       }
 
+      .coding-set-button.is-reset {
+        color: #b91c1c;
+        border-color: #f0a5a5;
+      }
+
+      .coding-set-button.is-reset:hover:not(:disabled) {
+        color: #991b1b;
+        background: #fef2f2;
+        border-color: #ef4444;
+      }
+
+      .coding-set-button[hidden] {
+        display: none;
+      }
+
       .coding-set-content {
-        display: grid;
-        grid-template-columns: minmax(270px, 0.85fr) minmax(430px, 1.45fr);
-        min-height: 0;
+        display: flex;
         flex: 1;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
       }
 
       .coding-set-statement {
-        padding: 22px;
+        max-height: 320px;
+        padding: 20px 22px;
         overflow: auto;
-        border-right: 1px solid var(--cs-border);
+        background: #fbfdff;
+        border-bottom: 1px solid var(--cs-border);
       }
 
       .coding-set-statement h1 {
@@ -472,6 +495,7 @@ export default function initCodingSet(
 
       .coding-set-workspace {
         display: grid;
+        flex: 1;
         grid-template-rows: minmax(360px, 1fr) auto;
         min-width: 0;
         min-height: 0;
@@ -560,14 +584,8 @@ export default function initCodingSet(
           min-width: 190px;
         }
 
-        .coding-set-content {
-          grid-template-columns: 1fr;
-        }
-
         .coding-set-statement {
           max-height: 360px;
-          border-right: 0;
-          border-bottom: 1px solid var(--cs-border);
         }
       }
 
@@ -580,6 +598,10 @@ export default function initCodingSet(
         .coding-set-actions {
           display: grid;
           grid-template-columns: 1fr 1fr;
+        }
+
+        .coding-set-button.is-reset {
+          grid-column: 1 / -1;
         }
 
         .coding-set-button {
@@ -615,6 +637,9 @@ export default function initCodingSet(
             </div>
           </div>
           <div class="coding-set-actions">
+            <button class="coding-set-button is-reset" id="coding-set-reset-all" type="button" hidden>
+              Làm lại toàn bộ
+            </button>
             <button class="coding-set-button" id="coding-set-grade-all" type="button">
               Chấm tất cả
             </button>
@@ -710,6 +735,9 @@ export default function initCodingSet(
   )!;
   const gradeAllButton = root.querySelector<HTMLButtonElement>(
     "#coding-set-grade-all",
+  )!;
+  const resetAllButton = root.querySelector<HTMLButtonElement>(
+    "#coding-set-reset-all",
   )!;
   const codeEditor = initCodeEditor(
     root,
@@ -907,11 +935,15 @@ export default function initCodingSet(
   };
 
   const updateButtons = () => {
+    const aggregate = getAggregate();
     previousButton.disabled = grading || currentIndex === 0;
     nextButton.disabled =
       grading || currentIndex === config.exercises.length - 1;
     gradeButton.disabled = grading;
     gradeAllButton.disabled = grading;
+    resetAllButton.disabled = grading;
+    resetAllButton.hidden =
+      aggregate.gradedExercises !== config.exercises.length;
     gradeButton.textContent = grading ? "Đang chấm..." : "Chấm bài";
   };
 
@@ -1020,6 +1052,26 @@ export default function initCodingSet(
     }
   };
 
+  const resetAllExercises = () => {
+    if (grading) return;
+
+    const confirmed = window.confirm(
+      "Làm lại toàn bộ sẽ xóa code, kết quả chấm và điểm đang lưu trên thiết bị. Bài đã nộp trong session (nếu có) không bị thay đổi. Bạn có muốn tiếp tục?",
+    );
+    if (!confirmed) return;
+
+    for (const exercise of config.exercises) {
+      codes[exercise.id] = exercise.starterCode ?? "";
+      delete results[exercise.id];
+    }
+
+    currentIndex = 0;
+    localStorage.removeItem(storageKey);
+    codeEditor.setCode(codes[config.exercises[0].id]);
+    renderCurrentExercise();
+    saveState();
+  };
+
   const editorElement = codeEditor.element;
 
   const handleEditorInput = () => {
@@ -1034,6 +1086,7 @@ export default function initCodingSet(
     renderNavigation();
     renderSummary();
     renderResults();
+    updateButtons();
     saveState();
   };
 
@@ -1055,6 +1108,7 @@ export default function initCodingSet(
   );
   gradeButton.addEventListener("click", gradeCurrentExercise);
   gradeAllButton.addEventListener("click", gradeAllExercises);
+  resetAllButton.addEventListener("click", resetAllExercises);
 
   const gameInstance: CodingSetGameInstance = {
     getCode: () => {
@@ -1105,6 +1159,7 @@ export default function initCodingSet(
     nav.removeEventListener("click", handleNavClick);
     gradeButton.removeEventListener("click", gradeCurrentExercise);
     gradeAllButton.removeEventListener("click", gradeAllExercises);
+    resetAllButton.removeEventListener("click", resetAllExercises);
 
     const gameWindow = window as Window & {
       gameInstance?: CodingSetGameInstance;

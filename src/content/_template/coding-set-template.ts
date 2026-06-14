@@ -12,9 +12,16 @@ export const CODING_SET_CONFIG: CodingSetConfig = {
   exercises: [
     {
       id: "bai-1",
-      title: "Tính tổng hai số",
-      description:
-        "Nhập hai số nguyên trên hai dòng. In ra tổng của hai số đó.",
+      title: "Bài 1. Tính tổng hai số",
+      description: `BÀI TOÁN
+Cho hai số nguyên a và b. Hãy tính tổng của hai số.
+
+DỮ LIỆU VÀO
+- Dòng 1 chứa số nguyên a.
+- Dòng 2 chứa số nguyên b.
+
+DỮ LIỆU RA
+In ra giá trị a + b.`,
       starterCode: "",
       points: 10,
       ioExamples: [
@@ -38,9 +45,15 @@ export const CODING_SET_CONFIG: CodingSetConfig = {
     },
     {
       id: "bai-2",
-      title: "Kiểm tra số chẵn",
-      description:
-        'Nhập một số nguyên. In ra "Chan" nếu số đó chẵn, ngược lại in ra "Le".',
+      title: "Bài 2. Kiểm tra số chẵn",
+      description: `BÀI TOÁN
+Cho số nguyên n. Hãy xác định n là số chẵn hay số lẻ.
+
+DỮ LIỆU VÀO
+Một dòng duy nhất chứa số nguyên n.
+
+DỮ LIỆU RA
+In ra Chan nếu n chẵn; ngược lại, in ra Le.`,
       starterCode: "",
       points: 10,
       ioExamples: [

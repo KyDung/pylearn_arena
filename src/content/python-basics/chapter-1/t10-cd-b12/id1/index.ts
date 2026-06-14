@@ -27,18 +27,15 @@ const GAME_PATH = "python-basics/chapter-1/t10-cd-b12/id1";
 const GAME_CONFIG = {
   // Tiêu đề và mô tả
   title: "Game 1: Kiểm tra xâu con",
-  description: `-- Cốt truyện("Có thể bỏ qua")
-Một cửa hàng kem đang mở sự kiện mua kem trúng thưởng, trên thân mỗi que kem sẽ ghi một đồ vật bất kì nều đồ vật này có trong danh sách các đồ vật trên vỏ của que kem thì người đó sẽ được nhận món quà đó nhưng ngặt nỗi các nhân vật trong game này chưa được lập trình chức năng kiểm tra chuỗi con vậy nên bạn hay viết một chương trình python giúp họ kiểm tra xem mình có trúng thưởng không nhé !!!
+  description: `BÀI TOÁN
+Cho xâu s chứa danh sách các phần thưởng và xâu sub là tên phần thưởng cần kiểm tra. Hãy xác định sub có xuất hiện liên tiếp trong s hay không. Phép so sánh có phân biệt chữ hoa và chữ thường.
 
--- Yêu cầu
-Viết chương trình nhập vào hai dòng:
-Dòng 1: Một xâu s là danh sách các giải thưởng của cửa hàng kem.
-Dòng 2: Một xâu sub là dòng chữ in trên que kem của khách hàng.
-Hãy kiểm tra xem sub có xuất hiện trong s hay không.
-Nếu có, in ra:
-CÓ
-Nếu không có, in ra:
-KHÔNG`,
+DỮ LIỆU VÀO
+- Dòng 1 chứa xâu s.
+- Dòng 2 chứa xâu sub.
+
+DỮ LIỆU RA
+In ra CÓ nếu sub xuất hiện trong s; ngược lại, in ra KHÔNG.`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
