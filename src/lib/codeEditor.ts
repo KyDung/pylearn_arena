@@ -789,6 +789,39 @@ export const initCodeEditor = (root: HTMLElement, starterCode: string) => {
     if (start !== end) return;
     if (start === 0) return;
 
+    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+    const lineEnd = value.indexOf("\n", start);
+    const indentationBeforeCursor = value.substring(lineStart, start);
+    const contentAfterCursor = value.substring(
+      start,
+      lineEnd === -1 ? value.length : lineEnd,
+    );
+
+    // On an empty indented line, remove one indentation block instead of
+    // requiring one Backspace per space.
+    if (
+      /^[ \t]+$/.test(indentationBeforeCursor) &&
+      /^[ \t]*$/.test(contentAfterCursor)
+    ) {
+      e.preventDefault();
+
+      let charactersToRemove = 1;
+      if (!indentationBeforeCursor.endsWith("\t")) {
+        const trailingSpaces =
+          indentationBeforeCursor.match(/ +$/)?.[0].length ?? 0;
+        charactersToRemove = ((trailingSpaces - 1) % 4) + 1;
+      }
+
+      codeInput.value =
+        value.substring(0, start - charactersToRemove) +
+        value.substring(start);
+      codeInput.selectionStart = codeInput.selectionEnd =
+        start - charactersToRemove;
+      updateDisplay();
+      updateCursorPosition();
+      return;
+    }
+
     const prevChar = value[start - 1];
     const nextChar = value[start];
 
