@@ -57,6 +57,8 @@ function PlayContent() {
   const [hasAlreadySubmitted, setHasAlreadySubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const pathParam = searchParams.get("path");
+  const sessionIdParam = searchParams.get("sessionId");
+  const isSessionMode = sessionIdParam !== null;
   const [effectivePathParam, setEffectivePathParam] = useState<string | null>(
     pathParam,
   );
@@ -82,8 +84,6 @@ function PlayContent() {
   useEffect(() => {
     if (!user) return;
 
-    const sessionId = searchParams.get("sessionId");
-
     const fetchActiveSessions = async () => {
       try {
         const res = await fetch("/api/student/sessions/active");
@@ -91,9 +91,11 @@ function PlayContent() {
         if (data.success && data.data) {
           const sessions: ActiveSession[] = data.data;
 
-          if (sessionId) {
+          if (sessionIdParam) {
             // Find specific session by ID
-            const session = sessions.find((s) => s.id === parseInt(sessionId));
+            const session = sessions.find(
+              (s) => s.id === parseInt(sessionIdParam),
+            );
             if (session) {
               setActiveSession(session);
               setHasAlreadySubmitted(!!(session as any).has_submitted);
@@ -126,7 +128,7 @@ function PlayContent() {
     };
 
     fetchActiveSessions();
-  }, [user, pathParam, searchParams]);
+  }, [user, pathParam, sessionIdParam]);
 
   // Fetch game info from API
   useEffect(() => {
@@ -278,12 +280,14 @@ function PlayContent() {
             <p className="text-red-700 mb-3 sm:mb-4 text-sm sm:text-base">
               Không tìm thấy nội dung. Vui lòng chọn lại bài học.
             </p>
-            <Link
-              href="/game"
-              className="text-blue-600 hover:underline text-sm sm:text-base"
-            >
-              Quay lại danh sách
-            </Link>
+            {!isSessionMode && (
+              <Link
+                href="/game"
+                className="text-blue-600 hover:underline text-sm sm:text-base"
+              >
+                Quay lại danh sách
+              </Link>
+            )}
           </div>
         </div>
       </main>
@@ -347,13 +351,15 @@ function PlayContent() {
                   )}
                 </button>
               )}
-              <Link
-                href={backLink}
-                className="px-3 sm:px-4 py-2 border-2 border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm sm:text-base"
-              >
-                <span className="hidden sm:inline">Quay lại</span>
-                <span className="sm:hidden">←</span>
-              </Link>
+              {!isSessionMode && (
+                <Link
+                  href={backLink}
+                  className="px-3 sm:px-4 py-2 border-2 border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                >
+                  <span className="hidden sm:inline">Quay lại</span>
+                  <span className="sm:hidden">←</span>
+                </Link>
+              )}
             </div>
           </div>
 
