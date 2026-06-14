@@ -35,7 +35,7 @@ DỮ LIỆU VÀO
 - Dòng 2 chứa xâu sub.
 
 DỮ LIỆU RA
-In ra CÓ nếu sub xuất hiện trong s; ngược lại, in ra KHÔNG.`,
+In ra CO nếu sub xuất hiện trong s; ngược lại, in ra KHONG.`,
 
   // Test cases với input và expected output
   // Mỗi test case = 1 scene trong game
@@ -43,26 +43,26 @@ In ra CÓ nếu sub xuất hiện trong s; ngược lại, in ra KHÔNG.`,
   // Ví dụ: input = "5\n10" → input() lần 1 = "5", input() lần 2 = "10"
   // Hãy dùng Generate Tests trong Content Manager để tự động tạo test cases
     ioExamples: [
-    { input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÚT CHÌ MÀU", output: "CÓ" },
-    { input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nKEM DÂU", output: "KHÔNG" }
+    { input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÚT CHÌ MÀU", output: "CO" },
+    { input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nKEM DÂU", output: "KHONG" }
   ],
 
     testCases: [
     {
       input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nÁO KHOÁC",
-      expected: "CÓ",
+      expected: "CO",
       description: "Test case 1",
       sceneText: "Vị khách đầu tiên",
     },
     {
       input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nROBOT ĐỒ CHƠI",
-      expected: "KHÔNG",
+      expected: "KHONG",
       description: "Test case 2",
       sceneText: "Vị khách thứ 2",
     },
     {
       input: "BÚT CHÌ MÀU, BÌNH NƯỚC, BALO, ÁO KHOÁC\nBÌNH NƯỚC",
-      expected: "CÓ",
+      expected: "CO",
       description: "Test  3",
       sceneText: "Vị khách thứ 3",
     }

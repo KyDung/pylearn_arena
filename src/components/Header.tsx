@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getUser, logout } from "@/lib/auth";
+import { logout, subscribeToAuthChanges } from "@/lib/auth";
 import type { User } from "@/types";
 
 export default function Header() {
@@ -14,7 +14,7 @@ export default function Header() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
-    setUser(getUser());
+    return subscribeToAuthChanges(setUser);
   }, []);
 
   const handleLogout = async () => {

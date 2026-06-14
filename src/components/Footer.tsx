@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getUser } from "@/lib/auth";
+import { subscribeToAuthChanges } from "@/lib/auth";
 import type { User } from "@/types";
 
 export default function Footer() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    setUser(getUser());
+    return subscribeToAuthChanges(setUser);
   }, []);
 
   return (
