@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { preloadLocalPyodide } from "@/lib/pyodideLoader";
 
 interface Contest {
   id: number;
@@ -62,6 +63,12 @@ export default function StudentContestDetailPage() {
   useEffect(() => {
     checkAuth();
   }, [contestId]);
+
+  useEffect(() => {
+    if (!loading && games.length > 0) {
+      preloadLocalPyodide();
+    }
+  }, [loading, games.length]);
 
   const checkAuth = async () => {
     try {

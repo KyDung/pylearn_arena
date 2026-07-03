@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { clearUser, getUser, setUser as saveUser } from "@/lib/auth";
+import { preloadLocalPyodide } from "@/lib/pyodideLoader";
 import type { User } from "@/types";
 
 interface CourseFromDB {
@@ -70,6 +71,12 @@ export default function GamePage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  useEffect(() => {
+    if (user && !loading) {
+      preloadLocalPyodide();
+    }
+  }, [user, loading]);
 
   const fetchCourses = async () => {
     if (!user) return;

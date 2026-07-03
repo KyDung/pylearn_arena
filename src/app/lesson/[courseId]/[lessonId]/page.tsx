@@ -3,8 +3,8 @@
 import { use, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { User } from "@/types";
 import { getUser } from "@/lib/auth";
+import { preloadLocalPyodide } from "@/lib/pyodideLoader";
 
 interface Game {
   id: string;
@@ -14,8 +14,17 @@ interface Game {
   path: string;
 }
 
+interface ApiGame {
+  slug: string;
+  title: string;
+  description?: string;
+  summary?: string;
+  path: string;
+}
+
 interface Lesson {
   id: string;
+  slug?: string;
   title: string;
   description?: string;
   summary?: string;
@@ -28,7 +37,6 @@ export default function LessonPage({
   params: Promise<{ courseId: string; lessonId: string }>;
 }) {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [games, setGames] = useState<Game[]>([]);
@@ -42,22 +50,29 @@ export default function LessonPage({
       );
       const data = await response.json();
 
-      if (data.success && data.games) {
+      if (data.success && Array.isArray(data.games)) {
         // Convert API data to match Game interface
-        const apiGames = data.games.map((g: any) => ({
+        const apiGames = data.games.map((g: ApiGame) => ({
           id: g.slug,
           title: g.title,
           description: g.description,
+          summary: g.summary,
           path: g.path,
         }));
 
         setGames(apiGames);
 
-        // Set lesson info from first game or fallback
+        const apiLesson = data.lesson;
+
         setLesson({
-          id: lessonId,
-          title: data.games[0]?.title?.split(":")[0] || "Bài học",
-          description: "Học qua mini game",
+          id: String(apiLesson?.id ?? lessonId),
+          slug: apiLesson?.slug ?? lessonId,
+          title: apiLesson?.title || "Bài học",
+          description: apiLesson?.description || "Học qua mini game",
+          summary:
+            apiLesson?.summary ||
+            apiLesson?.description ||
+            "Học qua mini game",
           games: apiGames,
         });
       }
@@ -78,10 +93,17 @@ export default function LessonPage({
         )}&lesson=${encodeURIComponent(lessonId)}`,
       );
     } else {
-      setUser(currentUser);
-      fetchLessonData();
+      queueMicrotask(() => {
+        fetchLessonData();
+      });
     }
   }, [router, courseId, lessonId, fetchLessonData]);
+
+  useEffect(() => {
+    if (!loading && games.length > 0) {
+      preloadLocalPyodide();
+    }
+  }, [loading, games.length]);
 
   if (loading) {
     return (

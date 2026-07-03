@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { User } from "@/types";
 import { getUser } from "@/lib/auth";
+import { preloadLocalPyodide } from "@/lib/pyodideLoader";
 
 interface Course {
   id: number;
@@ -86,6 +87,12 @@ export default function CoursePage({
       fetchCourseData();
     }
   }, [user, courseId]);
+
+  useEffect(() => {
+    if (!loading && (topics.length > 0 || sessions.length > 0)) {
+      preloadLocalPyodide();
+    }
+  }, [loading, topics.length, sessions.length]);
 
   const fetchActiveSessions = async () => {
     try {

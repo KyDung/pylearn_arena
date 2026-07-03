@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { preloadLocalPyodide } from "@/lib/pyodideLoader";
 
 interface ActiveSession {
   id: number;
@@ -17,9 +18,37 @@ interface ActiveSession {
   remaining_minutes?: number;
 }
 
+interface ActiveSessionFromApi extends Omit<ActiveSession, "remaining_minutes"> {
+  remaining_minutes?: number | string | null;
+}
+
+interface AuthResponse {
+  success?: boolean;
+  user?: {
+    role?: string;
+  };
+}
+
+interface ActiveSessionsResponse {
+  success?: boolean;
+  data?: ActiveSessionFromApi[];
+}
+
+const parseRemainingMinutes = (value: number | string | null | undefined) => {
+  if (typeof value === "number") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+
+  return 0;
+};
+
 export default function StudentSessionsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState<ActiveSession[]>([]);
 
@@ -27,17 +56,22 @@ export default function StudentSessionsPage() {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    if (!loading && sessions.length > 0) {
+      preloadLocalPyodide();
+    }
+  }, [loading, sessions.length]);
+
   const checkAuth = async () => {
     try {
       const res = await fetch("/api/auth/me");
-      const data = await res.json();
+      const data = (await res.json()) as AuthResponse;
       if (data.success && data.user && data.user.role === "student") {
-        setUser(data.user);
         await fetchActiveSessions();
       } else {
         router.push("/login");
       }
-    } catch (error) {
+    } catch {
       router.push("/login");
     } finally {
       setLoading(false);
@@ -47,14 +81,12 @@ export default function StudentSessionsPage() {
   const fetchActiveSessions = async () => {
     try {
       const res = await fetch("/api/student/sessions/active");
-      const data = await res.json();
+      const data = (await res.json()) as ActiveSessionsResponse;
       if (data.success) {
         // Ensure remaining_minutes is a number
-        const sessions = (data.data || []).map((session: any) => ({
+        const sessions = (data.data || []).map((session) => ({
           ...session,
-          remaining_minutes: session.remaining_minutes
-            ? parseInt(session.remaining_minutes)
-            : 0,
+          remaining_minutes: parseRemainingMinutes(session.remaining_minutes),
         }));
         setSessions(sessions);
       }
@@ -176,7 +208,7 @@ export default function StudentSessionsPage() {
             <h3 className="font-medium text-blue-900 mb-2">💡 Hướng dẫn:</h3>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• Sessions sẽ tự động hiển thị khi giáo viên mở</li>
-              <li>• Click "Tham gia ngay" để vào làm bài ngay lập tức</li>
+              <li>• Click &quot;Tham gia ngay&quot; để vào làm bài ngay lập tức</li>
               <li>• Không cần nhập mã session nào cả!</li>
               <li>• Kết quả sẽ được gửi tự động khi nộp bài</li>
             </ul>
