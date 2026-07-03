@@ -82,7 +82,7 @@ const buildLayout = () => `
     .lesson-side { display: flex; flex-direction: column; gap: 1rem; }
     .lesson-panel { background: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .code-panel { padding: 0; overflow: hidden; }
-    .output-panel { font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; font-size: 0.875rem; color: #374151; max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+    .output-panel { font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; font-size: 0.875rem; color: #374151; max-height: 200px; overflow: auto; white-space: pre; word-break: normal; overflow-wrap: normal; }
     .output-panel:empty::before { content: 'Output sẽ hiển thị ở đây...'; color: #9ca3af; font-style: italic; }
     @media (max-width: 1024px) { .lesson-layout { grid-template-columns: 1fr; } }
   </style>

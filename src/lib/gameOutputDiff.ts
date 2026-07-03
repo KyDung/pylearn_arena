@@ -194,9 +194,40 @@ export const renderGameOutputDiff = (
 };
 
 const OUTPUT_DIFF_STYLES = `
+  .output-panel {
+    overflow: auto !important;
+    overflow-x: auto !important;
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+  .output-panel > div {
+    white-space: pre !important;
+  }
+  .testcase-table {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+  }
+  .testcase-table table {
+    width: max-content !important;
+    min-width: 100% !important;
+    table-layout: auto !important;
+  }
+  .testcase-table th,
+  .testcase-table td {
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+  .testcase-table .input,
+  .testcase-table .output {
+    white-space: pre !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
   .game-output-diff {
     border-radius: 2px;
     padding: 0 1px;
+    white-space: inherit;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }

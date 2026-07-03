@@ -117,9 +117,10 @@ const buildLayout = () => `
       font-size: 0.75rem; 
       color: #374151; 
       max-height: 150px; 
-      overflow-y: auto; 
-      white-space: pre-wrap; 
-      word-break: break-word;
+      overflow: auto;
+      white-space: pre;
+      word-break: normal;
+      overflow-wrap: normal;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
     }
@@ -130,15 +131,15 @@ const buildLayout = () => `
     }
     
     /* Test Case Table */
-    .testcase-table { margin-top: 1rem; display: none; }
+    .testcase-table { margin-top: 1rem; display: none; max-width: 100%; overflow-x: auto; }
     .testcase-table.visible { display: block; }
     .testcase-table h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: #1f2937; }
-    .testcase-table table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .testcase-table table { width: max-content; min-width: 100%; table-layout: auto; border-collapse: collapse; font-size: 0.8rem; }
     .testcase-table th, .testcase-table td { padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; text-align: left; }
     .testcase-table th { background: #f1f5f9; font-weight: 600; color: #475569; }
     .testcase-table .pass { color: #10b981; font-weight: 600; }
     .testcase-table .fail { color: #ef4444; font-weight: 600; }
-    .testcase-table .input, .testcase-table .output { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+    .testcase-table .input, .testcase-table .output { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; white-space: pre; word-break: normal; overflow-wrap: normal; }
     
     /* Floating Next Scene Button - Always visible at bottom right */
     .next-scene-btn { 

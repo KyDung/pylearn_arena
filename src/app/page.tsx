@@ -20,6 +20,7 @@ export default function Home() {
               alt="Học Python qua trò chơi"
               fill
               priority
+              unoptimized
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-contain"
             />

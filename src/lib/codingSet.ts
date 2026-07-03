@@ -468,6 +468,8 @@ export default function initCodingSet(
 
       .coding-set-example {
         margin-top: 22px;
+        max-width: 100%;
+        overflow-x: auto;
       }
 
       .coding-set-example h3 {
@@ -477,7 +479,8 @@ export default function initCodingSet(
 
       .coding-set-example-table,
       .coding-set-result-table {
-        width: 100%;
+        width: max-content;
+        min-width: 100%;
         border-collapse: collapse;
       }
 
@@ -501,9 +504,13 @@ export default function initCodingSet(
 
       .coding-set-example-table code,
       .coding-set-result-table code {
+        display: block;
+        max-width: min(520px, 48vw);
+        overflow-x: auto;
         font-family: "JetBrains Mono", Consolas, monospace;
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
+        white-space: pre;
+        word-break: normal;
+        overflow-wrap: normal;
       }
 
       .coding-set-workspace {
