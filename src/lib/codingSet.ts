@@ -98,6 +98,9 @@ const escapeHtml = (value: unknown) =>
 const formatMultiline = (value: string) =>
   escapeHtml(value).replaceAll("\n", "<br>");
 
+const SESSION_SUBMIT_EVENT = "pylearn:submit-session";
+const SESSION_SUBMIT_STATE_EVENT = "pylearn:session-submit-state";
+
 function getStorageKey(config: CodingSetConfig) {
   let userId = "guest";
 
@@ -346,7 +349,7 @@ export default function initCodingSet(
       .coding-set-toolbar {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
         gap: 12px;
         min-height: 64px;
         padding: 10px 18px;
@@ -358,12 +361,22 @@ export default function initCodingSet(
         font-size: 14px;
       }
 
-      .coding-set-actions,
       .coding-set-navigation {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
         gap: 8px;
+      }
+
+      .coding-set-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 18px;
+        background: #ffffff;
+        border-top: 1px solid var(--cs-border);
       }
 
       .coding-set-button {
@@ -419,13 +432,12 @@ export default function initCodingSet(
         flex: 1;
         flex-direction: column;
         min-height: 0;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .coding-set-statement {
-        max-height: 320px;
         padding: 20px 22px;
-        overflow: auto;
+        overflow: visible;
         background: #fbfdff;
         border-bottom: 1px solid var(--cs-border);
       }
@@ -497,7 +509,7 @@ export default function initCodingSet(
       .coding-set-workspace {
         display: grid;
         flex: 1;
-        grid-template-rows: minmax(360px, 1fr) auto;
+        grid-template-rows: minmax(360px, 1fr) auto auto;
         min-width: 0;
         min-height: 0;
       }
@@ -584,10 +596,6 @@ export default function initCodingSet(
         .coding-set-nav-item {
           min-width: 190px;
         }
-
-        .coding-set-statement {
-          max-height: 360px;
-        }
       }
 
       @media (max-width: 640px) {
@@ -637,17 +645,6 @@ export default function initCodingSet(
               <button class="coding-set-button" id="coding-set-next" type="button">Bài sau</button>
             </div>
           </div>
-          <div class="coding-set-actions">
-            <button class="coding-set-button is-reset" id="coding-set-reset-all" type="button" hidden>
-              Làm lại toàn bộ
-            </button>
-            <button class="coding-set-button" id="coding-set-grade-all" type="button">
-              Chấm tất cả
-            </button>
-            <button class="coding-set-button is-primary" id="coding-set-grade" type="button">
-              Chấm bài
-            </button>
-          </div>
         </div>
 
         <div class="coding-set-content">
@@ -661,6 +658,17 @@ export default function initCodingSet(
           <section class="coding-set-workspace">
             <div class="code-panel">
               ${buildCodeEditorHTML("")}
+            </div>
+            <div class="coding-set-actions">
+              <button class="coding-set-button is-reset" id="coding-set-reset-all" type="button" hidden>
+                Làm lại toàn bộ
+              </button>
+              <button class="coding-set-button is-primary" id="coding-set-grade" type="button">
+                Chạy code
+              </button>
+              <button class="coding-set-button" id="coding-set-grade-all" type="button" hidden>
+                Chấm điểm
+              </button>
             </div>
             <div class="coding-set-results" id="coding-set-results"></div>
           </section>
@@ -701,6 +709,9 @@ export default function initCodingSet(
   let currentIndex = restoredIndex >= 0 ? restoredIndex : 0;
   let grading = false;
   let destroyed = false;
+  const isSessionMode = root.dataset.sessionMode === "true";
+  let sessionSubmitting = root.dataset.sessionSubmitting === "true";
+  let sessionSubmitted = root.dataset.sessionSubmitted === "true";
 
   const nav = root.querySelector<HTMLElement>("#coding-set-nav")!;
   const totalScore = root.querySelector<HTMLElement>(
@@ -881,7 +892,7 @@ export default function initCodingSet(
     if (!isCurrentResult) {
       resultPanel.innerHTML = `
         <div class="coding-set-placeholder">
-          Chấm bài để xem kết quả từng test case.
+          Chạy code để xem kết quả từng test case.
         </div>
       `;
       return;
@@ -937,15 +948,28 @@ export default function initCodingSet(
 
   const updateButtons = () => {
     const aggregate = getAggregate();
+    const isLastExercise = currentIndex === config.exercises.length - 1;
     previousButton.disabled = grading || currentIndex === 0;
     nextButton.disabled =
       grading || currentIndex === config.exercises.length - 1;
     gradeButton.disabled = grading;
-    gradeAllButton.disabled = grading;
+    gradeAllButton.disabled =
+      grading || (isSessionMode && (sessionSubmitting || sessionSubmitted));
+    gradeAllButton.hidden = !isLastExercise;
+    gradeAllButton.classList.toggle("is-primary", isSessionMode);
     resetAllButton.disabled = grading;
     resetAllButton.hidden =
       aggregate.gradedExercises !== config.exercises.length;
-    gradeButton.textContent = grading ? "Đang chấm..." : "Chấm bài";
+    gradeButton.textContent = grading ? "Đang chạy..." : "Chạy code";
+    gradeAllButton.textContent = isSessionMode
+      ? sessionSubmitted
+        ? "Đã nộp"
+        : sessionSubmitting
+          ? "Đang nộp..."
+          : "Nộp bài"
+      : grading
+        ? "Đang chấm..."
+        : "Chấm điểm";
   };
 
   const renderCurrentExercise = () => {
@@ -1099,6 +1123,22 @@ export default function initCodingSet(
     switchExercise(Number(button.dataset.exerciseIndex));
   };
 
+  const requestSessionSubmit = () => {
+    if (grading || sessionSubmitting || sessionSubmitted) return;
+    window.dispatchEvent(new CustomEvent(SESSION_SUBMIT_EVENT));
+  };
+
+  const handleSessionSubmitState = (event: Event) => {
+    const detail = (event as CustomEvent<{
+      submitting?: boolean;
+      submitted?: boolean;
+    }>).detail;
+
+    sessionSubmitting = Boolean(detail?.submitting);
+    sessionSubmitted = Boolean(detail?.submitted);
+    updateButtons();
+  };
+
   editorElement.addEventListener("input", handleEditorInput);
   nav.addEventListener("click", handleNavClick);
   previousButton.addEventListener("click", () =>
@@ -1108,8 +1148,12 @@ export default function initCodingSet(
     switchExercise(currentIndex + 1),
   );
   gradeButton.addEventListener("click", gradeCurrentExercise);
-  gradeAllButton.addEventListener("click", gradeAllExercises);
+  gradeAllButton.addEventListener(
+    "click",
+    isSessionMode ? requestSessionSubmit : gradeAllExercises,
+  );
   resetAllButton.addEventListener("click", resetAllExercises);
+  window.addEventListener(SESSION_SUBMIT_STATE_EVENT, handleSessionSubmitState);
 
   const gameInstance: CodingSetGameInstance = {
     prepareSubmission: gradeAllExercises,
@@ -1146,7 +1190,7 @@ export default function initCodingSet(
         return result && result.codeSnapshot === codes[exercise.id];
       }),
     getIncompleteMessage: () =>
-      "Bạn cần chấm tất cả bài trước khi nộp bài kiểm tra.",
+      "Bạn cần chấm điểm toàn bộ bài trước khi nộp bài kiểm tra.",
   };
 
   window.codingSetGameInstance = gameInstance;
@@ -1160,8 +1204,15 @@ export default function initCodingSet(
     editorElement.removeEventListener("input", handleEditorInput);
     nav.removeEventListener("click", handleNavClick);
     gradeButton.removeEventListener("click", gradeCurrentExercise);
-    gradeAllButton.removeEventListener("click", gradeAllExercises);
+    gradeAllButton.removeEventListener(
+      "click",
+      isSessionMode ? requestSessionSubmit : gradeAllExercises,
+    );
     resetAllButton.removeEventListener("click", resetAllExercises);
+    window.removeEventListener(
+      SESSION_SUBMIT_STATE_EVENT,
+      handleSessionSubmitState,
+    );
 
     const gameWindow = window as Window & {
       gameInstance?: CodingSetGameInstance;

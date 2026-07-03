@@ -4,9 +4,13 @@ import { Suspense, useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { createPortal } from "react-dom";
 import courses from "@/data/courses.json";
 import type { Course, User } from "@/types";
 import { getUser } from "@/lib/auth";
+
+const SESSION_SUBMIT_EVENT = "pylearn:submit-session";
+const SESSION_SUBMIT_STATE_EVENT = "pylearn:session-submit-state";
 
 // Dynamic import for Pyodide to avoid SSR issues
 const PlayGameContent = dynamic(() => import("@/components/PlayGameContent"), {
@@ -43,6 +47,101 @@ interface SessionGameInstance {
     totalTests?: number;
     score?: number;
   };
+}
+
+interface SessionSubmitPortalProps {
+  active: boolean;
+  submitting: boolean;
+  submitted: boolean;
+  pathKey: string | null;
+  onSubmit: () => void;
+}
+
+function SessionSubmitPortal({
+  active,
+  submitting,
+  submitted,
+  pathKey,
+  onSubmit,
+}: SessionSubmitPortalProps) {
+  const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!active) {
+      setMountNode(null);
+      return;
+    }
+
+    let slot: HTMLDivElement | null = null;
+
+    const removeSlot = () => {
+      if (slot?.parentElement) {
+        slot.parentElement.removeChild(slot);
+      }
+      slot = null;
+      setMountNode(null);
+    };
+
+    const attachSlot = () => {
+      if (document.querySelector(".coding-set-shell")) {
+        removeSlot();
+        return;
+      }
+
+      const codeActions = document.querySelector<HTMLElement>(".code-actions");
+      const codePanel = document.querySelector<HTMLElement>(".code-panel");
+      const target = codeActions || codePanel;
+
+      if (!target) return;
+
+      const existing = target.querySelector<HTMLDivElement>(
+        "[data-session-submit-slot='true']",
+      );
+      slot = existing || document.createElement("div");
+      slot.dataset.sessionSubmitSlot = "true";
+      slot.className = codeActions
+        ? "session-submit-slot"
+        : "session-submit-slot px-3 pb-3";
+
+      if (!existing) {
+        target.appendChild(slot);
+      }
+
+      setMountNode(slot);
+    };
+
+    attachSlot();
+
+    const observer = new MutationObserver(attachSlot);
+    observer.observe(document.body, { childList: true, subtree: true });
+    const intervalId = window.setInterval(attachSlot, 300);
+
+    return () => {
+      observer.disconnect();
+      window.clearInterval(intervalId);
+      removeSlot();
+    };
+  }, [active, pathKey]);
+
+  if (!active || !mountNode) return null;
+
+  return createPortal(
+    <button
+      type="button"
+      onClick={onSubmit}
+      disabled={submitting || submitted}
+      className={`w-full sm:w-auto px-5 py-2.5 rounded-lg font-semibold transition-all text-sm sm:text-base ${
+        submitted
+          ? "bg-green-500 text-white cursor-not-allowed"
+          : submitting
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg hover:scale-[1.02]"
+      }`}
+    >
+      {submitted ? "Đã nộp bài" : submitting ? "Đang nộp bài..." : "Nộp bài"}
+    </button>,
+    mountNode,
+  );
 }
 
 function PlayContent() {
@@ -160,6 +259,7 @@ function PlayContent() {
 
   const handleSubmitCode = async () => {
     if (!activeSession) return;
+    if (submitting || hasAlreadySubmitted) return;
 
     const gameInstance = (
       window as Window & { gameInstance?: SessionGameInstance }
@@ -191,6 +291,11 @@ function PlayContent() {
       );
       return;
     }
+
+    const confirmed = window.confirm(
+      "Bạn có chắc muốn nộp bài tới giáo viên chưa? Sau khi nộp, bài làm sẽ được gửi để giáo viên xem kết quả.",
+    );
+    if (!confirmed) return;
 
     setSubmitting(true);
     setSubmitError(null);
@@ -265,6 +370,35 @@ function PlayContent() {
     }
   };
 
+  useEffect(() => {
+    if (!isSessionMode) return;
+
+    const handleSessionSubmitRequest = () => {
+      void handleSubmitCode();
+    };
+
+    window.addEventListener(SESSION_SUBMIT_EVENT, handleSessionSubmitRequest);
+    return () => {
+      window.removeEventListener(
+        SESSION_SUBMIT_EVENT,
+        handleSessionSubmitRequest,
+      );
+    };
+  }, [isSessionMode, handleSubmitCode]);
+
+  useEffect(() => {
+    if (!isSessionMode) return;
+
+    window.dispatchEvent(
+      new CustomEvent(SESSION_SUBMIT_STATE_EVENT, {
+        detail: {
+          submitting,
+          submitted: hasAlreadySubmitted,
+        },
+      }),
+    );
+  }, [isSessionMode, submitting, hasAlreadySubmitted]);
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">Đang tải...</div>
@@ -337,29 +471,13 @@ function PlayContent() {
               )}
             </div>
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              {activeSession && (
-                <button
-                  onClick={handleSubmitCode}
-                  disabled={submitting || hasAlreadySubmitted}
-                  className={`px-4 sm:px-6 py-2 rounded-lg font-medium transition-all text-sm sm:text-base ${
-                    hasAlreadySubmitted
-                      ? "bg-green-500 text-white cursor-not-allowed"
-                      : submitting
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg hover:scale-105"
-                  }`}
+              {isSessionMode && (
+                <Link
+                  href="/student/sessions"
+                  className="px-3 sm:px-4 py-2 border-2 border-blue-200 text-blue-700 rounded-lg font-medium hover:bg-blue-50 transition-colors text-sm sm:text-base whitespace-nowrap"
                 >
-                  {hasAlreadySubmitted ? (
-                    "✓ Đã nộp"
-                  ) : submitting ? (
-                    "Đang nộp..."
-                  ) : (
-                    <>
-                      <span className="hidden sm:inline">📤 Nộp bài</span>
-                      <span className="sm:hidden">📤</span>
-                    </>
-                  )}
-                </button>
+                  ← Danh sách session
+                </Link>
               )}
               {!isSessionMode && (
                 <Link
@@ -385,7 +503,19 @@ function PlayContent() {
             </div>
           )}
 
-          <PlayGameContent pathParam={effectivePathParam} />
+          <PlayGameContent
+            pathParam={effectivePathParam}
+            sessionMode={isSessionMode}
+            sessionSubmitted={hasAlreadySubmitted}
+            sessionSubmitting={submitting}
+          />
+          <SessionSubmitPortal
+            active={!!activeSession}
+            submitting={submitting}
+            submitted={hasAlreadySubmitted}
+            pathKey={effectivePathParam}
+            onSubmit={handleSubmitCode}
+          />
         </div>
       </section>
     </main>

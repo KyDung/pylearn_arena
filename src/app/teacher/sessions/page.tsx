@@ -13,6 +13,7 @@ interface Session {
   description?: string;
   started_at: string;
   closed_at?: string;
+  duration_minutes?: number;
   status: "active" | "closed";
   total_submissions: number;
   unique_submitters: number;
@@ -27,29 +28,60 @@ interface Class {
   code: string;
 }
 
+interface Course {
+  id: number;
+  slug: string;
+  title: string;
+}
+
+interface Lesson {
+  id: number;
+  slug: string;
+  title: string;
+}
+
 interface Game {
   id: number;
   title: string;
   slug: string;
 }
 
+type DurationUnit = "minutes" | "hours" | "days" | "weeks";
+
+const durationUnitToMinutes: Record<DurationUnit, number> = {
+  minutes: 1,
+  hours: 60,
+  days: 24 * 60,
+  weeks: 7 * 24 * 60,
+};
+
+const emptySessionForm = {
+  class_id: "",
+  course_slug: "",
+  lesson_id: "",
+  game_id: "",
+  title: "",
+  description: "",
+  duration_value: 1,
+  duration_unit: "hours" as DurationUnit,
+};
+
 export default function TeacherSessionsPage() {
   const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
   const [games, setGames] = useState<Game[]>([]);
+  const [loadingCourses, setLoadingCourses] = useState(false);
+  const [loadingLessons, setLoadingLessons] = useState(false);
+  const [loadingGames, setLoadingGames] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [filter, setFilter] = useState<"all" | "active" | "closed">("all");
   const [selectedClass, setSelectedClass] = useState<string>("");
 
-  const [newSession, setNewSession] = useState({
-    class_id: "",
-    game_id: "",
-    title: "",
-    description: "",
-    duration_minutes: 60,
-  });
+  const [newSession, setNewSession] = useState(emptySessionForm);
 
   useEffect(() => {
     const user = getUser();
@@ -79,7 +111,7 @@ export default function TeacherSessionsPage() {
       }
 
       // Load classes
-      const classesRes = await fetch("/api/classes");
+      const classesRes = await fetch("/api/classes?pageSize=100");
       const classesData = await classesRes.json();
       if (classesData.success) {
         setClasses(classesData.data.items || []);
@@ -91,33 +123,101 @@ export default function TeacherSessionsPage() {
     }
   };
 
-  const loadGamesForLesson = async () => {
+  const loadCourses = async () => {
     try {
-      // Simplified: Load all games (filter by course access in production)
-      const res = await fetch(`/api/games`);
+      setLoadingCourses(true);
+      const res = await fetch("/api/courses");
       const data = await res.json();
       if (data.success) {
-        setGames(data.data || []);
+        setCourses(data.courses || data.data || []);
+      }
+    } catch (error) {
+      console.error("Error loading courses:", error);
+    } finally {
+      setLoadingCourses(false);
+    }
+  };
+
+  const loadLessonsForCourse = async (courseSlug: string) => {
+    try {
+      setLoadingLessons(true);
+      const res = await fetch(
+        `/api/courses/${encodeURIComponent(courseSlug)}/lessons`,
+      );
+      const data = await res.json();
+      if (data.success) {
+        setLessons(data.lessons || data.data || []);
+      }
+    } catch (error) {
+      console.error("Error loading lessons:", error);
+    } finally {
+      setLoadingLessons(false);
+    }
+  };
+
+  const loadGamesForLesson = async (courseSlug: string, lessonId: string) => {
+    try {
+      setLoadingGames(true);
+      const res = await fetch(
+        `/api/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonId)}/games`,
+      );
+      const data = await res.json();
+      if (data.success) {
+        setGames(data.games || data.data || []);
       }
     } catch (error) {
       console.error("Error loading games:", error);
+    } finally {
+      setLoadingGames(false);
     }
   };
 
   useEffect(() => {
     if (showCreateModal) {
-      loadGamesForLesson();
+      loadCourses();
     }
   }, [showCreateModal]);
+
+  useEffect(() => {
+    if (!showCreateModal || !newSession.course_slug) {
+      setLessons([]);
+      setGames([]);
+      return;
+    }
+
+    loadLessonsForCourse(newSession.course_slug);
+  }, [showCreateModal, newSession.course_slug]);
+
+  useEffect(() => {
+    if (!showCreateModal || !newSession.course_slug || !newSession.lesson_id) {
+      setGames([]);
+      return;
+    }
+
+    loadGamesForLesson(newSession.course_slug, newSession.lesson_id);
+  }, [showCreateModal, newSession.course_slug, newSession.lesson_id]);
 
   const handleCreateSession = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      const durationValue = Math.max(
+        1,
+        Number(newSession.duration_value) || 1,
+      );
+      const durationMinutes =
+        durationValue * durationUnitToMinutes[newSession.duration_unit];
+
       const res = await fetch("/api/teacher/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSession),
+        body: JSON.stringify({
+          class_id: newSession.class_id,
+          game_id: newSession.game_id,
+          title: newSession.title,
+          description: newSession.description,
+          duration_minutes: durationMinutes,
+        }),
       });
 
       const data = await res.json();
@@ -125,13 +225,9 @@ export default function TeacherSessionsPage() {
       if (data.success) {
         alert("✅ Session đã được tạo thành công!");
         setShowCreateModal(false);
-        setNewSession({
-          class_id: "",
-          game_id: "",
-          title: "",
-          description: "",
-          duration_minutes: 60,
-        });
+        setNewSession(emptySessionForm);
+        setLessons([]);
+        setGames([]);
         loadData();
       } else {
         alert("❌ " + data.error);
@@ -219,6 +315,20 @@ export default function TeacherSessionsPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const formatDuration = (minutes?: number) => {
+    if (!minutes) return "Không giới hạn";
+    if (minutes % durationUnitToMinutes.weeks === 0) {
+      return `${minutes / durationUnitToMinutes.weeks} tuần`;
+    }
+    if (minutes % durationUnitToMinutes.days === 0) {
+      return `${minutes / durationUnitToMinutes.days} ngày`;
+    }
+    if (minutes % durationUnitToMinutes.hours === 0) {
+      return `${minutes / durationUnitToMinutes.hours} giờ`;
+    }
+    return `${minutes} phút`;
   };
 
   const getTimeDiff = (startDate: string, endDate?: string) => {
@@ -405,6 +515,12 @@ export default function TeacherSessionsPage() {
                             {getTimeDiff(session.started_at, session.closed_at)}
                           </span>
                         </div>
+                        <div>
+                          <span className="text-gray-500">Thời lượng mở:</span>
+                          <span className="ml-2 font-medium text-gray-900">
+                            {formatDuration(session.duration_minutes)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -499,17 +615,93 @@ export default function TeacherSessionsPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Game <span className="text-red-500">*</span>
+                  Khóa học <span className="text-red-500">*</span>
                 </label>
                 <select
-                  value={newSession.game_id}
+                  value={newSession.course_slug}
                   onChange={(e) =>
-                    setNewSession({ ...newSession, game_id: e.target.value })
+                    setNewSession({
+                      ...newSession,
+                      course_slug: e.target.value,
+                      lesson_id: "",
+                      game_id: "",
+                    })
                   }
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 >
-                  <option value="">Chọn game...</option>
+                  <option value="">
+                    {loadingCourses ? "Đang tải khóa học..." : "Chọn khóa học..."}
+                  </option>
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.slug}>
+                      {course.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Bài học <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={newSession.lesson_id}
+                  onChange={(e) =>
+                    setNewSession({
+                      ...newSession,
+                      lesson_id: e.target.value,
+                      game_id: "",
+                    })
+                  }
+                  required
+                  disabled={!newSession.course_slug || loadingLessons}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-100 disabled:text-gray-500"
+                >
+                  <option value="">
+                    {!newSession.course_slug
+                      ? "Chọn khóa học trước..."
+                      : loadingLessons
+                        ? "Đang tải bài học..."
+                        : "Chọn bài học..."}
+                  </option>
+                  {lessons.map((lesson) => (
+                    <option key={lesson.id} value={lesson.id}>
+                      {lesson.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Game <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={newSession.game_id}
+                  onChange={(e) => {
+                    const selectedGame = games.find(
+                      (game) => String(game.id) === e.target.value,
+                    );
+                    setNewSession({
+                      ...newSession,
+                      game_id: e.target.value,
+                      title: newSession.title
+                        ? newSession.title
+                        : `Session - ${selectedGame?.title || ""}`,
+                    });
+                  }}
+                  required
+                  disabled={!newSession.lesson_id || loadingGames}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-100 disabled:text-gray-500"
+                >
+                  <option value="">
+                    {!newSession.lesson_id
+                      ? "Chọn bài học trước..."
+                      : loadingGames
+                        ? "Đang tải game..."
+                        : "Chọn game..."}
+                  </option>
                   {games.map((g) => (
                     <option key={g.id} value={g.id}>
                       {g.title}
@@ -554,21 +746,37 @@ export default function TeacherSessionsPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Thời gian tự động đóng (phút)
+                  Thời lượng mở session
                 </label>
-                <input
-                  type="number"
-                  value={newSession.duration_minutes}
-                  onChange={(e) =>
-                    setNewSession({
-                      ...newSession,
-                      duration_minutes: parseInt(e.target.value) || 60,
-                    })
-                  }
-                  min={10}
-                  max={180}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-[1fr_180px] gap-3">
+                  <input
+                    type="number"
+                    value={newSession.duration_value}
+                    onChange={(e) =>
+                      setNewSession({
+                        ...newSession,
+                        duration_value: parseInt(e.target.value) || 1,
+                      })
+                    }
+                    min={1}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  />
+                  <select
+                    value={newSession.duration_unit}
+                    onChange={(e) =>
+                      setNewSession({
+                        ...newSession,
+                        duration_unit: e.target.value as DurationUnit,
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  >
+                    <option value="minutes">Phút</option>
+                    <option value="hours">Giờ</option>
+                    <option value="days">Ngày</option>
+                    <option value="weeks">Tuần</option>
+                  </select>
+                </div>
                 <p className="text-xs text-gray-500 mt-1">
                   💡 Session sẽ tự động đóng sau thời gian này, hoặc bạn có thể
                   đóng thủ công bất kỳ lúc nào
@@ -586,13 +794,9 @@ export default function TeacherSessionsPage() {
                   type="button"
                   onClick={() => {
                     setShowCreateModal(false);
-                    setNewSession({
-                      class_id: "",
-                      game_id: "",
-                      title: "",
-                      description: "",
-                      duration_minutes: 60,
-                    });
+                    setNewSession(emptySessionForm);
+                    setLessons([]);
+                    setGames([]);
                   }}
                   className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold transition"
                 >

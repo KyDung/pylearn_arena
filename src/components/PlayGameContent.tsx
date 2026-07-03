@@ -2,22 +2,31 @@
 
 import { useEffect, useRef, useState } from "react";
 import { enhanceGameOutputDiffTables } from "@/lib/gameOutputDiff";
-
-// Declare global loadPyodide from CDN
-declare global {
-  interface Window {
-    loadPyodide: (config: { indexURL: string }) => Promise<any>;
-  }
-}
+import { loadLocalPyodide } from "@/lib/pyodideLoader";
 
 interface PlayGameContentProps {
   pathParam: string;
+  sessionMode?: boolean;
+  sessionSubmitted?: boolean;
+  sessionSubmitting?: boolean;
 }
 
-export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
+export default function PlayGameContent({
+  pathParam,
+  sessionMode = false,
+  sessionSubmitted = false,
+  sessionSubmitting = false,
+}: PlayGameContentProps) {
   const gameRootRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState("Đang tải Pyodide...");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!gameRootRef.current) return;
+    gameRootRef.current.dataset.sessionMode = String(sessionMode);
+    gameRootRef.current.dataset.sessionSubmitted = String(sessionSubmitted);
+    gameRootRef.current.dataset.sessionSubmitting = String(sessionSubmitting);
+  }, [sessionMode, sessionSubmitted, sessionSubmitting]);
 
   useEffect(() => {
     let mounted = true;
@@ -28,27 +37,13 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
       if (!gameRootRef.current) return;
 
       try {
-        // Load Pyodide script from CDN
+        gameRootRef.current.dataset.sessionMode = String(sessionMode);
+        gameRootRef.current.dataset.sessionSubmitted = String(sessionSubmitted);
+        gameRootRef.current.dataset.sessionSubmitting = String(sessionSubmitting);
+
+        // Load Pyodide from local npm package assets served by this app.
         setStatus("Đang tải Pyodide...");
-
-        // Load Pyodide script if not already loaded
-        if (!window.loadPyodide) {
-          const script = document.createElement("script");
-          script.src =
-            "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js";
-          script.async = true;
-
-          await new Promise<void>((resolve, reject) => {
-            script.onload = () => resolve();
-            script.onerror = () =>
-              reject(new Error("Failed to load Pyodide script"));
-            document.head.appendChild(script);
-          });
-        }
-
-        const pyodide = await window.loadPyodide({
-          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/",
-        });
+        const pyodide = await loadLocalPyodide();
 
         if (!mounted) return;
 
@@ -70,7 +65,10 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
           if (!mounted) return;
 
           if (gameRootRef.current) {
-            const cleanup = initGame(gameRootRef.current, { pyodide });
+            const cleanup = initGame(gameRootRef.current, {
+              pyodide,
+              sessionMode,
+            });
             if (typeof cleanup === "function") {
               cleanupGame = cleanup;
             }
@@ -79,7 +77,7 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
             );
             setStatus("Game đã sẵn sàng!");
           }
-        } catch (importError: any) {
+        } catch (importError: unknown) {
           console.error("Failed to import game module:", importError);
           setError(`Không thể tải game: ${pathParam}`);
         }
@@ -97,14 +95,15 @@ export default function PlayGameContent({ pathParam }: PlayGameContentProps) {
       cleanupOutputDiff?.();
       cleanupGame?.();
     };
-  }, [pathParam]);
+  }, [pathParam, sessionMode]);
 
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 p-4 sm:p-6 rounded-lg">
         <p className="text-red-700 mb-2 text-sm sm:text-base">{error}</p>
         <p className="text-xs sm:text-sm text-gray-600">
-          Các game cần được chuyển đổi sang Next.js. Vui lòng kiểm tra lại.
+          Vui lòng tải lại trang. Nếu lỗi vẫn còn, hãy kiểm tra các file
+          Pyodide trong thư mục public/pyodide.
         </p>
       </div>
     );

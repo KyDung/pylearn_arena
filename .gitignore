@@ -25,6 +25,7 @@
 *.pem
 cookies.txt
 student-cookies.txt
+public/pyodide/
 
 # debug
 npm-debug.log*
