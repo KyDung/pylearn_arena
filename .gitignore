@@ -50,3 +50,6 @@ src/app/dev/**
 src/app/api/dev/**
 src/app/admin/cms/**
 src/app/api/admin/game-content/**
+
+# Claude Code local settings
+.claude/settings.local.json

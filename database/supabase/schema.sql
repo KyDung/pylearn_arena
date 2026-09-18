@@ -549,96 +549,7 @@ select
 from rankings r
 join users u on r.user_id = u.id;
 
--- Seed data from pylearnarena.sql. Safe to re-run.
-insert into users (id, username, password, email, full_name, role, created_at, updated_at)
-values
-  (2, 'student1', '$2b$10$lDSZBZhXtl3jPznaQspXlOgJAXttBGBW5YwBuOd6ThLUhYJNcHncO', 'student1@pylearn.com', 'Học Viên 1', 'student', '2026-01-18 23:24:43', '2026-01-31 01:04:17'),
-  (5, 'admin', '$2b$10$lDSZBZhXtl3jPznaQspXlOgJAXttBGBW5YwBuOd6ThLUhYJNcHncO', 'admin@pylearn.com', 'Administrator', 'admin', '2026-01-24 21:15:27', '2026-01-31 01:04:17'),
-  (6, 'hongkhanh', '$2b$10$3G7Elwtrpf3n7w1XChuXG.JdYdiOXLGChyyKJBKMSjJZP3GgO4uIi', 'hongkhanh204@gmail.com', 'Hồng Khánh', 'student', '2026-01-31 01:13:47', '2026-01-31 01:13:47'),
-  (7, 'cokhanh', '$2b$10$vW5HYzyr.4heti5nCx28t.YmyF5qRcV0XcvuLPV/dCLSd8DNeOKXW', 'hkn@gmail.com', 'Cô Khánh', 'teacher', '2026-02-02 10:28:23', '2026-02-02 10:28:23'),
-  (8, 'namnguyen', '$2b$10$YLLA1QuNo70YYZGY.YQ7aO5eZW0GZjfaaMunTK4l5eZbjLKZpedC.', 'nguyennam@gmail.com', 'Nguyễn Nam', 'student', '2026-02-02 12:39:19', '2026-02-02 12:39:19'),
-  (10, 'teststudent', '$2b$10$j/IA.j5hMh1g8/k0SZFFV.WW/.yhpunbq/xl7Il729ud8oeImhKu.', 'student@test.com', 'Test Student', 'student', '2026-02-02 14:24:45', '2026-02-02 14:24:45'),
-  (11, 'student', '$2b$10$F3/KaHKbVxQgRKRBJEqybuSvrqXAJHf6BkSz/sa./Ryl3KQw2.1eS', 'hstest@gmail.com', 'HS test 1', 'student', '2026-02-02 16:55:35', '2026-02-02 16:55:35'),
-  (13, 'thaydung', '$2b$10$OYf7QCIpPqX.ZWsOHl6Mferi9jAGYKhqDBEEKaw1NyteTfoE1ro0i', 'kydung204@gmail.com', 'Kỳ Dũng', 'teacher', '2026-02-08 21:53:09', '2026-02-08 21:53:09')
-on conflict (id) do nothing;
-
-insert into courses (id, slug, title, description, thumbnail, difficulty, level, is_published, status, created_at, updated_at)
-values
-  (1, 'python-basics', 'Tin học 10 - Kết nối tri thức', 'Khóa học Python cho học sinh lớp 10 sách kết nối tri thức', null, 'beginner', 'beginner', true, 'published', '2026-01-18 23:24:43', '2026-02-02 10:30:55')
-on conflict (id) do nothing;
-
-insert into topics (id, course_id, slug, title, description, order_num, created_at, updated_at)
-values
-  (1, 1, 'chapter-1', 'Chủ đề 5: GIẢI QUYẾT VẤN ĐỀ VỚI SỰ TRỢ GIÚP CỦA MÁY TÍNH', '', 1, '2026-01-18 23:24:43', '2026-02-02 10:31:57')
-on conflict (id) do nothing;
-
-insert into lessons (id, topic_id, slug, title, description, summary, duration_minutes, order_num, created_at, updated_at)
-values
-  (1, 1, 't10-cd-b12', 'Bài 25: Một số lệnh làm việc với xâu kí tự', 'Một số lệnh thường dùng với xâu kí tự', 'Thao tác chuỗi cơ bản', 12, 1, '2026-01-18 23:24:43', '2026-02-02 10:33:46')
-on conflict (id) do nothing;
-
-insert into games (id, lesson_id, slug, title, description, path, order_num, created_at, updated_at)
-values
-  (1, 1, 't10-cd-b12-id1', 'Game 1: Đảo ngược chuỗi', 'Viết hàm đảo ngược chuỗi', 'python-basics/chapter-1/t10-cd-b12/id1', 1, '2026-01-18 23:24:43', '2026-01-19 01:07:46'),
-  (2, 1, 't10-cd-b12-id2', 'Game 2: Đếm ký tự', 'Đếm số lần xuất hiện của ký tự', 'python-basics/chapter-1/t10-cd-b12/id2', 2, '2026-01-18 23:24:43', '2026-01-19 01:07:46'),
-  (5, 1, 't10-cd-b12-id3', 'Game 3: Cuộc đua vượt chướng ngại vật', 'Hãy giúp cá mập nhỏ chiến thắng cuộc đua nhé', 'python-basics/chapter-1/t10-cd-b12/id3', 3, '2026-01-19 02:09:58', '2026-02-09 19:54:45')
-on conflict (id) do nothing;
-
-insert into classes (id, code, name, description, teacher_id, school_year, grade, max_students, status, created_at, updated_at)
-values
-  (1, 'XM1GMXQE', '10A3', 'ict', 5, '2025-2026', '10', 50, 'active', '2026-02-01 22:55:38', '2026-02-01 22:55:38'),
-  (3, 'ESTR_QD6', '10A3', 'cs', 7, '2026', '10', 40, 'active', '2026-02-02 12:38:51', '2026-02-02 12:38:51'),
-  (4, '6GUSTLWY', '10A2', '', 7, '2026', '10', 40, 'active', '2026-02-02 12:39:33', '2026-02-02 12:39:33')
-on conflict (id) do nothing;
-
-insert into class_members (id, class_id, user_id, joined_at, status)
-values
-  (2, 4, 8, '2026-02-02 14:02:55', 'active'),
-  (3, 4, 10, '2026-02-02 14:25:10', 'active'),
-  (4, 4, 11, '2026-02-02 16:55:36', 'active'),
-  (5, 4, 2, '2026-02-02 17:18:26', 'active'),
-  (6, 4, 6, '2026-02-02 17:18:26', 'active'),
-  (11, 4, 13, '2026-02-08 21:53:09', 'active')
-on conflict (id) do nothing;
-
-insert into course_access (id, class_id, course_id, granted_at)
-values
-  (10, 4, 1, '2026-02-02 18:48:06')
-on conflict (id) do nothing;
-
-insert into course_content_access (id, class_id, course_id, content_type, content_id, is_unlocked, unlocked_by, unlocked_at, created_at)
-values
-  (47, 4, 1, 'topic', '1', true, 7, '2026-02-02 11:50:17', '2026-02-02 11:41:04'),
-  (50, 4, 1, 'lesson', '1', false, null, null, '2026-02-02 11:48:06')
-on conflict (id) do nothing;
-
-insert into sessions (id, class_id, game_id, title, description, started_at, closed_at, duration_minutes, max_submissions, auto_close, status, created_by, total_submissions, unique_submitters, created_at, updated_at)
-values
-  (3, 4, 5, 'Test Session', 'Test session for debugging', '2026-02-02 07:24:28', null, 60, null, true, 'active', 5, 1, 1, '2026-02-02 07:24:28', '2026-02-02 07:40:29'),
-  (5, 4, 5, 'Bài luyện tập str', null, '2026-02-02 10:01:04', null, 60, null, true, 'active', 7, 0, 0, '2026-02-02 10:01:04', '2026-02-02 10:01:04')
-on conflict (id) do nothing;
-
-insert into session_submissions (id, session_id, user_id, code, score, passed_tests, total_tests, is_correct, execution_time, error_message, attempt_number, submitted_at)
-values
-  (1, 3, 8, '# Đọc chuỗi chướng ngại vật
-obstacles = input()
-
-# Tách chuỗi thành list
-items = obstacles.split("-")
-
-# Tạo list hành động
-actions = []
-for item in items:
-    if item == "duongdi":
-        actions.append("chay")
-    elif item == "vatcan":
-        actions.append("nhay")
-
-# Ghép và in kết quả
-result = "-".join(actions)
-print(result)', 0, 0, 0, false, null, null, 1, '2026-02-02 07:40:29')
-on conflict (id) do nothing;
-
+-- Application defaults only. Accounts and teaching content are created explicitly.
 insert into settings (setting_key, setting_value, description)
 values
   ('allow_self_registration', 'false', 'Cho phép học sinh tự đăng ký'),
@@ -649,15 +560,12 @@ values
   ('maintenance_mode', 'false', 'Chế độ bảo trì')
 on conflict (setting_key) do nothing;
 
-select setval(pg_get_serial_sequence('users', 'id'), greatest((select coalesce(max(id), 1) from users), 1), true);
-select setval(pg_get_serial_sequence('courses', 'id'), greatest((select coalesce(max(id), 1) from courses), 1), true);
-select setval(pg_get_serial_sequence('topics', 'id'), greatest((select coalesce(max(id), 1) from topics), 1), true);
-select setval(pg_get_serial_sequence('lessons', 'id'), greatest((select coalesce(max(id), 1) from lessons), 1), true);
-select setval(pg_get_serial_sequence('games', 'id'), greatest((select coalesce(max(id), 1) from games), 1), true);
-select setval(pg_get_serial_sequence('classes', 'id'), greatest((select coalesce(max(id), 1) from classes), 1), true);
-select setval(pg_get_serial_sequence('class_members', 'id'), greatest((select coalesce(max(id), 1) from class_members), 1), true);
-select setval(pg_get_serial_sequence('course_access', 'id'), greatest((select coalesce(max(id), 1) from course_access), 1), true);
-select setval(pg_get_serial_sequence('course_content_access', 'id'), greatest((select coalesce(max(id), 1) from course_content_access), 1), true);
-select setval(pg_get_serial_sequence('sessions', 'id'), greatest((select coalesce(max(id), 1) from sessions), 1), true);
-select setval(pg_get_serial_sequence('session_submissions', 'id'), greatest((select coalesce(max(id), 1) from session_submissions), 1), true);
-select setval(pg_get_serial_sequence('user_progress', 'id'), greatest((select coalesce(max(id), 1) from user_progress), 1), true);
+-- Custom auth goes through the server API; public Data API access stays denied.
+DO $$
+DECLARE app_table record;
+BEGIN
+  FOR app_table IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' LOOP
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', app_table.tablename);
+  END LOOP;
+END;
+$$;

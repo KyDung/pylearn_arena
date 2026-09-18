@@ -56,18 +56,10 @@ export const CourseService = {
    * Lấy tất cả courses (bao gồm chưa published)
    */
   async getAllCourses(): Promise<Course[]> {
-    try {
-      const [rows] = await pool.query<RowDataPacket[]>(
-        `SELECT * FROM courses ORDER BY order_num ASC, created_at ASC`,
-      );
-      return rows as Course[];
-    } catch {
-      // Fallback nếu cột order_num chưa tồn tại (migration chưa chạy)
-      const [rows] = await pool.query<RowDataPacket[]>(
-        `SELECT * FROM courses ORDER BY created_at ASC`,
-      );
-      return rows as Course[];
-    }
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT * FROM courses ORDER BY order_num ASC, created_at ASC, id ASC`,
+    );
+    return rows as Course[];
   },
 
   /**
@@ -864,45 +856,18 @@ export const LessonSessionService = {
       executionTime?: number;
     },
   ): Promise<SessionSubmission[]> {
-    const [existing] = await pool.query<RowDataPacket[]>(
-      "SELECT id, score FROM session_submissions WHERE session_id = ? AND user_id = ?",
-      [sessionId, userId],
+    // Quick lesson sessions have their own FK namespace. An atomic upsert also
+    // prevents simultaneous requests from replacing a better result with a worse one.
+    await pool.query(
+      `INSERT INTO lesson_session_submissions (session_id, user_id, code, score, is_correct, execution_time)
+       VALUES (?, ?, ?, ?, ?, ?)
+       ON CONFLICT (session_id, user_id) DO UPDATE SET
+         code = EXCLUDED.code, score = EXCLUDED.score,
+         is_correct = EXCLUDED.is_correct, execution_time = EXCLUDED.execution_time,
+         submitted_at = clock_timestamp()
+       WHERE EXCLUDED.score > lesson_session_submissions.score`,
+      [sessionId, userId, data.code, data.score, data.isCorrect, data.executionTime ?? null],
     );
-
-    if (existing.length > 0) {
-      if (data.score > existing[0].score) {
-        await pool.query(
-          `
-          UPDATE session_submissions 
-          SET code = ?, score = ?, is_correct = ?, execution_time = ?, submitted_at = NOW()
-          WHERE session_id = ? AND user_id = ?
-        `,
-          [
-            data.code,
-            data.score,
-            data.isCorrect,
-            data.executionTime || null,
-            sessionId,
-            userId,
-          ],
-        );
-      }
-    } else {
-      await pool.query(
-        `
-        INSERT INTO session_submissions (session_id, user_id, code, score, is_correct, execution_time)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `,
-        [
-          sessionId,
-          userId,
-          data.code,
-          data.score,
-          data.isCorrect,
-          data.executionTime || null,
-        ],
-      );
-    }
 
     return this.getSessionRankings(sessionId);
   },
@@ -915,7 +880,7 @@ export const LessonSessionService = {
         u.username,
         u.full_name,
         RANK() OVER (ORDER BY ss.score DESC, ss.submitted_at ASC) as rank_position
-      FROM session_submissions ss
+      FROM lesson_session_submissions ss
       JOIN users u ON u.id = ss.user_id
       WHERE ss.session_id = ?
       ORDER BY ss.score DESC, ss.submitted_at ASC
@@ -936,7 +901,7 @@ export const LessonSessionService = {
     const [rows] = await pool.query<RowDataPacket[]>(
       `
       SELECT ls.*, l.title as lesson_title, g.title as game_title,
-             (SELECT COUNT(*) FROM session_submissions WHERE session_id = ls.id) as submission_count
+             (SELECT COUNT(*) FROM lesson_session_submissions WHERE session_id = ls.id) as submission_count
       FROM lesson_sessions ls
       JOIN lessons l ON l.id = ls.lesson_id
       LEFT JOIN games g ON g.id = ls.game_id

@@ -1,0 +1,6192 @@
+{
+  "capturedAt": "2026-09-18T16:27:42.152Z",
+  "target": "05ca2564a33332d0",
+  "readOnly": true,
+  "server": [
+    {
+      "version": "17.6",
+      "timezone": "UTC"
+    }
+  ],
+  "tables": [
+    {
+      "name": "activity_log",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "assignment_submissions",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "assignments",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "class_course_settings",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "class_members",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "class_students",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "classes",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "contest_games",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "contest_rankings",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "contest_submissions",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "contests",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "course_access",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "course_content_access",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "courses",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "games",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "lesson_sessions",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "lessons",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "notifications",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "rankings",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "session_submissions",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "sessions",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "settings",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "submissions",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "topics",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "user_progress",
+      "rls": true,
+      "force_rls": false
+    },
+    {
+      "name": "users",
+      "rls": true,
+      "force_rls": false
+    }
+  ],
+  "columns": [
+    {
+      "table_name": "activity_log",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "activity_log",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "activity_log",
+      "column_name": "action",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "activity_log",
+      "column_name": "entity_type",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "activity_log",
+      "column_name": "entity_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "activity_log",
+      "column_name": "details",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "activity_log",
+      "column_name": "ip_address",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "activity_log",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "assignment_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "student_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "game_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "code",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "is_correct",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "score",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "execution_time",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "column_name": "submitted_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "class_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "game_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "title",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "game_ids",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "created_by",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "start_time",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "end_time",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "time_limit",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "late_submission",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "late_penalty",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "max_attempts",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "1",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "show_ranking",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "show_answers_after",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'draft'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "assignments",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_course_settings",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_course_settings",
+      "column_name": "class_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_course_settings",
+      "column_name": "course_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_course_settings",
+      "column_name": "created_by",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_course_settings",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_course_settings",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_members",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_members",
+      "column_name": "class_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_members",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_members",
+      "column_name": "role",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'student'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_members",
+      "column_name": "joined_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_members",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'active'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_students",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_students",
+      "column_name": "class_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_students",
+      "column_name": "student_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_students",
+      "column_name": "joined_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "class_students",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'active'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "code",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "teacher_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "school_year",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'2025-2026'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "grade",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "max_students",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "50",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'active'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "classes",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_games",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_games",
+      "column_name": "contest_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_games",
+      "column_name": "game_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_games",
+      "column_name": "is_active",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_games",
+      "column_name": "sort_order",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_games",
+      "column_name": "points",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "100",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_games",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "contest_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "total_score",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "games_completed",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "total_games",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "total_attempts",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "best_submission_time",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "rank_position",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "best_score",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "best_submission_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "first_submission_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "best_submission_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_rankings",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "contest_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "game_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "code",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "score",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "passed_tests",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "total_tests",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "is_correct",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "execution_time",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "is_late",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "final_score",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'pending'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "error_message",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "attempt_number",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "1",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "submitted_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contest_submissions",
+      "column_name": "graded_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "title",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "contest_code",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "class_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "game_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "course_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "lesson_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "created_by",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "open_all_games",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "start_time",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "end_time",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "result_announce_time",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "show_ranking",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "allow_resubmit",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "max_attempts",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "max_submissions",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "10",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "allow_late_submission",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "late_penalty_percent",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "20",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "show_leaderboard",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "show_leaderboard_scores",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "prizes",
+      "data_type": "jsonb",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'draft'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "total_participants",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "total_submissions",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "contests",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_access",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_access",
+      "column_name": "class_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_access",
+      "column_name": "course_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_access",
+      "column_name": "granted_by",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_access",
+      "column_name": "is_active",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_access",
+      "column_name": "granted_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_access",
+      "column_name": "expires_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_content_access",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_content_access",
+      "column_name": "class_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_content_access",
+      "column_name": "course_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_content_access",
+      "column_name": "content_type",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_content_access",
+      "column_name": "content_id",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_content_access",
+      "column_name": "is_unlocked",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_content_access",
+      "column_name": "unlocked_by",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_content_access",
+      "column_name": "unlocked_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "course_content_access",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "slug",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "title",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "thumbnail",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "difficulty",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'beginner'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "level",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'beginner'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "total_lessons",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "is_published",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'published'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "courses",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "lesson_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "slug",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "title",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "path",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "game_path",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "ALWAYS"
+    },
+    {
+      "table_name": "games",
+      "column_name": "game_type",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'type1'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "is_active",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "order_num",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "order_index",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "ALWAYS"
+    },
+    {
+      "table_name": "games",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "games",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "column_name": "lesson_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "column_name": "game_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "column_name": "session_code",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "column_name": "created_by",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "column_name": "is_active",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "column_name": "expires_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "topic_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "slug",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "title",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "summary",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "duration_minutes",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "difficulty_level",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "order_num",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "order_index",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "ALWAYS"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "lessons",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "notifications",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "notifications",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "notifications",
+      "column_name": "type",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "notifications",
+      "column_name": "title",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "notifications",
+      "column_name": "message",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "notifications",
+      "column_name": "link",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "notifications",
+      "column_name": "is_read",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "notifications",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "rankings",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "rankings",
+      "column_name": "assignment_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "rankings",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "rankings",
+      "column_name": "best_score",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "rankings",
+      "column_name": "best_submission_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "rankings",
+      "column_name": "total_attempts",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "rankings",
+      "column_name": "first_passed_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "rankings",
+      "column_name": "rank_position",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "rankings",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "session_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "code",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "score",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "passed_tests",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "total_tests",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "is_correct",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "execution_time",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "error_message",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "attempt_number",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "1",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "session_submissions",
+      "column_name": "submitted_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "class_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "game_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "title",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "started_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "closed_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "duration_minutes",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "60",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "max_submissions",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "auto_close",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "true",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'active'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "created_by",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "total_submissions",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "unique_submitters",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "settings",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "settings",
+      "column_name": "setting_key",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "settings",
+      "column_name": "setting_value",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "settings",
+      "column_name": "description",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "settings",
+      "column_name": "updated_by",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "settings",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "assignment_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "game_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "code",
+      "data_type": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": "'pending'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "score",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "passed_tests",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "total_tests",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "execution_time",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "feedback",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "error_message",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "is_late",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "attempt_number",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "1",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "ip_address",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "user_agent",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "submitted_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "submissions",
+      "column_name": "graded_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "topics",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "topics",
+      "column_name": "course_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "topics",
+      "column_name": "slug",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "topics",
+      "column_name": "title",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "topics",
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "topics",
+      "column_name": "order_num",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "topics",
+      "column_name": "order_index",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "ALWAYS"
+    },
+    {
+      "table_name": "topics",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "topics",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "user_progress",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "user_progress",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "user_progress",
+      "column_name": "game_id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "user_progress",
+      "column_name": "is_completed",
+      "data_type": "boolean",
+      "is_nullable": "YES",
+      "column_default": "false",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "user_progress",
+      "column_name": "score",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "user_progress",
+      "column_name": "attempts",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": "0",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "user_progress",
+      "column_name": "last_attempt_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "user_progress",
+      "column_name": "completed_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "YES",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "username",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "password",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "email",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "full_name",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "role",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": "'student'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "avatar",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "phone",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "column_default": "'active'::character varying",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "created_by",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "last_login",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "users",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": "now()",
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_assignment_leaderboard",
+      "column_name": "assignment_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_assignment_leaderboard",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_assignment_leaderboard",
+      "column_name": "full_name",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_assignment_leaderboard",
+      "column_name": "username",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_assignment_leaderboard",
+      "column_name": "best_score",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_assignment_leaderboard",
+      "column_name": "total_attempts",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_assignment_leaderboard",
+      "column_name": "first_passed_at",
+      "data_type": "timestamp without time zone",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_assignment_leaderboard",
+      "column_name": "rank_position",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_class_stats",
+      "column_name": "class_id",
+      "data_type": "integer",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_class_stats",
+      "column_name": "class_name",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_class_stats",
+      "column_name": "class_code",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_class_stats",
+      "column_name": "teacher_name",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_class_stats",
+      "column_name": "student_count",
+      "data_type": "bigint",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_class_stats",
+      "column_name": "course_count",
+      "data_type": "bigint",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    },
+    {
+      "table_name": "v_class_stats",
+      "column_name": "assignment_count",
+      "data_type": "bigint",
+      "is_nullable": "YES",
+      "column_default": null,
+      "is_identity": "NO",
+      "is_generated": "NEVER"
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "activity_log",
+      "name": "activity_log_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "activity_log",
+      "name": "activity_log_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "name": "assignment_submissions_assignment_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "name": "assignment_submissions_game_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "name": "assignment_submissions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "assignment_submissions",
+      "name": "assignment_submissions_student_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "assignments",
+      "name": "assignments_class_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "assignments",
+      "name": "assignments_created_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "assignments",
+      "name": "assignments_game_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "assignments",
+      "name": "assignments_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "assignments",
+      "name": "assignments_status_check",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'published'::character varying, 'closed'::character varying])::text[])))"
+    },
+    {
+      "table_name": "class_course_settings",
+      "name": "class_course_settings_class_id_course_id_key",
+      "type": "u",
+      "definition": "UNIQUE (class_id, course_id)"
+    },
+    {
+      "table_name": "class_course_settings",
+      "name": "class_course_settings_class_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "class_course_settings",
+      "name": "class_course_settings_course_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "class_course_settings",
+      "name": "class_course_settings_created_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "class_course_settings",
+      "name": "class_course_settings_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "class_members",
+      "name": "class_members_class_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "class_members",
+      "name": "class_members_class_id_user_id_key",
+      "type": "u",
+      "definition": "UNIQUE (class_id, user_id)"
+    },
+    {
+      "table_name": "class_members",
+      "name": "class_members_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "class_members",
+      "name": "class_members_role_check",
+      "type": "c",
+      "definition": "CHECK (((role)::text = ANY ((ARRAY['student'::character varying, 'assistant'::character varying])::text[])))"
+    },
+    {
+      "table_name": "class_members",
+      "name": "class_members_status_check",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'removed'::character varying, 'left'::character varying])::text[])))"
+    },
+    {
+      "table_name": "class_members",
+      "name": "class_members_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "class_students",
+      "name": "class_students_class_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "class_students",
+      "name": "class_students_class_id_student_id_key",
+      "type": "u",
+      "definition": "UNIQUE (class_id, student_id)"
+    },
+    {
+      "table_name": "class_students",
+      "name": "class_students_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "class_students",
+      "name": "class_students_status_check",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'removed'::character varying])::text[])))"
+    },
+    {
+      "table_name": "class_students",
+      "name": "class_students_student_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "classes",
+      "name": "classes_code_key",
+      "type": "u",
+      "definition": "UNIQUE (code)"
+    },
+    {
+      "table_name": "classes",
+      "name": "classes_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "classes",
+      "name": "classes_status_check",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'archived'::character varying, 'closed'::character varying])::text[])))"
+    },
+    {
+      "table_name": "classes",
+      "name": "classes_teacher_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "contest_games",
+      "name": "contest_games_contest_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "contest_games",
+      "name": "contest_games_contest_id_game_id_key",
+      "type": "u",
+      "definition": "UNIQUE (contest_id, game_id)"
+    },
+    {
+      "table_name": "contest_games",
+      "name": "contest_games_game_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "contest_games",
+      "name": "contest_games_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "contest_rankings",
+      "name": "contest_rankings_best_submission_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (best_submission_id) REFERENCES contest_submissions(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "contest_rankings",
+      "name": "contest_rankings_contest_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "contest_rankings",
+      "name": "contest_rankings_contest_id_user_id_key",
+      "type": "u",
+      "definition": "UNIQUE (contest_id, user_id)"
+    },
+    {
+      "table_name": "contest_rankings",
+      "name": "contest_rankings_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "contest_rankings",
+      "name": "contest_rankings_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "contest_submissions",
+      "name": "contest_submissions_contest_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (contest_id) REFERENCES contests(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "contest_submissions",
+      "name": "contest_submissions_game_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "contest_submissions",
+      "name": "contest_submissions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "contest_submissions",
+      "name": "contest_submissions_status_check",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'running'::character varying, 'passed'::character varying, 'failed'::character varying, 'error'::character varying])::text[])))"
+    },
+    {
+      "table_name": "contest_submissions",
+      "name": "contest_submissions_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "contests",
+      "name": "contests_class_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "contests",
+      "name": "contests_contest_code_key",
+      "type": "u",
+      "definition": "UNIQUE (contest_code)"
+    },
+    {
+      "table_name": "contests",
+      "name": "contests_course_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "contests",
+      "name": "contests_created_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "contests",
+      "name": "contests_game_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "contests",
+      "name": "contests_lesson_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "contests",
+      "name": "contests_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "contests",
+      "name": "contests_status_check",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['draft'::character varying, 'active'::character varying, 'closed'::character varying, 'published'::character varying, 'ongoing'::character varying, 'ended'::character varying, 'archived'::character varying])::text[])))"
+    },
+    {
+      "table_name": "course_access",
+      "name": "course_access_class_id_course_id_key",
+      "type": "u",
+      "definition": "UNIQUE (class_id, course_id)"
+    },
+    {
+      "table_name": "course_access",
+      "name": "course_access_class_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "course_access",
+      "name": "course_access_course_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "course_access",
+      "name": "course_access_granted_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (granted_by) REFERENCES users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "course_access",
+      "name": "course_access_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "course_content_access",
+      "name": "course_content_access_class_id_course_id_content_type_conte_key",
+      "type": "u",
+      "definition": "UNIQUE (class_id, course_id, content_type, content_id)"
+    },
+    {
+      "table_name": "course_content_access",
+      "name": "course_content_access_class_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "course_content_access",
+      "name": "course_content_access_content_type_check",
+      "type": "c",
+      "definition": "CHECK (((content_type)::text = ANY ((ARRAY['topic'::character varying, 'lesson'::character varying])::text[])))"
+    },
+    {
+      "table_name": "course_content_access",
+      "name": "course_content_access_course_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "course_content_access",
+      "name": "course_content_access_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "course_content_access",
+      "name": "course_content_access_unlocked_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (unlocked_by) REFERENCES users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "courses",
+      "name": "courses_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "courses",
+      "name": "courses_slug_key",
+      "type": "u",
+      "definition": "UNIQUE (slug)"
+    },
+    {
+      "table_name": "games",
+      "name": "games_lesson_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "games",
+      "name": "games_lesson_id_slug_key",
+      "type": "u",
+      "definition": "UNIQUE (lesson_id, slug)"
+    },
+    {
+      "table_name": "games",
+      "name": "games_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "name": "lesson_sessions_created_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "name": "lesson_sessions_game_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "name": "lesson_sessions_lesson_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "name": "lesson_sessions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "lesson_sessions",
+      "name": "lesson_sessions_session_code_key",
+      "type": "u",
+      "definition": "UNIQUE (session_code)"
+    },
+    {
+      "table_name": "lessons",
+      "name": "lessons_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "lessons",
+      "name": "lessons_topic_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "notifications",
+      "name": "notifications_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "notifications",
+      "name": "notifications_type_check",
+      "type": "c",
+      "definition": "CHECK (((type)::text = ANY ((ARRAY['assignment'::character varying, 'grade'::character varying, 'class'::character varying, 'system'::character varying])::text[])))"
+    },
+    {
+      "table_name": "notifications",
+      "name": "notifications_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "rankings",
+      "name": "rankings_assignment_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "rankings",
+      "name": "rankings_assignment_id_user_id_key",
+      "type": "u",
+      "definition": "UNIQUE (assignment_id, user_id)"
+    },
+    {
+      "table_name": "rankings",
+      "name": "rankings_best_submission_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (best_submission_id) REFERENCES submissions(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "rankings",
+      "name": "rankings_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "rankings",
+      "name": "rankings_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "session_submissions",
+      "name": "session_submissions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "session_submissions",
+      "name": "session_submissions_session_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "session_submissions",
+      "name": "session_submissions_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_class_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_created_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_game_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE RESTRICT"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_status_check",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'closed'::character varying])::text[])))"
+    },
+    {
+      "table_name": "settings",
+      "name": "settings_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "settings",
+      "name": "settings_setting_key_key",
+      "type": "u",
+      "definition": "UNIQUE (setting_key)"
+    },
+    {
+      "table_name": "settings",
+      "name": "settings_updated_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "submissions",
+      "name": "submissions_assignment_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "submissions",
+      "name": "submissions_game_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "submissions",
+      "name": "submissions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "submissions",
+      "name": "submissions_status_check",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'running'::character varying, 'passed'::character varying, 'failed'::character varying, 'error'::character varying, 'completed'::character varying])::text[])))"
+    },
+    {
+      "table_name": "submissions",
+      "name": "submissions_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "topics",
+      "name": "topics_course_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "topics",
+      "name": "topics_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "user_progress",
+      "name": "user_progress_game_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "user_progress",
+      "name": "user_progress_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "user_progress",
+      "name": "user_progress_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "user_progress",
+      "name": "user_progress_user_id_game_id_key",
+      "type": "u",
+      "definition": "UNIQUE (user_id, game_id)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_created_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "users",
+      "name": "users_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "users",
+      "name": "users_role_check",
+      "type": "c",
+      "definition": "CHECK (((role)::text = ANY ((ARRAY['admin'::character varying, 'teacher'::character varying, 'student'::character varying])::text[])))"
+    },
+    {
+      "table_name": "users",
+      "name": "users_status_check",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying, 'suspended'::character varying, 'banned'::character varying])::text[])))"
+    },
+    {
+      "table_name": "users",
+      "name": "users_username_key",
+      "type": "u",
+      "definition": "UNIQUE (username)"
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "activity_log",
+      "indexname": "activity_log_pkey",
+      "indexdef": "CREATE UNIQUE INDEX activity_log_pkey ON public.activity_log USING btree (id)"
+    },
+    {
+      "tablename": "activity_log",
+      "indexname": "idx_activity_action",
+      "indexdef": "CREATE INDEX idx_activity_action ON public.activity_log USING btree (action)"
+    },
+    {
+      "tablename": "activity_log",
+      "indexname": "idx_activity_created",
+      "indexdef": "CREATE INDEX idx_activity_created ON public.activity_log USING btree (created_at DESC)"
+    },
+    {
+      "tablename": "activity_log",
+      "indexname": "idx_activity_user",
+      "indexdef": "CREATE INDEX idx_activity_user ON public.activity_log USING btree (user_id)"
+    },
+    {
+      "tablename": "assignment_submissions",
+      "indexname": "assignment_submissions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX assignment_submissions_pkey ON public.assignment_submissions USING btree (id)"
+    },
+    {
+      "tablename": "assignment_submissions",
+      "indexname": "idx_assignment_submissions_assignment",
+      "indexdef": "CREATE INDEX idx_assignment_submissions_assignment ON public.assignment_submissions USING btree (assignment_id)"
+    },
+    {
+      "tablename": "assignment_submissions",
+      "indexname": "idx_assignment_submissions_student",
+      "indexdef": "CREATE INDEX idx_assignment_submissions_student ON public.assignment_submissions USING btree (student_id)"
+    },
+    {
+      "tablename": "assignments",
+      "indexname": "assignments_pkey",
+      "indexdef": "CREATE UNIQUE INDEX assignments_pkey ON public.assignments USING btree (id)"
+    },
+    {
+      "tablename": "assignments",
+      "indexname": "idx_assignments_class",
+      "indexdef": "CREATE INDEX idx_assignments_class ON public.assignments USING btree (class_id)"
+    },
+    {
+      "tablename": "assignments",
+      "indexname": "idx_assignments_created_by",
+      "indexdef": "CREATE INDEX idx_assignments_created_by ON public.assignments USING btree (created_by)"
+    },
+    {
+      "tablename": "assignments",
+      "indexname": "idx_assignments_game",
+      "indexdef": "CREATE INDEX idx_assignments_game ON public.assignments USING btree (game_id)"
+    },
+    {
+      "tablename": "assignments",
+      "indexname": "idx_assignments_status",
+      "indexdef": "CREATE INDEX idx_assignments_status ON public.assignments USING btree (status)"
+    },
+    {
+      "tablename": "assignments",
+      "indexname": "idx_assignments_time",
+      "indexdef": "CREATE INDEX idx_assignments_time ON public.assignments USING btree (start_time, end_time)"
+    },
+    {
+      "tablename": "class_course_settings",
+      "indexname": "class_course_settings_class_id_course_id_key",
+      "indexdef": "CREATE UNIQUE INDEX class_course_settings_class_id_course_id_key ON public.class_course_settings USING btree (class_id, course_id)"
+    },
+    {
+      "tablename": "class_course_settings",
+      "indexname": "class_course_settings_pkey",
+      "indexdef": "CREATE UNIQUE INDEX class_course_settings_pkey ON public.class_course_settings USING btree (id)"
+    },
+    {
+      "tablename": "class_members",
+      "indexname": "class_members_class_id_user_id_key",
+      "indexdef": "CREATE UNIQUE INDEX class_members_class_id_user_id_key ON public.class_members USING btree (class_id, user_id)"
+    },
+    {
+      "tablename": "class_members",
+      "indexname": "class_members_pkey",
+      "indexdef": "CREATE UNIQUE INDEX class_members_pkey ON public.class_members USING btree (id)"
+    },
+    {
+      "tablename": "class_members",
+      "indexname": "idx_class_members_class",
+      "indexdef": "CREATE INDEX idx_class_members_class ON public.class_members USING btree (class_id)"
+    },
+    {
+      "tablename": "class_members",
+      "indexname": "idx_class_members_status",
+      "indexdef": "CREATE INDEX idx_class_members_status ON public.class_members USING btree (status)"
+    },
+    {
+      "tablename": "class_members",
+      "indexname": "idx_class_members_user",
+      "indexdef": "CREATE INDEX idx_class_members_user ON public.class_members USING btree (user_id)"
+    },
+    {
+      "tablename": "class_students",
+      "indexname": "class_students_class_id_student_id_key",
+      "indexdef": "CREATE UNIQUE INDEX class_students_class_id_student_id_key ON public.class_students USING btree (class_id, student_id)"
+    },
+    {
+      "tablename": "class_students",
+      "indexname": "class_students_pkey",
+      "indexdef": "CREATE UNIQUE INDEX class_students_pkey ON public.class_students USING btree (id)"
+    },
+    {
+      "tablename": "classes",
+      "indexname": "classes_code_key",
+      "indexdef": "CREATE UNIQUE INDEX classes_code_key ON public.classes USING btree (code)"
+    },
+    {
+      "tablename": "classes",
+      "indexname": "classes_pkey",
+      "indexdef": "CREATE UNIQUE INDEX classes_pkey ON public.classes USING btree (id)"
+    },
+    {
+      "tablename": "classes",
+      "indexname": "idx_classes_code",
+      "indexdef": "CREATE INDEX idx_classes_code ON public.classes USING btree (code)"
+    },
+    {
+      "tablename": "classes",
+      "indexname": "idx_classes_status",
+      "indexdef": "CREATE INDEX idx_classes_status ON public.classes USING btree (status)"
+    },
+    {
+      "tablename": "classes",
+      "indexname": "idx_classes_teacher",
+      "indexdef": "CREATE INDEX idx_classes_teacher ON public.classes USING btree (teacher_id)"
+    },
+    {
+      "tablename": "contest_games",
+      "indexname": "contest_games_contest_id_game_id_key",
+      "indexdef": "CREATE UNIQUE INDEX contest_games_contest_id_game_id_key ON public.contest_games USING btree (contest_id, game_id)"
+    },
+    {
+      "tablename": "contest_games",
+      "indexname": "contest_games_pkey",
+      "indexdef": "CREATE UNIQUE INDEX contest_games_pkey ON public.contest_games USING btree (id)"
+    },
+    {
+      "tablename": "contest_games",
+      "indexname": "idx_contest_games_contest",
+      "indexdef": "CREATE INDEX idx_contest_games_contest ON public.contest_games USING btree (contest_id)"
+    },
+    {
+      "tablename": "contest_games",
+      "indexname": "idx_contest_games_game",
+      "indexdef": "CREATE INDEX idx_contest_games_game ON public.contest_games USING btree (game_id)"
+    },
+    {
+      "tablename": "contest_games",
+      "indexname": "idx_contest_games_order",
+      "indexdef": "CREATE INDEX idx_contest_games_order ON public.contest_games USING btree (contest_id, sort_order)"
+    },
+    {
+      "tablename": "contest_rankings",
+      "indexname": "contest_rankings_contest_id_user_id_key",
+      "indexdef": "CREATE UNIQUE INDEX contest_rankings_contest_id_user_id_key ON public.contest_rankings USING btree (contest_id, user_id)"
+    },
+    {
+      "tablename": "contest_rankings",
+      "indexname": "contest_rankings_pkey",
+      "indexdef": "CREATE UNIQUE INDEX contest_rankings_pkey ON public.contest_rankings USING btree (id)"
+    },
+    {
+      "tablename": "contest_rankings",
+      "indexname": "idx_contest_rankings_rank",
+      "indexdef": "CREATE INDEX idx_contest_rankings_rank ON public.contest_rankings USING btree (contest_id, rank_position)"
+    },
+    {
+      "tablename": "contest_rankings",
+      "indexname": "idx_contest_rankings_score",
+      "indexdef": "CREATE INDEX idx_contest_rankings_score ON public.contest_rankings USING btree (contest_id, total_score DESC)"
+    },
+    {
+      "tablename": "contest_submissions",
+      "indexname": "contest_submissions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX contest_submissions_pkey ON public.contest_submissions USING btree (id)"
+    },
+    {
+      "tablename": "contest_submissions",
+      "indexname": "idx_contest_submissions_contest",
+      "indexdef": "CREATE INDEX idx_contest_submissions_contest ON public.contest_submissions USING btree (contest_id)"
+    },
+    {
+      "tablename": "contest_submissions",
+      "indexname": "idx_contest_submissions_game",
+      "indexdef": "CREATE INDEX idx_contest_submissions_game ON public.contest_submissions USING btree (contest_id, game_id)"
+    },
+    {
+      "tablename": "contest_submissions",
+      "indexname": "idx_contest_submissions_score",
+      "indexdef": "CREATE INDEX idx_contest_submissions_score ON public.contest_submissions USING btree (contest_id, user_id, score DESC)"
+    },
+    {
+      "tablename": "contest_submissions",
+      "indexname": "idx_contest_submissions_user",
+      "indexdef": "CREATE INDEX idx_contest_submissions_user ON public.contest_submissions USING btree (user_id)"
+    },
+    {
+      "tablename": "contests",
+      "indexname": "contests_contest_code_key",
+      "indexdef": "CREATE UNIQUE INDEX contests_contest_code_key ON public.contests USING btree (contest_code)"
+    },
+    {
+      "tablename": "contests",
+      "indexname": "contests_pkey",
+      "indexdef": "CREATE UNIQUE INDEX contests_pkey ON public.contests USING btree (id)"
+    },
+    {
+      "tablename": "contests",
+      "indexname": "idx_contests_class",
+      "indexdef": "CREATE INDEX idx_contests_class ON public.contests USING btree (class_id)"
+    },
+    {
+      "tablename": "contests",
+      "indexname": "idx_contests_code",
+      "indexdef": "CREATE INDEX idx_contests_code ON public.contests USING btree (contest_code)"
+    },
+    {
+      "tablename": "contests",
+      "indexname": "idx_contests_creator",
+      "indexdef": "CREATE INDEX idx_contests_creator ON public.contests USING btree (created_by)"
+    },
+    {
+      "tablename": "contests",
+      "indexname": "idx_contests_status",
+      "indexdef": "CREATE INDEX idx_contests_status ON public.contests USING btree (status)"
+    },
+    {
+      "tablename": "contests",
+      "indexname": "idx_contests_time",
+      "indexdef": "CREATE INDEX idx_contests_time ON public.contests USING btree (start_time, end_time)"
+    },
+    {
+      "tablename": "course_access",
+      "indexname": "course_access_class_id_course_id_key",
+      "indexdef": "CREATE UNIQUE INDEX course_access_class_id_course_id_key ON public.course_access USING btree (class_id, course_id)"
+    },
+    {
+      "tablename": "course_access",
+      "indexname": "course_access_pkey",
+      "indexdef": "CREATE UNIQUE INDEX course_access_pkey ON public.course_access USING btree (id)"
+    },
+    {
+      "tablename": "course_access",
+      "indexname": "idx_course_access_active",
+      "indexdef": "CREATE INDEX idx_course_access_active ON public.course_access USING btree (is_active)"
+    },
+    {
+      "tablename": "course_access",
+      "indexname": "idx_course_access_class",
+      "indexdef": "CREATE INDEX idx_course_access_class ON public.course_access USING btree (class_id)"
+    },
+    {
+      "tablename": "course_access",
+      "indexname": "idx_course_access_course",
+      "indexdef": "CREATE INDEX idx_course_access_course ON public.course_access USING btree (course_id)"
+    },
+    {
+      "tablename": "course_content_access",
+      "indexname": "course_content_access_class_id_course_id_content_type_conte_key",
+      "indexdef": "CREATE UNIQUE INDEX course_content_access_class_id_course_id_content_type_conte_key ON public.course_content_access USING btree (class_id, course_id, content_type, content_id)"
+    },
+    {
+      "tablename": "course_content_access",
+      "indexname": "course_content_access_pkey",
+      "indexdef": "CREATE UNIQUE INDEX course_content_access_pkey ON public.course_content_access USING btree (id)"
+    },
+    {
+      "tablename": "course_content_access",
+      "indexname": "idx_content_access_class_course",
+      "indexdef": "CREATE INDEX idx_content_access_class_course ON public.course_content_access USING btree (class_id, course_id)"
+    },
+    {
+      "tablename": "course_content_access",
+      "indexname": "idx_content_access_lookup",
+      "indexdef": "CREATE INDEX idx_content_access_lookup ON public.course_content_access USING btree (class_id, course_id, content_type, content_id)"
+    },
+    {
+      "tablename": "courses",
+      "indexname": "courses_pkey",
+      "indexdef": "CREATE UNIQUE INDEX courses_pkey ON public.courses USING btree (id)"
+    },
+    {
+      "tablename": "courses",
+      "indexname": "courses_slug_key",
+      "indexdef": "CREATE UNIQUE INDEX courses_slug_key ON public.courses USING btree (slug)"
+    },
+    {
+      "tablename": "courses",
+      "indexname": "idx_courses_published",
+      "indexdef": "CREATE INDEX idx_courses_published ON public.courses USING btree (is_published)"
+    },
+    {
+      "tablename": "courses",
+      "indexname": "idx_courses_slug",
+      "indexdef": "CREATE INDEX idx_courses_slug ON public.courses USING btree (slug)"
+    },
+    {
+      "tablename": "games",
+      "indexname": "games_lesson_id_slug_key",
+      "indexdef": "CREATE UNIQUE INDEX games_lesson_id_slug_key ON public.games USING btree (lesson_id, slug)"
+    },
+    {
+      "tablename": "games",
+      "indexname": "games_pkey",
+      "indexdef": "CREATE UNIQUE INDEX games_pkey ON public.games USING btree (id)"
+    },
+    {
+      "tablename": "games",
+      "indexname": "idx_games_game_path",
+      "indexdef": "CREATE INDEX idx_games_game_path ON public.games USING btree (game_path)"
+    },
+    {
+      "tablename": "games",
+      "indexname": "idx_games_lesson",
+      "indexdef": "CREATE INDEX idx_games_lesson ON public.games USING btree (lesson_id)"
+    },
+    {
+      "tablename": "games",
+      "indexname": "idx_games_order",
+      "indexdef": "CREATE INDEX idx_games_order ON public.games USING btree (order_num)"
+    },
+    {
+      "tablename": "games",
+      "indexname": "idx_games_path",
+      "indexdef": "CREATE INDEX idx_games_path ON public.games USING btree (path)"
+    },
+    {
+      "tablename": "lesson_sessions",
+      "indexname": "idx_lesson_sessions_code",
+      "indexdef": "CREATE INDEX idx_lesson_sessions_code ON public.lesson_sessions USING btree (session_code)"
+    },
+    {
+      "tablename": "lesson_sessions",
+      "indexname": "idx_lesson_sessions_lesson",
+      "indexdef": "CREATE INDEX idx_lesson_sessions_lesson ON public.lesson_sessions USING btree (lesson_id)"
+    },
+    {
+      "tablename": "lesson_sessions",
+      "indexname": "lesson_sessions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX lesson_sessions_pkey ON public.lesson_sessions USING btree (id)"
+    },
+    {
+      "tablename": "lesson_sessions",
+      "indexname": "lesson_sessions_session_code_key",
+      "indexdef": "CREATE UNIQUE INDEX lesson_sessions_session_code_key ON public.lesson_sessions USING btree (session_code)"
+    },
+    {
+      "tablename": "lessons",
+      "indexname": "idx_lessons_order",
+      "indexdef": "CREATE INDEX idx_lessons_order ON public.lessons USING btree (order_num)"
+    },
+    {
+      "tablename": "lessons",
+      "indexname": "idx_lessons_topic",
+      "indexdef": "CREATE INDEX idx_lessons_topic ON public.lessons USING btree (topic_id)"
+    },
+    {
+      "tablename": "lessons",
+      "indexname": "lessons_pkey",
+      "indexdef": "CREATE UNIQUE INDEX lessons_pkey ON public.lessons USING btree (id)"
+    },
+    {
+      "tablename": "notifications",
+      "indexname": "idx_notifications_created",
+      "indexdef": "CREATE INDEX idx_notifications_created ON public.notifications USING btree (created_at DESC)"
+    },
+    {
+      "tablename": "notifications",
+      "indexname": "idx_notifications_user",
+      "indexdef": "CREATE INDEX idx_notifications_user ON public.notifications USING btree (user_id, is_read)"
+    },
+    {
+      "tablename": "notifications",
+      "indexname": "notifications_pkey",
+      "indexdef": "CREATE UNIQUE INDEX notifications_pkey ON public.notifications USING btree (id)"
+    },
+    {
+      "tablename": "rankings",
+      "indexname": "idx_rankings_rank",
+      "indexdef": "CREATE INDEX idx_rankings_rank ON public.rankings USING btree (assignment_id, rank_position)"
+    },
+    {
+      "tablename": "rankings",
+      "indexname": "rankings_assignment_id_user_id_key",
+      "indexdef": "CREATE UNIQUE INDEX rankings_assignment_id_user_id_key ON public.rankings USING btree (assignment_id, user_id)"
+    },
+    {
+      "tablename": "rankings",
+      "indexname": "rankings_pkey",
+      "indexdef": "CREATE UNIQUE INDEX rankings_pkey ON public.rankings USING btree (id)"
+    },
+    {
+      "tablename": "session_submissions",
+      "indexname": "idx_session_submissions_correct",
+      "indexdef": "CREATE INDEX idx_session_submissions_correct ON public.session_submissions USING btree (session_id, is_correct)"
+    },
+    {
+      "tablename": "session_submissions",
+      "indexname": "idx_session_submissions_session",
+      "indexdef": "CREATE INDEX idx_session_submissions_session ON public.session_submissions USING btree (session_id)"
+    },
+    {
+      "tablename": "session_submissions",
+      "indexname": "idx_session_submissions_user",
+      "indexdef": "CREATE INDEX idx_session_submissions_user ON public.session_submissions USING btree (user_id)"
+    },
+    {
+      "tablename": "session_submissions",
+      "indexname": "session_submissions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX session_submissions_pkey ON public.session_submissions USING btree (id)"
+    },
+    {
+      "tablename": "sessions",
+      "indexname": "idx_sessions_active",
+      "indexdef": "CREATE INDEX idx_sessions_active ON public.sessions USING btree (status, closed_at)"
+    },
+    {
+      "tablename": "sessions",
+      "indexname": "idx_sessions_class",
+      "indexdef": "CREATE INDEX idx_sessions_class ON public.sessions USING btree (class_id)"
+    },
+    {
+      "tablename": "sessions",
+      "indexname": "idx_sessions_created_by",
+      "indexdef": "CREATE INDEX idx_sessions_created_by ON public.sessions USING btree (created_by)"
+    },
+    {
+      "tablename": "sessions",
+      "indexname": "idx_sessions_game",
+      "indexdef": "CREATE INDEX idx_sessions_game ON public.sessions USING btree (game_id)"
+    },
+    {
+      "tablename": "sessions",
+      "indexname": "idx_sessions_status",
+      "indexdef": "CREATE INDEX idx_sessions_status ON public.sessions USING btree (status)"
+    },
+    {
+      "tablename": "sessions",
+      "indexname": "sessions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX sessions_pkey ON public.sessions USING btree (id)"
+    },
+    {
+      "tablename": "settings",
+      "indexname": "settings_pkey",
+      "indexdef": "CREATE UNIQUE INDEX settings_pkey ON public.settings USING btree (id)"
+    },
+    {
+      "tablename": "settings",
+      "indexname": "settings_setting_key_key",
+      "indexdef": "CREATE UNIQUE INDEX settings_setting_key_key ON public.settings USING btree (setting_key)"
+    },
+    {
+      "tablename": "submissions",
+      "indexname": "idx_submissions_assignment",
+      "indexdef": "CREATE INDEX idx_submissions_assignment ON public.submissions USING btree (assignment_id)"
+    },
+    {
+      "tablename": "submissions",
+      "indexname": "idx_submissions_game",
+      "indexdef": "CREATE INDEX idx_submissions_game ON public.submissions USING btree (game_id)"
+    },
+    {
+      "tablename": "submissions",
+      "indexname": "idx_submissions_status",
+      "indexdef": "CREATE INDEX idx_submissions_status ON public.submissions USING btree (status)"
+    },
+    {
+      "tablename": "submissions",
+      "indexname": "idx_submissions_submitted",
+      "indexdef": "CREATE INDEX idx_submissions_submitted ON public.submissions USING btree (submitted_at)"
+    },
+    {
+      "tablename": "submissions",
+      "indexname": "idx_submissions_user",
+      "indexdef": "CREATE INDEX idx_submissions_user ON public.submissions USING btree (user_id)"
+    },
+    {
+      "tablename": "submissions",
+      "indexname": "submissions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX submissions_pkey ON public.submissions USING btree (id)"
+    },
+    {
+      "tablename": "topics",
+      "indexname": "idx_topics_course",
+      "indexdef": "CREATE INDEX idx_topics_course ON public.topics USING btree (course_id)"
+    },
+    {
+      "tablename": "topics",
+      "indexname": "idx_topics_order",
+      "indexdef": "CREATE INDEX idx_topics_order ON public.topics USING btree (order_num)"
+    },
+    {
+      "tablename": "topics",
+      "indexname": "topics_pkey",
+      "indexdef": "CREATE UNIQUE INDEX topics_pkey ON public.topics USING btree (id)"
+    },
+    {
+      "tablename": "user_progress",
+      "indexname": "idx_user_progress_completed",
+      "indexdef": "CREATE INDEX idx_user_progress_completed ON public.user_progress USING btree (is_completed)"
+    },
+    {
+      "tablename": "user_progress",
+      "indexname": "idx_user_progress_game",
+      "indexdef": "CREATE INDEX idx_user_progress_game ON public.user_progress USING btree (game_id)"
+    },
+    {
+      "tablename": "user_progress",
+      "indexname": "idx_user_progress_user",
+      "indexdef": "CREATE INDEX idx_user_progress_user ON public.user_progress USING btree (user_id)"
+    },
+    {
+      "tablename": "user_progress",
+      "indexname": "user_progress_pkey",
+      "indexdef": "CREATE UNIQUE INDEX user_progress_pkey ON public.user_progress USING btree (id)"
+    },
+    {
+      "tablename": "user_progress",
+      "indexname": "user_progress_user_id_game_id_key",
+      "indexdef": "CREATE UNIQUE INDEX user_progress_user_id_game_id_key ON public.user_progress USING btree (user_id, game_id)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "idx_users_created_by",
+      "indexdef": "CREATE INDEX idx_users_created_by ON public.users USING btree (created_by)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "idx_users_role",
+      "indexdef": "CREATE INDEX idx_users_role ON public.users USING btree (role)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "idx_users_status",
+      "indexdef": "CREATE INDEX idx_users_status ON public.users USING btree (status)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "idx_users_username",
+      "indexdef": "CREATE INDEX idx_users_username ON public.users USING btree (username)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "users_pkey",
+      "indexdef": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)"
+    },
+    {
+      "tablename": "users",
+      "indexname": "users_username_key",
+      "indexdef": "CREATE UNIQUE INDEX users_username_key ON public.users USING btree (username)"
+    }
+  ],
+  "policies": [],
+  "apiGrants": [
+    {
+      "grantee": "anon",
+      "table_name": "activity_log",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "activity_log",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "activity_log",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "activity_log",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "activity_log",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "activity_log",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "activity_log",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "activity_log",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "activity_log",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "activity_log",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "activity_log",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "activity_log",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "activity_log",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "activity_log",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignment_submissions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignment_submissions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignment_submissions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignment_submissions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignment_submissions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignment_submissions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignment_submissions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignment_submissions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignment_submissions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignment_submissions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignment_submissions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignment_submissions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignment_submissions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignment_submissions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignments",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignments",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignments",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignments",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignments",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignments",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "assignments",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignments",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignments",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignments",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignments",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignments",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignments",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "assignments",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_course_settings",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_course_settings",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_course_settings",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_course_settings",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_course_settings",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_course_settings",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_course_settings",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_course_settings",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_course_settings",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_course_settings",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_course_settings",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_course_settings",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_course_settings",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_course_settings",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_members",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_members",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_members",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_members",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_members",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_members",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_members",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_members",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_members",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_members",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_members",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_members",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_members",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_members",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_students",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_students",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_students",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_students",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_students",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_students",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "class_students",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_students",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_students",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_students",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_students",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_students",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_students",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "class_students",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "classes",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "classes",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "classes",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "classes",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "classes",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "classes",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "classes",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "classes",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "classes",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "classes",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "classes",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "classes",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "classes",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "classes",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_games",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_games",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_games",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_games",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_games",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_games",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_games",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_games",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_games",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_games",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_games",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_games",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_games",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_games",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_rankings",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_rankings",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_rankings",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_rankings",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_rankings",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_rankings",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_rankings",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_rankings",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_rankings",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_rankings",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_rankings",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_rankings",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_rankings",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_rankings",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_submissions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_submissions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_submissions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_submissions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_submissions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_submissions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contest_submissions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_submissions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_submissions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_submissions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_submissions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_submissions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_submissions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contest_submissions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contests",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contests",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contests",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contests",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contests",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contests",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "contests",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contests",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contests",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contests",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contests",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contests",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contests",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "contests",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_access",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_access",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_access",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_access",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_access",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_access",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_access",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_access",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_access",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_access",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_access",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_access",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_access",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_access",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_content_access",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_content_access",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_content_access",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_content_access",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_content_access",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_content_access",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "course_content_access",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_content_access",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_content_access",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_content_access",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_content_access",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_content_access",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_content_access",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "course_content_access",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "courses",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "courses",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "courses",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "courses",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "courses",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "courses",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "courses",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "courses",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "courses",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "courses",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "courses",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "courses",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "courses",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "courses",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "games",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "games",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "games",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "games",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "games",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "games",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "games",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "games",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "games",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "games",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "games",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "games",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "games",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "games",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lesson_sessions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lesson_sessions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lesson_sessions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lesson_sessions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lesson_sessions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lesson_sessions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lesson_sessions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lesson_sessions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lesson_sessions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lesson_sessions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lesson_sessions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lesson_sessions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lesson_sessions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lesson_sessions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lessons",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lessons",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lessons",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lessons",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lessons",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lessons",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "lessons",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lessons",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lessons",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lessons",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lessons",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lessons",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lessons",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "lessons",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "notifications",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "notifications",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "notifications",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "notifications",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "notifications",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "notifications",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "notifications",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "notifications",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "notifications",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "notifications",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "notifications",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "notifications",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "notifications",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "notifications",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "rankings",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "rankings",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "rankings",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "rankings",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "rankings",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "rankings",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "rankings",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "rankings",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "rankings",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "rankings",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "rankings",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "rankings",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "rankings",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "rankings",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "session_submissions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "session_submissions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "session_submissions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "session_submissions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "session_submissions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "session_submissions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "session_submissions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "session_submissions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "session_submissions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "session_submissions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "session_submissions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "session_submissions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "session_submissions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "session_submissions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "sessions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "sessions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "sessions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "sessions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "sessions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "sessions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "sessions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "sessions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "sessions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "sessions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "sessions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "sessions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "sessions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "sessions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "settings",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "settings",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "settings",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "settings",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "settings",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "settings",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "settings",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "settings",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "settings",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "settings",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "settings",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "settings",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "settings",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "settings",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "submissions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "submissions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "submissions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "submissions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "submissions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "submissions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "submissions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "submissions",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "submissions",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "submissions",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "submissions",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "submissions",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "submissions",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "submissions",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "topics",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "topics",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "topics",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "topics",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "topics",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "topics",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "topics",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "topics",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "topics",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "topics",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "topics",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "topics",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "topics",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "topics",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "user_progress",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "user_progress",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "user_progress",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "user_progress",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "user_progress",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "user_progress",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "user_progress",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "user_progress",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "user_progress",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "user_progress",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "user_progress",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "user_progress",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "user_progress",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "user_progress",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "users",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "users",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "users",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "users",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "users",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "users",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "users",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "users",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "users",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "users",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "users",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "users",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "users",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "users",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_assignment_leaderboard",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_class_stats",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_class_stats",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_class_stats",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_class_stats",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_class_stats",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_class_stats",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "anon",
+      "table_name": "v_class_stats",
+      "privilege_type": "UPDATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_class_stats",
+      "privilege_type": "DELETE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_class_stats",
+      "privilege_type": "INSERT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_class_stats",
+      "privilege_type": "REFERENCES"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_class_stats",
+      "privilege_type": "SELECT"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_class_stats",
+      "privilege_type": "TRIGGER"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_class_stats",
+      "privilege_type": "TRUNCATE"
+    },
+    {
+      "grantee": "authenticated",
+      "table_name": "v_class_stats",
+      "privilege_type": "UPDATE"
+    }
+  ],
+  "triggers": [
+    {
+      "table_name": "assignments",
+      "trigger_name": "trg_assignments_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "class_course_settings",
+      "trigger_name": "trg_class_course_settings_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "classes",
+      "trigger_name": "trg_classes_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "contest_rankings",
+      "trigger_name": "trg_contest_rankings_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "contests",
+      "trigger_name": "trg_contests_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "courses",
+      "trigger_name": "trg_courses_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "games",
+      "trigger_name": "trg_games_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "lessons",
+      "trigger_name": "trg_lessons_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "rankings",
+      "trigger_name": "trg_rankings_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "sessions",
+      "trigger_name": "trg_sessions_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "settings",
+      "trigger_name": "trg_settings_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "topics",
+      "trigger_name": "trg_topics_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "table_name": "users",
+      "trigger_name": "trg_users_updated_at",
+      "action_statement": "EXECUTE FUNCTION set_updated_at()"
+    }
+  ],
+  "views": [
+    {
+      "name": "v_assignment_leaderboard",
+      "options": null
+    },
+    {
+      "name": "v_class_stats",
+      "options": null
+    }
+  ],
+  "counts": {
+    "activity_log": 0,
+    "assignment_submissions": 0,
+    "assignments": 0,
+    "class_course_settings": 0,
+    "class_members": 27,
+    "class_students": 0,
+    "classes": 4,
+    "contest_games": 0,
+    "contest_rankings": 0,
+    "contest_submissions": 0,
+    "contests": 0,
+    "course_access": 1,
+    "course_content_access": 3,
+    "courses": 1,
+    "games": 8,
+    "lesson_sessions": 0,
+    "lessons": 2,
+    "notifications": 0,
+    "rankings": 0,
+    "session_submissions": 0,
+    "sessions": 0,
+    "settings": 6,
+    "submissions": 0,
+    "topics": 1,
+    "user_progress": 0,
+    "users": 29
+  },
+  "userSummary": [
+    {
+      "role": "admin",
+      "status": "active",
+      "count": 1,
+      "missing_creator": 1
+    },
+    {
+      "role": "student",
+      "status": "active",
+      "count": 26,
+      "missing_creator": 26
+    },
+    {
+      "role": "teacher",
+      "status": "active",
+      "count": 2,
+      "missing_creator": 2
+    }
+  ],
+  "duplicateSessionSubmissions": 0,
+  "migrations": []
+}
