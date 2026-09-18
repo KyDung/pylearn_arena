@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
 const COURSE_SLUG = process.argv[2];
 
@@ -21,7 +22,7 @@ async function removeCourse() {
   console.log("⚠️  WARNING: This will delete everything in the course!");
 
   // 1. Get course info
-  const [courses]: any = await connection.execute(
+  const [courses] = await connection.execute<RowDataPacket[]>(
     "SELECT * FROM courses WHERE slug = ?",
     [COURSE_SLUG],
   );
@@ -36,7 +37,7 @@ async function removeCourse() {
   console.log(`📋 Found: ${course.title}`);
 
   // 2. Get all topics in this course
-  const [topics]: any = await connection.execute(
+  const [topics] = await connection.execute<RowDataPacket[]>(
     "SELECT * FROM topics WHERE course_id = ?",
     [course.id],
   );
@@ -49,7 +50,7 @@ async function removeCourse() {
 
     for (const topic of topics) {
       // Count lessons
-      const [lessons]: any = await connection.execute(
+      const [lessons] = await connection.execute<RowDataPacket[]>(
         "SELECT * FROM lessons WHERE topic_id = ?",
         [topic.id],
       );
@@ -57,7 +58,7 @@ async function removeCourse() {
 
       // Count games
       for (const lesson of lessons) {
-        const [games]: any = await connection.execute(
+        const [games] = await connection.execute<RowDataPacket[]>(
           "SELECT COUNT(*) as count FROM games WHERE lesson_id = ?",
           [lesson.id],
         );
@@ -77,7 +78,7 @@ async function removeCourse() {
     if (totalGames > 0) {
       console.log(`\n🗄️  Deleting all games (${totalGames} total)...`);
       for (const topic of topics) {
-        const [lessons]: any = await connection.execute(
+        const [lessons] = await connection.execute<RowDataPacket[]>(
           "SELECT id FROM lessons WHERE topic_id = ?",
           [topic.id],
         );

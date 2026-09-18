@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import SessionService from "@/lib/services/sessions";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // GET /api/student/sessions/active - Lấy active sessions cho học sinh
 export const GET = withAuth(
   async (request: NextRequest, { user }) => {
@@ -10,8 +11,8 @@ export const GET = withAuth(
         user.id,
       );
       return successResponse(sessions); // Return sessions directly as data
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["student"],

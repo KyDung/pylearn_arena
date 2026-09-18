@@ -8,9 +8,10 @@ async function testConnection() {
     console.log("✅ Connected successfully!");
 
     // Test query
-    const result = await client.query("SELECT * FROM users");
+    // The compatibility layer returns [rows, header], not a pg result object.
+    const [rows] = await client.query("SELECT * FROM users");
     console.log("\n📋 Users in database:");
-    console.log(result.rows);
+    console.log(rows);
 
     client.release();
     await pool.end();

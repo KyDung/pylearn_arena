@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import * as readline from "readline";
 import pool from "../src/lib/db";
+import type { RowDataPacket } from "@/lib/dbTypes";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -30,10 +31,10 @@ async function addLesson() {
     console.log("\n✅ Đang thêm vào database...\n");
 
     // Kiểm tra course tồn tại
-    const [courseCheck] = (await pool.query(
+    const [courseCheck] = await pool.query<RowDataPacket[]>(
       "SELECT id FROM courses WHERE slug = ?",
       [courseId],
-    )) as any;
+    );
 
     if (!Array.isArray(courseCheck) || courseCheck.length === 0) {
       console.log(`⚠️  Course '${courseId}' chưa tồn tại. Tạo mới...`);

@@ -1,5 +1,6 @@
 import pool from "../src/lib/db";
-
+
+import { getErrorMessage } from "@/lib/errors";
 async function checkStudentClasses() {
   try {
     console.log("🔍 Kiểm tra học sinh và lớp học...\n");
@@ -17,7 +18,7 @@ async function checkStudentClasses() {
 
     // Lấy lớp học của học sinh đầu tiên
     if (Array.isArray(students) && students.length > 0) {
-      const studentId = (students as any)[0].id;
+      const studentId = students[0].id;
       console.log(`\n🔍 Kiểm tra lớp của học sinh ID ${studentId}:`);
 
       const [classes] = await pool.query(
@@ -44,8 +45,8 @@ async function checkStudentClasses() {
     }
 
     process.exit(0);
-  } catch (error: any) {
-    console.error("❌ Error:", error.message);
+  } catch (error) {
+    console.error("❌ Error:", getErrorMessage(error));
     process.exit(1);
   }
 }

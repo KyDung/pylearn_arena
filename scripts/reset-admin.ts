@@ -1,19 +1,20 @@
 // Script để tạo lại user admin với password đúng
 import bcrypt from "bcryptjs";
 import pool from "../src/lib/db";
+import type { RowDataPacket } from "@/lib/dbTypes";
 
 async function resetAdmin() {
   console.log("🔧 Resetting admin account...\n");
 
   try {
     // Check current users
-    const [users] = (await pool.query(
+    const [users] = await pool.query<RowDataPacket[]>(
       "SELECT id, username, role FROM users",
-    )) as any;
+    );
 
     console.log("📋 Current users:");
     if (Array.isArray(users) && users.length > 0) {
-      users.forEach((u: any) => {
+      users.forEach((u) => {
         console.log(`   - ${u.username} (${u.role})`);
       });
     } else {

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { RowDataPacket } from "@/lib/dbTypes";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // GET /api/games/info?path=python-basics/chapter-1/t10-cd-b12/id1
 export async function GET(request: NextRequest) {
   try {
@@ -92,8 +93,8 @@ export async function GET(request: NextRequest) {
       success: true,
       data: gameInfo,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching game info:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

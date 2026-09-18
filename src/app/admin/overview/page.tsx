@@ -34,6 +34,25 @@ interface TeacherStats {
   submissionCount: number;
 }
 
+/** Only the fields this page reads from each API payload. */
+interface UserRow {
+  id: number;
+  username: string;
+  fullName?: string;
+  role: string;
+}
+
+interface ClassRow {
+  teacherId?: number;
+  studentCount?: number;
+}
+
+interface ContestRow {
+  status?: string;
+  created_by?: number;
+  submission_count?: number;
+}
+
 interface StatCardProps {
   icon: string;
   value: number;
@@ -42,6 +61,42 @@ interface StatCardProps {
   bgGradient: string;
   iconBg: string;
 }
+
+// Modern Stat Card Component
+const StatCard = ({
+  icon,
+  value,
+  label,
+  color,
+  bgGradient,
+  iconBg,
+}: StatCardProps) => (
+  <div
+    className={`group bg-gradient-to-br ${bgGradient} rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 text-white hover:scale-105 transform cursor-pointer overflow-hidden relative`}
+  >
+    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+    <div className="relative">
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-5xl filter drop-shadow-lg">{icon}</div>
+        <div
+          className={`${iconBg} rounded-full p-3 backdrop-blur-sm group-hover:scale-110 transition-transform`}
+        >
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </div>
+      </div>
+      <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
+        {value}
+      </div>
+      <div className={`${color} text-sm font-medium`}>{label}</div>
+    </div>
+  </div>
+);
 
 export default function AdminOverviewPage() {
   const router = useRouter();
@@ -52,20 +107,6 @@ export default function AdminOverviewPage() {
   const [activeTab, setActiveTab] = useState<
     "overview" | "teachers" | "activity"
   >("overview");
-
-  useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    setCurrentUser(user);
-    loadData();
-  }, [router]);
 
   const loadData = async () => {
     setLoading(true);
@@ -81,43 +122,43 @@ export default function AdminOverviewPage() {
       const classesData = await classesRes.json();
       const contestsData = await contestsRes.json();
 
-      const users = usersData.success ? usersData.data.items || [] : [];
-      const classes = classesData.success ? classesData.data.items || [] : [];
-      const contests = contestsData.success ? contestsData.data || [] : [];
+      const users: UserRow[] = usersData.success ? usersData.data.items || [] : [];
+      const classes: ClassRow[] = classesData.success ? classesData.data.items || [] : [];
+      const contests: ContestRow[] = contestsData.success ? contestsData.data || [] : [];
 
       // Calculate stats
       const totalSubmissions = contests.reduce(
-        (sum: number, c: any) => sum + (c.submission_count || 0),
+        (sum: number, c) => sum + (c.submission_count || 0),
         0,
       );
 
       setStats({
         totalUsers: users.length,
-        totalTeachers: users.filter((u: any) => u.role === "teacher").length,
-        totalStudents: users.filter((u: any) => u.role === "student").length,
+        totalTeachers: users.filter((u) => u.role === "teacher").length,
+        totalStudents: users.filter((u) => u.role === "student").length,
         totalClasses: classes.length,
         totalContests: contests.length,
-        activeContests: contests.filter((c: any) => c.status === "active")
+        activeContests: contests.filter((c) => c.status === "active")
           .length,
         totalSubmissions,
         recentActivities: [], // Would need a separate API for this
       });
 
       // Calculate per-teacher stats
-      const teachers = users.filter((u: any) => u.role === "teacher");
-      const teacherStatsData: TeacherStats[] = teachers.map((teacher: any) => {
+      const teachers = users.filter((u) => u.role === "teacher");
+      const teacherStatsData: TeacherStats[] = teachers.map((teacher) => {
         const teacherClasses = classes.filter(
-          (c: any) => c.teacherId === teacher.id,
+          (c) => c.teacherId === teacher.id,
         );
         const teacherContests = contests.filter(
-          (c: any) => c.created_by === teacher.id,
+          (c) => c.created_by === teacher.id,
         );
         const studentCount = teacherClasses.reduce(
-          (sum: number, c: any) => sum + (c.studentCount || 0),
+          (sum: number, c) => sum + (c.studentCount || 0),
           0,
         );
         const submissionCount = teacherContests.reduce(
-          (sum: number, c: any) => sum + (c.submission_count || 0),
+          (sum: number, c) => sum + (c.submission_count || 0),
           0,
         );
 
@@ -139,43 +180,21 @@ export default function AdminOverviewPage() {
     setLoading(false);
   };
 
-  if (!currentUser) return null;
+  useEffect(() => {
+    const user = getUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (user.role !== "admin") {
+      router.push("/");
+      return;
+    }
+    setCurrentUser(user);
+    loadData();
+  }, [router]);
 
-  // Modern Stat Card Component
-  const StatCard = ({
-    icon,
-    value,
-    label,
-    color,
-    bgGradient,
-    iconBg,
-  }: StatCardProps) => (
-    <div
-      className={`group bg-gradient-to-br ${bgGradient} rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 text-white hover:scale-105 transform cursor-pointer overflow-hidden relative`}
-    >
-      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-      <div className="relative">
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-5xl filter drop-shadow-lg">{icon}</div>
-          <div
-            className={`${iconBg} rounded-full p-3 backdrop-blur-sm group-hover:scale-110 transition-transform`}
-          >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </div>
-        <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform">
-          {value}
-        </div>
-        <div className={`${color} text-sm font-medium`}>{label}</div>
-      </div>
-    </div>
-  );
+  if (!currentUser) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">

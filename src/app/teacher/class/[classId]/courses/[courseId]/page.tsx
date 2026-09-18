@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { getUser } from "@/lib/auth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+
+import { getErrorMessage } from "@/lib/errors";
 interface Topic {
   id: number;
   title: string;
@@ -86,8 +87,8 @@ export default function CourseAccessManagementPage() {
       if (!res.ok) throw new Error("Failed to update");
 
       loadAccess();
-    } catch (err: any) {
-      alert("Lỗi: " + err.message);
+    } catch (err) {
+      alert("Lỗi: " + getErrorMessage(err));
     }
   };
 
@@ -110,8 +111,8 @@ export default function CourseAccessManagementPage() {
       if (!res.ok) throw new Error("Failed to update");
 
       loadAccess();
-    } catch (err: any) {
-      alert("Lỗi: " + err.message);
+    } catch (err) {
+      alert("Lỗi: " + getErrorMessage(err));
     }
   };
 
@@ -139,8 +140,8 @@ export default function CourseAccessManagementPage() {
 
       alert(`Đã mở ${lessonIds.length} bài trong chương!`);
       loadAccess();
-    } catch (err: any) {
-      alert("Lỗi: " + err.message);
+    } catch (err) {
+      alert("Lỗi: " + getErrorMessage(err));
     }
   };
 
@@ -168,8 +169,8 @@ export default function CourseAccessManagementPage() {
 
       alert(`Đã khóa ${lessonIds.length} bài trong chương!`);
       loadAccess();
-    } catch (err: any) {
-      alert("Lỗi: " + err.message);
+    } catch (err) {
+      alert("Lỗi: " + getErrorMessage(err));
     }
   };
 
@@ -322,9 +323,9 @@ export default function CourseAccessManagementPage() {
           <h3 className="font-bold mb-2">ℹ️ Hướng dẫn:</h3>
           <ul className="list-disc list-inside space-y-1 text-sm">
             <li>Chọn chương bên trái để xem các bài học</li>
-            <li>Click nút "Mở/Khóa" để điều khiển từng bài</li>
+            <li>Click nút “Mở/Khóa” để điều khiển từng bài</li>
             <li>
-              Dùng "Mở tất cả bài trong chương" để mở nhanh toàn bộ bài trong 1
+              Dùng “Mở tất cả bài trong chương” để mở nhanh toàn bộ bài trong 1
               chương
             </li>
             <li>

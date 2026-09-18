@@ -12,7 +12,33 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored Pyodide runtime, copied in by scripts/copy-pyodide-assets.mjs.
+    "public/pyodide/**",
+    // Dated copies the content manager leaves behind; not part of the build.
+    "**/*.backup-*.ts",
+    "**/*.ts.backup.*",
+    // Local-only authoring tools. These paths are in .gitignore on purpose, so
+    // nothing here is ever committed and lint findings could not be shared.
+    "src/app/dev/**",
+    "src/app/api/dev/**",
+    "src/app/admin/cms/**",
+    "src/app/api/admin/game-content/**",
   ]),
+  {
+    // Game content is authored from the templates in src/content/_template and
+    // by the local content manager. Every file opens with @ts-nocheck on
+    // purpose: these are Phaser sketches, not typed application code, and the
+    // Phaser scene idiom relies on aliasing `this`. Typing them would not make
+    // a game more correct, so the rules that only describe type discipline are
+    // scoped off here rather than silenced file by file. Everything that can
+    // actually break a game still applies.
+    files: ["src/content/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-this-alias": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

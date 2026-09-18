@@ -1,15 +1,16 @@
 import bcrypt from "bcryptjs";
 import pool from "../src/lib/db";
+import type { RowDataPacket } from "@/lib/dbTypes";
 
 async function checkAdmin() {
   try {
     console.log("🔍 Checking admin account...\n");
 
     // Get admin user
-    const [rows] = (await pool.query(
+    const [rows] = await pool.query<RowDataPacket[]>(
       "SELECT id, username, password, full_name, email, role, status FROM users WHERE username = ?",
       ["admin"],
-    )) as any;
+    );
 
     if (!Array.isArray(rows) || rows.length === 0) {
       console.log("❌ Admin account not found");

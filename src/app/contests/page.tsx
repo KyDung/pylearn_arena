@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import type { User } from "@/types";
 
 interface Class {
   id: number;
@@ -61,9 +62,20 @@ interface ContestGame {
   game_path: string;
 }
 
+/** One row of the overall contest leaderboard this page renders. */
+interface ContestLeaderboardRow {
+  user_id: number;
+  rank_position: number;
+  username: string;
+  full_name?: string;
+  total_score: number;
+  games_completed: number;
+  total_games: number;
+}
+
 export default function ContestsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [contests, setContests] = useState<Contest[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
@@ -76,7 +88,7 @@ export default function ContestsPage() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
   const [contestGames, setContestGames] = useState<ContestGame[]>([]);
-  const [contestRankings, setContestRankings] = useState<any[]>([]);
+  const [contestRankings, setContestRankings] = useState<ContestLeaderboardRow[]>([]);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -93,32 +105,6 @@ export default function ContestsPage() {
     allowResubmit: true,
     maxAttempts: "",
   });
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      const data = await res.json();
-      if (data.success && data.user) {
-        if (data.user.role === "admin" || data.user.role === "teacher") {
-          setUser(data.user);
-          setLoading(false);
-          await Promise.all([fetchContests(), fetchClasses(), fetchCourses()]);
-        } else {
-          // Student - redirect to student contests page
-          router.replace("/student/contests");
-          return;
-        }
-      } else {
-        router.replace("/login?next=contests");
-      }
-    } catch (error) {
-      router.replace("/login?next=contests");
-    }
-  };
 
   const fetchContests = async () => {
     const res = await fetch("/api/contests");
@@ -143,6 +129,32 @@ export default function ContestsPage() {
       setCourses(data.data || []);
     }
   };
+
+  const checkAuth = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      const data = await res.json();
+      if (data.success && data.user) {
+        if (data.user.role === "admin" || data.user.role === "teacher") {
+          setUser(data.user);
+          setLoading(false);
+          await Promise.all([fetchContests(), fetchClasses(), fetchCourses()]);
+        } else {
+          // Student - redirect to student contests page
+          router.replace("/student/contests");
+          return;
+        }
+      } else {
+        router.replace("/login?next=contests");
+      }
+    } catch (error) {
+      router.replace("/login?next=contests");
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const fetchLessonsForCourse = async (courseId: number) => {
     // Fetch all lessons for this course through topics

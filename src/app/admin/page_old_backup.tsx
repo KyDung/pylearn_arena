@@ -32,20 +32,6 @@ export default function AdminDashboard() {
   });
   const [createError, setCreateError] = useState("");
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    setCurrentUser(user);
-    loadData();
-  }, [router]);
-
   const loadData = async (role?: UserRole) => {
     setLoading(true);
     try {
@@ -63,6 +49,20 @@ export default function AdminDashboard() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    const user = getUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (user.role !== "admin") {
+      router.push("/");
+      return;
+    }
+    setCurrentUser(user);
+    loadData();
+  }, [router]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -21,20 +21,6 @@ export default function TeacherDashboard() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "teacher" && user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    setCurrentUser(user);
-    loadData(user);
-  }, [router]);
-
   const loadData = async (user?: User | null) => {
     const currentRole = user?.role || currentUser?.role;
     setLoading(true);
@@ -61,10 +47,12 @@ export default function TeacherDashboard() {
         const teacherData = await teacherRes.json();
         if (teacherData.success) {
           setAllTeachers(
-            (teacherData.data.items || []).map((t: any) => ({
-              id: t.id,
-              fullName: t.fullName || t.username,
-            })),
+            (teacherData.data.items || []).map(
+              (t: { id: number; fullName?: string; username: string }) => ({
+                id: t.id,
+                fullName: t.fullName || t.username,
+              }),
+            ),
           );
         }
       }
@@ -73,6 +61,20 @@ export default function TeacherDashboard() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    const user = getUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (user.role !== "teacher" && user.role !== "admin") {
+      router.push("/");
+      return;
+    }
+    setCurrentUser(user);
+    loadData(user);
+  }, [router]);
 
   // Filter classes by selected teacher (for admin)
   const filteredClasses =

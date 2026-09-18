@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import ContestService from "@/lib/services/contests-new";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // GET /api/student/courses/virtual-contests/lessons - Lấy danh sách contests như lessons
 export const GET = withAuth(
   async (
@@ -18,7 +19,7 @@ export const GET = withAuth(
       );
 
       // Format như lessons để FE dễ xử lý
-      const lessons = contests.map((contest: any) => ({
+      const lessons = contests.map((contest) => ({
         id: `contest-${contest.id}`,
         title: contest.title,
         description:
@@ -44,9 +45,9 @@ export const GET = withAuth(
         lessons,
         total: lessons.length,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Get contests as lessons error:", error);
-      return errorResponse(error.message, 500);
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["student"],

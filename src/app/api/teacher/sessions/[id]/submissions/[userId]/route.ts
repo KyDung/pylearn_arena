@@ -4,7 +4,8 @@ import type { User } from "@/types";
 import SessionService from "@/lib/services/sessions";
 import pool from "@/lib/db";
 import { RowDataPacket } from "@/lib/dbTypes";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // GET /api/teacher/sessions/[id]/submissions/[userId] - Xem tất cả submissions của một user
 export const GET = withAuth(
   async (
@@ -60,8 +61,8 @@ export const GET = withAuth(
       );
 
       return successResponse({ submissions: rows });
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["admin", "teacher"],

@@ -1,13 +1,15 @@
 import { pool } from "./src/lib/db";
 import fs from "fs/promises";
 import path from "path";
-
+
+import { getErrorMessage } from "@/lib/errors";
+import type { RowDataPacket } from "@/lib/dbTypes";
 async function testDeleteGame() {
   try {
     const gameId = 9;
 
     // Get game info first
-    const [games]: any = await pool.execute(
+    const [games] = await pool.execute<RowDataPacket[]>(
       "SELECT id, path FROM games WHERE id = ?",
       [gameId],
     );
@@ -52,20 +54,20 @@ async function testDeleteGame() {
       try {
         await fs.rm(publicPath, { recursive: true, force: true });
         console.log("✅ Deleted public folder:", publicPath);
-      } catch (err: any) {
-        console.log("⚠️ Public folder:", err.message);
+      } catch (err) {
+        console.log("⚠️ Public folder:", getErrorMessage(err));
       }
 
       try {
         await fs.rm(contentPath, { recursive: true, force: true });
         console.log("✅ Deleted content folder:", contentPath);
-      } catch (err: any) {
-        console.log("⚠️ Content folder:", err.message);
+      } catch (err) {
+        console.log("⚠️ Content folder:", getErrorMessage(err));
       }
     }
 
     // Verify
-    const [remaining]: any = await pool.execute("SELECT id, title FROM games");
+    const [remaining] = await pool.execute<RowDataPacket[]>("SELECT id, title FROM games");
     console.log("\nRemaining games:", remaining);
 
     await pool.end();

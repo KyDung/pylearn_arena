@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-18T16:47:13.885Z",
+  "capturedAt": "2026-09-18T18:19:37.078Z",
   "target": "05ca2564a33332d0",
   "readOnly": true,
   "server": [
@@ -6359,7 +6359,7 @@
     "assignment_submissions": 0,
     "assignments": 0,
     "class_course_settings": 0,
-    "class_members": 27,
+    "class_members": 26,
     "class_students": 0,
     "classes": 4,
     "contest_games": 0,
@@ -6381,7 +6381,7 @@
     "submissions": 0,
     "topics": 1,
     "user_progress": 0,
-    "users": 29
+    "users": 28
   },
   "userSummary": [
     {
@@ -6393,14 +6393,14 @@
     {
       "role": "student",
       "status": "active",
-      "count": 26,
-      "missing_creator": 26
+      "count": 25,
+      "missing_creator": 0
     },
     {
       "role": "teacher",
       "status": "active",
       "count": 2,
-      "missing_creator": 2
+      "missing_creator": 0
     }
   ],
   "duplicateSessionSubmissions": 0,
@@ -6419,6 +6419,11 @@
       "name": "003_view_security.sql",
       "checksum": "951941b64dad779d033b631c327550c07e3a929557d8198084df9d5ec4a0308c",
       "applied_at": "2026-09-18T16:46:05.748Z"
+    },
+    {
+      "name": "004_assign_account_creators.sql",
+      "checksum": "7e922ac583efb8194731b4da49841f9fabfb354839f779d729abab7a9f7bffb3",
+      "applied_at": "2026-09-18T17:54:48.973Z"
     }
   ]
 }

@@ -1,5 +1,6 @@
 // Script để test kết nối MySQL
 import pool, { testConnection } from "../src/lib/db-mysql";
+import type { RowDataPacket } from "mysql2/promise";
 
 async function main() {
   console.log("🔍 Testing MySQL connection...\n");
@@ -9,21 +10,21 @@ async function main() {
   if (isConnected) {
     try {
       // Test query
-      const [rows] = await pool.query("SELECT VERSION() as version");
-      console.log("📊 MySQL Version:", (rows as any)[0].version);
+      const [rows] = await pool.query<RowDataPacket[]>("SELECT VERSION() as version");
+      console.log("📊 MySQL Version:", rows[0].version);
 
       // Kiểm tra database
-      const [dbs] = await pool.query("SELECT DATABASE() as db");
+      const [dbs] = await pool.query<RowDataPacket[]>("SELECT DATABASE() as db");
       console.log(
         "🗄️  Current Database:",
-        (rows as any)[0].db || "pylearn_arena",
+        rows[0].db || "pylearn_arena",
       );
 
       // Kiểm tra tables
       const [tables] = await pool.query("SHOW TABLES");
       console.log("\n📋 Tables:");
       if (Array.isArray(tables) && tables.length > 0) {
-        tables.forEach((table: any) => {
+        tables.forEach((table) => {
           console.log("  -", Object.values(table)[0]);
         });
       } else {

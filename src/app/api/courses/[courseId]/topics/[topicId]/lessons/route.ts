@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
+import type { RowDataPacket } from "@/lib/dbTypes";
 
 export async function GET(
   request: Request,
@@ -9,10 +10,10 @@ export async function GET(
 
   try {
     // Get topic by ID
-    const [topicRows] = (await pool.query(
+    const [topicRows] = await pool.query<RowDataPacket[]>(
       "SELECT id FROM topics WHERE id = ?",
       [topicId],
-    )) as any;
+    );
 
     if (!topicRows || topicRows.length === 0) {
       return NextResponse.json(

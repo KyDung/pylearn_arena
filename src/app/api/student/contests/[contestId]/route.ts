@@ -1,5 +1,8 @@
 import { NextRequest } from "next/server";
-import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
+import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
+import { getErrorMessage } from "@/lib/errors";
+import type { User } from "@/types";
+import type { RowDataPacket } from "@/lib/dbTypes";
 import {
   ContestService,
   ContestGameService,
@@ -10,7 +13,7 @@ import {
 export const GET = withAuth(
   async (
     request: NextRequest,
-    { params, user }: { params?: Record<string, string>; user: any },
+    { params, user }: { params?: Record<string, string>; user: User },
   ) => {
     try {
       const contestId = params?.contestId || "0";
@@ -38,7 +41,7 @@ export const GET = withAuth(
       // Kiểm tra quyền truy cập (nếu có class_id)
       if (contest.class_id) {
         const pool = (await import("@/lib/db")).default;
-        const [memberCheck] = await pool.query<any>(
+        const [memberCheck] = await pool.query<RowDataPacket[]>(
           `SELECT 1 FROM class_members 
            WHERE class_id = ? AND user_id = ? AND status = 'active'`,
           [contest.class_id, user.id],
@@ -58,7 +61,7 @@ export const GET = withAuth(
       );
 
       // Lấy rankings nếu được hiển thị
-      let rankings: any[] = [];
+      let rankings: RowDataPacket[] = [];
       if (contest.show_ranking) {
         rankings = await ContestSubmissionService.getContestRankings(id);
       }
@@ -90,9 +93,9 @@ export const GET = withAuth(
           ),
         },
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching contest:", error);
-      return errorResponse(error.message, 500);
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["student"],

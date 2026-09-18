@@ -5,7 +5,8 @@
  * GET  - Lấy bảng xếp hạng của game trong cuộc thi
  */
 import { NextResponse } from "next/server";
-import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
+import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
+import { getErrorMessage } from "@/lib/errors";
 import {
   ContestService,
   ContestGameService,
@@ -80,9 +81,9 @@ export const POST = withAuth(async (request, context) => {
       submission,
       rankings,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error submitting to contest:", error);
-    return errorResponse(error.message || "Lỗi server", 500);
+    return errorResponse(getErrorMessage(error) || "Lỗi server", 500);
   }
 });
 

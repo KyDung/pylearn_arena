@@ -3,7 +3,8 @@ import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import SessionService from "@/lib/services/sessions";
 import pool from "@/lib/db";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // DELETE /api/teacher/sessions/[id] - Xóa session
 export const DELETE = withAuth(
   async (
@@ -67,8 +68,8 @@ export const DELETE = withAuth(
       } finally {
         connection.release();
       }
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["admin", "teacher"],

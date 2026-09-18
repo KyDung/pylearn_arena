@@ -3,7 +3,8 @@ import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import pool from "@/lib/db";
 import { RowDataPacket } from "@/lib/dbTypes";
-import SessionService from "@/lib/services/sessions";
+import SessionService from "@/lib/services/sessions";
+import { getErrorMessage } from "@/lib/errors";
 // import ContestService from "@/lib/services/contests-new"; // ẨN CONTESTS
 
 // GET /api/student/courses - Lấy danh sách khóa học được phép truy cập + Virtual courses
@@ -54,10 +55,10 @@ export const GET = withAuth(
           user.id,
         );
         console.log("📝 Active sessions:", activeSessions.length);
-      } catch (sessionError: any) {
+      } catch (sessionError) {
         console.error(
           "❌ Error fetching active sessions:",
-          sessionError.message,
+          getErrorMessage(sessionError),
         );
         // Continue anyway - just no sessions
       }
@@ -114,8 +115,8 @@ export const GET = withAuth(
       const allCourses = [...virtualCourses, ...rows];
 
       return successResponse(allCourses);
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["student"],

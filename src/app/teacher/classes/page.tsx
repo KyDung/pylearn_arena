@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getUser } from "@/lib/auth";
-
+
+import { getErrorMessage } from "@/lib/errors";
 interface Class {
   id: number;
   name: string;
@@ -103,9 +104,9 @@ export default function TeacherClassesPage() {
       console.log("Classes API response:", data);
       // API returns { data: { items: [...] } }
       setClasses(data.data?.items || data.items || []);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching classes:", err);
-      setError(err.message);
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -125,9 +126,9 @@ export default function TeacherClassesPage() {
       }
       // API returns { success: true, data: [...] }
       setMembers(data.data || data);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching members:", err);
-      alert("Không thể tải danh sách học sinh: " + err.message);
+      alert("Không thể tải danh sách học sinh: " + getErrorMessage(err));
     } finally {
       setLoadingMembers(false);
     }
@@ -163,9 +164,9 @@ export default function TeacherClassesPage() {
       });
       setShowCreateModal(false);
       fetchClasses();
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error creating class:", err);
-      alert(err.message);
+      alert(getErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -195,7 +196,7 @@ export default function TeacherClassesPage() {
       await fetchMembers(selectedClass.id);
       // Refresh classes to update count
       await fetchClasses();
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error removing member:", err);
       alert("Không thể xóa học sinh");
     }
@@ -238,9 +239,9 @@ export default function TeacherClassesPage() {
       setSelectedClass(null);
       await fetchClasses();
       alert("Cập nhật lớp thành công!");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error updating class:", err);
-      alert(err.message);
+      alert(getErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -262,7 +263,7 @@ export default function TeacherClassesPage() {
 
       await fetchClasses();
       alert("Đã khôi phục lớp học");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error restoring class:", err);
       alert("Không thể khôi phục lớp");
     }
@@ -302,9 +303,9 @@ export default function TeacherClassesPage() {
 
       await fetchClasses();
       alert(permanent ? "Đã xóa vĩnh viễn lớp học" : "Đã lưu trữ lớp học");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error deleting class:", err);
-      alert(err.message || "Không thể xóa lớp");
+      alert(getErrorMessage(err) || "Không thể xóa lớp");
     }
   };
 
@@ -326,7 +327,7 @@ export default function TeacherClassesPage() {
 
     setSubmitting(true);
     try {
-      const updateData: any = {
+      const updateData: Record<string, string> = {
         fullName: studentForm.fullName,
         email: studentForm.email,
       };
@@ -356,9 +357,9 @@ export default function TeacherClassesPage() {
       }
 
       alert("Cập nhật thông tin học sinh thành công!");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error updating student:", err);
-      alert(err.message);
+      alert(getErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -387,7 +388,7 @@ export default function TeacherClassesPage() {
       alert(
         `Đã đổi mật khẩu thành công!\nUsername: ${student.username}\nPassword mới: ${newPassword}\n\nGhi chú lại để cung cấp cho học sinh.`,
       );
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error resetting password:", err);
       alert("Không thể đổi mật khẩu");
     }
@@ -414,7 +415,7 @@ export default function TeacherClassesPage() {
       }
       await fetchClasses();
       alert("Đã xóa tài khoản học sinh");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error deleting student:", err);
       alert("Không thể xóa tài khoản");
     }
@@ -464,9 +465,9 @@ export default function TeacherClassesPage() {
       setShowAddStudentModal(false);
       await fetchClasses();
       alert("Tạo tài khoản học sinh thành công!");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error creating student:", err);
-      alert(err.message);
+      alert(getErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -501,7 +502,7 @@ export default function TeacherClassesPage() {
 
       // Step 2: Add all to class if modal opened from class
       if (selectedClass && result.users) {
-        const userIds = result.users.map((u: any) => u.id);
+        const userIds = result.users.map((u: { id: number }) => u.id);
         await fetch(`/api/classes/${selectedClass.id}/members`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -516,9 +517,9 @@ export default function TeacherClassesPage() {
       alert(
         `Đã import ${result.success || 0} tài khoản${result.failed ? `, ${result.failed} lỗi` : ""}!`,
       );
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error bulk import:", err);
-      alert(err.message);
+      alert(getErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -1311,7 +1312,7 @@ export default function TeacherClassesPage() {
                       <li>
                         • VD:{" "}
                         <code className="bg-white px-1 rounded">
-                          student1 pass123 "Học sinh 1" student1@email.com
+                          student1 pass123 “Học sinh 1” student1@email.com
                         </code>
                       </li>
                     </>

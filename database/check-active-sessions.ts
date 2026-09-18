@@ -1,5 +1,6 @@
 import pool from "../src/lib/db";
-
+
+import { getErrorMessage } from "@/lib/errors";
 async function checkActiveSessions() {
   try {
     console.log("🔍 Kiểm tra active sessions...\n");
@@ -29,8 +30,8 @@ async function checkActiveSessions() {
     }
 
     process.exit(0);
-  } catch (error: any) {
-    console.error("❌ Error:", error.message);
+  } catch (error) {
+    console.error("❌ Error:", getErrorMessage(error));
     process.exit(1);
   }
 }

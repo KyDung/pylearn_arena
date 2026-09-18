@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import type { RowDataPacket } from "@/lib/dbTypes";
-
+
+import { getErrorMessage } from "@/lib/errors";
 export async function GET() {
   try {
     // First, check which columns exist
     const [columns] = await pool.query<RowDataPacket[]>(
       "SHOW COLUMNS FROM games",
     );
-    const columnNames = columns.map((c: any) => c.Field);
+    const columnNames = columns.map((c) => c.Field);
 
     // Build dynamic query based on existing columns
     const hasGameType = columnNames.includes("game_type");
@@ -32,10 +33,10 @@ export async function GET() {
       success: true,
       data: rows,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching games:", error);
     return NextResponse.json(
-      { success: false, error: "Lỗi lấy danh sách games: " + error.message },
+      { success: false, error: "Lỗi lấy danh sách games: " + getErrorMessage(error) },
       { status: 500 },
     );
   }

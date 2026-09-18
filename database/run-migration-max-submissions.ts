@@ -1,7 +1,8 @@
 import pool from "../src/lib/db";
 import fs from "fs";
 import path from "path";
-
+
+import { getErrorCode, getErrorMessage } from "@/lib/errors";
 async function runMigration() {
   try {
     console.log("🔄 Đang chạy migration: add max_submissions...");
@@ -21,21 +22,21 @@ async function runMigration() {
       try {
         await pool.query(statement);
         console.log("✅ Executed:", statement.substring(0, 60) + "...");
-      } catch (err: any) {
-        if (err.code === "ER_DUP_FIELDNAME") {
+      } catch (err) {
+        if (getErrorCode(err) === "ER_DUP_FIELDNAME") {
           console.log("⚠️  Column already exists, skipping...");
-        } else if (err.code === "ER_TABLE_EXISTS_ERROR") {
+        } else if (getErrorCode(err) === "ER_TABLE_EXISTS_ERROR") {
           console.log("⚠️  Table already exists, skipping...");
         } else {
-          console.error("❌ Error:", err.message);
+          console.error("❌ Error:", getErrorMessage(err));
         }
       }
     }
 
     console.log("✅ Migration completed!");
     process.exit(0);
-  } catch (error: any) {
-    console.error("❌ Migration failed:", error.message);
+  } catch (error) {
+    console.error("❌ Migration failed:", getErrorMessage(error));
     process.exit(1);
   }
 }

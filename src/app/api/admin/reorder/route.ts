@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import pool from "@/lib/db";
+import type { RowDataPacket } from "@/lib/dbTypes";
 
 // POST /api/admin/reorder - Đổi vị trí 2 items (swap order_num)
 export const POST = withAuth(
@@ -25,7 +26,7 @@ export const POST = withAuth(
     }
 
     // Lấy order_num của 2 items
-    const [rows]: any = await pool.query(
+    const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT id, order_num FROM ${table} WHERE id IN (?, ?)`,
       [id, swap_with_id],
     );
@@ -34,8 +35,8 @@ export const POST = withAuth(
       return errorResponse("Không tìm thấy một hoặc cả hai items");
     }
 
-    const itemA = rows.find((r: any) => r.id == id);
-    const itemB = rows.find((r: any) => r.id == swap_with_id);
+    const itemA = rows.find((r) => r.id == id);
+    const itemB = rows.find((r) => r.id == swap_with_id);
 
     if (!itemA || !itemB) {
       return errorResponse("Không tìm thấy items");

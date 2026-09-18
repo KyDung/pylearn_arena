@@ -1,12 +1,14 @@
 import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import SessionService from "@/lib/services/sessions";
-
+import type { User } from "@/types";
+
+import { getErrorMessage } from "@/lib/errors";
 // PUT /api/teacher/sessions/[id]/close - Đóng session
 export const PUT = withAuth(
   async (
     request: NextRequest,
-    context: { params?: Record<string, string>; user: any },
+    context: { params?: Record<string, string>; user: User },
   ) => {
     try {
       const id = context.params?.id;
@@ -38,8 +40,8 @@ export const PUT = withAuth(
       }
 
       return successResponse(null, "Session closed successfully");
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["admin", "teacher"],

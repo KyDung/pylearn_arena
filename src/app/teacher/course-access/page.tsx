@@ -27,7 +27,7 @@ interface Topic {
 interface Lesson {
   id: string;
   title: string;
-  games?: any[];
+  games?: Array<{ id: string; title?: string }>;
 }
 
 interface ContentAccess {
@@ -111,7 +111,7 @@ export default function CourseAccessPage() {
 
         // Load lessons cho mỗi topic
         const topicsWithLessons = await Promise.all(
-          topics.map(async (topic: any) => {
+          topics.map(async (topic: Topic) => {
             console.log(`📝 Fetching lessons for topic ${topic.id}...`);
             const lessonsRes = await fetch(
               `/api/courses/${selectedCourseSlug}/topics/${topic.id}/lessons`,

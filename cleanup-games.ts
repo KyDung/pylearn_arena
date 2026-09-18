@@ -1,11 +1,13 @@
 import { pool } from "./src/lib/db";
 import fs from "fs/promises";
 import path from "path";
-
+
+import { getErrorMessage } from "@/lib/errors";
+import type { RowDataPacket } from "@/lib/dbTypes";
 async function cleanupGames() {
   try {
     // Get all games to delete their files
-    const [games]: any = await pool.execute(
+    const [games] = await pool.execute<RowDataPacket[]>(
       "SELECT id, path FROM games WHERE id IN (6, 7, 8)",
     );
 
@@ -23,15 +25,15 @@ async function cleanupGames() {
         try {
           await fs.rm(publicPath, { recursive: true, force: true });
           console.log(`✅ Deleted: ${publicPath}`);
-        } catch (err: any) {
-          console.log(`⚠️ Could not delete: ${publicPath} - ${err.message}`);
+        } catch (err) {
+          console.log(`⚠️ Could not delete: ${publicPath} - ${getErrorMessage(err)}`);
         }
 
         try {
           await fs.rm(contentPath, { recursive: true, force: true });
           console.log(`✅ Deleted: ${contentPath}`);
-        } catch (err: any) {
-          console.log(`⚠️ Could not delete: ${contentPath} - ${err.message}`);
+        } catch (err) {
+          console.log(`⚠️ Could not delete: ${contentPath} - ${getErrorMessage(err)}`);
         }
       }
     }
@@ -41,7 +43,7 @@ async function cleanupGames() {
     console.log("\n✅ Deleted games from database");
 
     // Show remaining games
-    const [remaining]: any = await pool.execute(
+    const [remaining] = await pool.execute<RowDataPacket[]>(
       "SELECT id, title, slug, path FROM games ORDER BY id",
     );
 

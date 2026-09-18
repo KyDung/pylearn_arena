@@ -29,20 +29,6 @@ export default function ClassDetailPage({
   const [availableStudents, setAvailableStudents] = useState<User[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "teacher" && user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    setCurrentUser(user);
-    loadClassData();
-  }, [router, classId]);
-
   const loadClassData = async () => {
     setLoading(true);
     try {
@@ -64,6 +50,20 @@ export default function ClassDetailPage({
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    const user = getUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (user.role !== "teacher" && user.role !== "admin") {
+      router.push("/");
+      return;
+    }
+    setCurrentUser(user);
+    loadClassData();
+  }, [router, classId]);
 
   const loadAvailableStudents = async () => {
     try {

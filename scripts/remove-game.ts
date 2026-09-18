@@ -1,6 +1,7 @@
 import mysql from "mysql2/promise";
 import fs from "fs";
 import path from "path";
+import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
 const GAME_SLUG = process.argv[2];
 
@@ -21,7 +22,7 @@ async function removeGame() {
   console.log(`\n🗑️  Removing game: ${GAME_SLUG}\n`);
 
   // 1. Get game info
-  const [games]: any = await connection.execute(
+  const [games] = await connection.execute<RowDataPacket[]>(
     "SELECT * FROM games WHERE slug = ?",
     [GAME_SLUG],
   );

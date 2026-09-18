@@ -13,6 +13,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import mysql from "mysql2/promise";
+import type { RowDataPacket } from "mysql2/promise";
 
 // Colors for console
 const colors = {
@@ -61,7 +62,7 @@ async function validateContent() {
   try {
     // 1. Lấy tất cả games từ DB
     console.log("\n📊 Đang lấy dữ liệu từ database...");
-    const [games]: any = await conn.query(
+    const [games] = await conn.query<RowDataPacket[]>(
       `SELECT g.id, g.slug, g.path, g.title,
               l.slug as lesson_slug,
               t.slug as topic_slug,
@@ -138,7 +139,7 @@ async function validateContent() {
     // 3. Kiểm tra orphan content (có file nhưng không có trong DB)
     log.header("🔎 Kiểm tra Orphan Content (files không có trong DB)");
 
-    const dbPaths = new Set(games.map((g: any) => g.path));
+    const dbPaths = new Set(games.map((g: RowDataPacket) => g.path));
     const orphanPaths: string[] = [];
 
     // Scan content directory

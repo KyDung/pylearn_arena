@@ -1,6 +1,7 @@
 // Script để reset password cho tất cả tài khoản mẫu
 import bcrypt from "bcryptjs";
 import pool from "../src/lib/db";
+import type { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 
 async function resetAllUsers() {
   console.log("🔧 Resetting all sample accounts...\n");
@@ -14,10 +15,10 @@ async function resetAllUsers() {
     console.log("📝 Password for all accounts:", newPassword);
 
     // Update admin account
-    const [adminResult] = (await pool.query(
+    const [adminResult] = await pool.query<ResultSetHeader>(
       `UPDATE users SET password = ?, role = ? WHERE username = ?`,
       [hashedPassword, "admin", "admin"],
-    )) as any;
+    );
 
     if (adminResult.affectedRows > 0) {
       console.log("\n✅ admin - Password updated, role set to 'admin'");
@@ -37,10 +38,10 @@ async function resetAllUsers() {
     }
 
     // Update student1 account
-    const [student1Result] = (await pool.query(
+    const [student1Result] = await pool.query<ResultSetHeader>(
       `UPDATE users SET password = ? WHERE username = ?`,
       [hashedPassword, "student1"],
-    )) as any;
+    );
 
     if (student1Result.affectedRows > 0) {
       console.log("✅ student1 - Password updated");
@@ -60,12 +61,12 @@ async function resetAllUsers() {
     }
 
     // Show all current users
-    const [users] = (await pool.query(
+    const [users] = await pool.query<RowDataPacket[]>(
       "SELECT id, username, role, email FROM users",
-    )) as any;
+    );
     console.log("\n📋 Current accounts in database:");
     console.log("─".repeat(50));
-    users.forEach((u: any) => {
+    users.forEach((u) => {
       console.log(
         `   ${u.username.padEnd(15)} | ${u.role.padEnd(10)} | ${u.email || "N/A"}`,
       );

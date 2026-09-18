@@ -22,8 +22,13 @@ for _name in ("__codex_start", "__codex_limit", "__codex_trace"):
         del globals()[_name]
 `;
 
+/** Only the part of the Pyodide runtime this helper drives. */
+export interface PyodideRunner {
+  runPython(code: string): unknown;
+}
+
 export const withPyodideTimeout = <T>(
-  pyodide: any,
+  pyodide: PyodideRunner | null | undefined,
   run: () => T,
   timeoutMs: number = DEFAULT_TIMEOUT_MS,
 ): T => {
@@ -38,7 +43,7 @@ export const withPyodideTimeout = <T>(
   }
 };
 
-export const isPyodideTimeout = (error: any): boolean => {
+export const isPyodideTimeout = (error: unknown): boolean => {
   const message = String(error);
   return (
     message.includes("TimeoutError") || message.includes("Time limit exceeded")

@@ -93,7 +93,10 @@ function prepareSql(sql: string): string {
   return prepared;
 }
 
-function toHeader(rowCount: number | null, rows: any[]): DbResultHeader {
+function toHeader(
+  rowCount: number | null,
+  rows: Array<Record<string, unknown>>,
+): DbResultHeader {
   const insertId = rows[0]?.id ? Number(rows[0].id) : 0;
   const affectedRows = rowCount ?? 0;
 
@@ -108,7 +111,7 @@ function toHeader(rowCount: number | null, rows: any[]): DbResultHeader {
 class PgCompatConnection {
   constructor(private readonly client: PoolClient) {}
 
-  async query<T = any>(
+  async query<T = unknown>(
     sql: string,
     params?: QueryParams,
   ): Promise<MysqlStyleResult<T>> {
@@ -123,7 +126,7 @@ class PgCompatConnection {
     return [header as T, header];
   }
 
-  execute<T = any>(sql: string, params?: QueryParams) {
+  execute<T = unknown>(sql: string, params?: QueryParams) {
     return this.query<T>(sql, params);
   }
 
@@ -168,7 +171,7 @@ class PgCompatPool {
     return this.pool;
   }
 
-  async query<T = any>(
+  async query<T = unknown>(
     sql: string,
     params?: QueryParams,
   ): Promise<MysqlStyleResult<T>> {
@@ -183,7 +186,7 @@ class PgCompatPool {
     return [header as T, header];
   }
 
-  execute<T = any>(sql: string, params?: QueryParams) {
+  execute<T = unknown>(sql: string, params?: QueryParams) {
     return this.query<T>(sql, params);
   }
 
@@ -192,7 +195,7 @@ class PgCompatPool {
     return new PgCompatConnection(client);
   }
 
-  connect(): Promise<any> {
+  connect(): Promise<PgCompatConnection> {
     return this.getConnection();
   }
 

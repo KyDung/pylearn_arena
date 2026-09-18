@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import pool from "@/lib/db";
 import { RowDataPacket } from "@/lib/dbTypes";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // GET /api/student/contests/active - Lấy danh sách cuộc thi active cho học sinh
 export const GET = withAuth(
   async (request: NextRequest, { user }) => {
@@ -35,9 +36,9 @@ export const GET = withAuth(
       );
 
       return successResponse({ contests: rows });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching active contests:", error);
-      return errorResponse(error.message, 500);
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["student"],

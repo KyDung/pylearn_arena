@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
 const TOPIC_SLUG = process.argv[2];
 
@@ -19,7 +20,7 @@ async function removeTopic() {
   console.log(`\n🗑️  Removing topic: ${TOPIC_SLUG}\n`);
 
   // 1. Get topic info
-  const [topics]: any = await connection.execute(
+  const [topics] = await connection.execute<RowDataPacket[]>(
     "SELECT * FROM topics WHERE slug = ?",
     [TOPIC_SLUG],
   );
@@ -34,7 +35,7 @@ async function removeTopic() {
   console.log(`📋 Found: ${topic.title}`);
 
   // 2. Get all lessons in this topic
-  const [lessons]: any = await connection.execute(
+  const [lessons] = await connection.execute<RowDataPacket[]>(
     "SELECT * FROM lessons WHERE topic_id = ?",
     [topic.id],
   );
@@ -44,7 +45,7 @@ async function removeTopic() {
 
     let totalGames = 0;
     for (const lesson of lessons) {
-      const [games]: any = await connection.execute(
+      const [games] = await connection.execute<RowDataPacket[]>(
         "SELECT COUNT(*) as count FROM games WHERE lesson_id = ?",
         [lesson.id],
       );

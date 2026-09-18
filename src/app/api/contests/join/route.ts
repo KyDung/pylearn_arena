@@ -3,7 +3,8 @@ import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import { ContestService } from "@/lib/services/contests";
 import pool from "@/lib/db";
 import { RowDataPacket } from "@/lib/dbTypes";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // GET /api/contests/join?code=ABC123 - Tham gia cuộc thi bằng mã
 export const GET = withAuth(
   async (request: NextRequest, { user }) => {
@@ -54,9 +55,9 @@ export const GET = withAuth(
         contestId: contest.id,
         title: contest.title,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error joining contest:", error);
-      return errorResponse(error.message || "Lỗi server", 500);
+      return errorResponse(getErrorMessage(error) || "Lỗi server", 500);
     }
   },
   ["student"],

@@ -22,6 +22,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as readline from "readline";
 import mysql from "mysql2/promise";
+import type { RowDataPacket } from "mysql2/promise";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -70,14 +71,14 @@ async function main() {
     // Show existing structure
     console.log("\n📚 Cấu trúc hiện có:\n");
 
-    const [courses]: any = await conn.query(
+    const [courses] = await conn.query<RowDataPacket[]>(
       `SELECT c.id, c.slug, c.title FROM courses c ORDER BY c.id`,
     );
 
     for (const course of courses) {
       console.log(`📘 [${course.id}] ${course.title} (${course.slug})`);
 
-      const [topics]: any = await conn.query(
+      const [topics] = await conn.query<RowDataPacket[]>(
         `SELECT t.id, t.slug, t.title FROM topics t WHERE t.course_id = ? ORDER BY t.order_num`,
         [course.id],
       );
@@ -85,13 +86,13 @@ async function main() {
       for (const topic of topics) {
         console.log(`   📂 [${topic.id}] ${topic.title} (${topic.slug})`);
 
-        const [lessons]: any = await conn.query(
+        const [lessons] = await conn.query<RowDataPacket[]>(
           `SELECT l.id, l.slug, l.title FROM lessons l WHERE l.topic_id = ? ORDER BY l.order_num`,
           [topic.id],
         );
 
         for (const lesson of lessons) {
-          const [games]: any = await conn.query(
+          const [games] = await conn.query<RowDataPacket[]>(
             `SELECT COUNT(*) as count FROM games WHERE lesson_id = ?`,
             [lesson.id],
           );
@@ -109,7 +110,7 @@ async function main() {
     const lessonId = await question("Lesson ID (số): ");
 
     // Get lesson info for path building
-    const [lessonInfo]: any = await conn.query(
+    const [lessonInfo] = await conn.query<RowDataPacket[]>(
       `SELECT l.slug as lesson_slug, t.slug as topic_slug, c.slug as course_slug 
        FROM lessons l 
        JOIN topics t ON l.topic_id = t.id 
@@ -128,7 +129,7 @@ async function main() {
     const lessonSlug = lessonInfo[0].lesson_slug;
 
     // Count existing games to suggest next ID
-    const [existingGames]: any = await conn.query(
+    const [existingGames] = await conn.query<RowDataPacket[]>(
       `SELECT COUNT(*) as count FROM games WHERE lesson_id = ?`,
       [parseInt(lessonId)],
     );

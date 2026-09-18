@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 
 async function cleanup() {
   const connection = await mysql.createConnection({
@@ -24,7 +25,7 @@ async function cleanup() {
   // Xóa lessons không còn game nào
   console.log("\n🗑️  Xóa lessons không còn game...");
 
-  const [result]: any = await connection.execute(`
+  const [result] = await connection.execute<ResultSetHeader>(`
     DELETE l FROM lessons l
     LEFT JOIN games g ON l.id = g.lesson_id
     WHERE g.id IS NULL

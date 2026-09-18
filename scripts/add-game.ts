@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import * as readline from "readline";
 import pool from "../src/lib/db";
+import type { RowDataPacket } from "@/lib/dbTypes";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -19,16 +20,16 @@ async function addGame() {
 
   try {
     // Show available lessons
-    const [lessons] = (await pool.query(
+    const [lessons] = await pool.query<RowDataPacket[]>(
       `SELECT l.id, l.slug, l.title, t.title as topic_title
        FROM lessons l
        JOIN topics t ON l.topic_id = t.id
        ORDER BY l.order_num`,
-    )) as any;
+    );
 
     if (Array.isArray(lessons) && lessons.length > 0) {
       console.log("\n📝 Lessons hiện có:");
-      lessons.forEach((l: any) => {
+      lessons.forEach((l) => {
         console.log(`   [${l.id}] ${l.title} (Topic: ${l.topic_title})`);
       });
       console.log("");

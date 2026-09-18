@@ -474,11 +474,11 @@ export default function initGame(
 
       displayText = this.displayText;
       sceneText = this.sceneText;
-      let quekem = this.add
+      const quekem = this.add
         .image(-100, this.scale.gameSize.height + 200, `QK${this.sceneIndex}`)
         .setOrigin(0, 1)
         .setScale(1.5);
-      let vokem = this.add
+      const vokem = this.add
         .image(
           this.scale.gameSize.width / 10,
           this.scale.gameSize.height / 4,

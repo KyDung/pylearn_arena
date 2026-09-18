@@ -3,6 +3,7 @@ import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import { bulkCreateUsers } from "@/lib/services/users";
 import type { UserRole } from "@/types";
 
+import { getErrorMessage } from "@/lib/errors";
 interface BulkUserData {
   username: string;
   password: string;
@@ -127,8 +128,8 @@ export const POST = withAuth(
         result,
         `Tạo thành công ${result.success} tài khoản. ${result.failed} thất bại.`,
       );
-    } catch (error: any) {
-      return errorResponse(error.message || "Lỗi khi import users");
+    } catch (error) {
+      return errorResponse(getErrorMessage(error) || "Lỗi khi import users");
     }
   },
   ["admin", "teacher"],

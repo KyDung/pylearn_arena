@@ -1,4 +1,5 @@
 import pool from "../src/lib/db";
+import type { RowDataPacket } from "@/lib/dbTypes";
 
 async function createAllMissingTables() {
   console.log("🔧 Creating all missing tables...\n");
@@ -21,15 +22,15 @@ async function createAllMissingTables() {
     console.log("✅ Table 'course_access' created");
 
     // Verify all tables exist
-    const [tables] = (await pool.query(`
+    const [tables] = await pool.query<RowDataPacket[]>(`
       SELECT TABLE_NAME 
       FROM information_schema.TABLES 
       WHERE TABLE_SCHEMA = 'pylearn_arena'
       ORDER BY TABLE_NAME
-    `)) as any;
+    `);
 
     console.log("\n📋 Current tables in database:");
-    tables.forEach((t: any) => {
+    tables.forEach((t) => {
       console.log(`   - ${t.TABLE_NAME}`);
     });
 

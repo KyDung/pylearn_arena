@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getUser } from "@/lib/auth";
-
+
+import { getErrorMessage } from "@/lib/errors";
 interface User {
   id: number;
   username: string;
@@ -191,8 +192,8 @@ export default function AccountsManagementPage() {
       });
       await loadUsers();
       alert("Tạo tài khoản thành công!");
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
     setSubmitting(false);
   };
@@ -223,8 +224,8 @@ export default function AccountsManagementPage() {
       setSelectedUser(null);
       await loadUsers();
       alert("Cập nhật thành công!");
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
     setSubmitting(false);
   };
@@ -264,8 +265,8 @@ export default function AccountsManagementPage() {
       alert(
         permanent ? "Đã xóa vĩnh viễn tài khoản" : "Đã vô hiệu hóa tài khoản",
       );
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
   };
 
@@ -293,8 +294,8 @@ export default function AccountsManagementPage() {
       alert(
         `Đã đổi mật khẩu!\nUsername: ${user.username}\nPassword mới: ${newPassword}`,
       );
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
   };
 
@@ -376,8 +377,8 @@ export default function AccountsManagementPage() {
       alert(
         `Đã tạo ${created} tài khoản${failed > 0 ? `, ${failed} lỗi` : ""}`,
       );
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
     setSubmitting(false);
   };
@@ -406,8 +407,8 @@ export default function AccountsManagementPage() {
       alert(
         `Đã thêm ${added} tài khoản vào lớp${errors ? `, ${errors} lỗi/bị trùng` : ""}.`,
       );
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     } finally {
       setBulkAction(null);
       setBulkMessage("");
@@ -462,9 +463,9 @@ export default function AccountsManagementPage() {
           } else {
             deleted++;
           }
-        } catch (error: any) {
+        } catch (error) {
           failed++;
-          errors.push(`${user.username}: ${error.message || "Lỗi xóa tài khoản"}`);
+          errors.push(`${user.username}: ${getErrorMessage(error) || "Lỗi xóa tài khoản"}`);
         }
       }
 
@@ -496,8 +497,8 @@ export default function AccountsManagementPage() {
       if (!res.ok) throw new Error("Lỗi xóa khỏi lớp");
 
       await loadUsers();
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
   };
 
@@ -1003,10 +1004,10 @@ export default function AccountsManagementPage() {
               {isAdmin && userForm.role === "teacher" && userForm.classId && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                   <p className="text-xs text-yellow-800">
-                    ⚠️ <strong>Lưu ý:</strong> "Thêm vào lớp" sẽ thêm giáo viên
+                    ⚠️ <strong>Lưu ý:</strong> “Thêm vào lớp” sẽ thêm giáo viên
                     làm <strong>thành viên</strong> của lớp, không phải quản lý
-                    lớp. Giáo viên nên tự tạo lớp của mình ở trang "Quản lý lớp
-                    học".
+                    lớp. Giáo viên nên tự tạo lớp của mình ở trang “Quản lý lớp
+                    học”.
                   </p>
                 </div>
               )}

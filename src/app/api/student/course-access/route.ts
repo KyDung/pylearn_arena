@@ -3,7 +3,8 @@ import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import pool from "@/lib/db";
 import { RowDataPacket } from "@/lib/dbTypes";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // GET /api/student/course-access?courseId=X - Lấy danh sách content đã unlock cho student
 export const GET = withAuth(
   async (request: NextRequest, context: { user: User }) => {
@@ -54,8 +55,8 @@ export const GET = withAuth(
         topics: topics.map((t) => String(t.content_id)),
         lessons: lessons.map((l) => String(l.content_id)),
       });
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["student"],

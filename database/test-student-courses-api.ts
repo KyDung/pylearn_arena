@@ -1,6 +1,7 @@
 import pool from "../src/lib/db";
 import SessionService from "../src/lib/services/sessions";
-
+
+import { getErrorMessage, getErrorStack } from "@/lib/errors";
 async function testStudentCoursesAPI() {
   try {
     console.log("🔍 Test API student/courses...\n");
@@ -15,7 +16,7 @@ async function testStudentCoursesAPI() {
       process.exit(1);
     }
 
-    const student = (students as any)[0];
+    const student = students[0];
     console.log(
       `👨‍🎓 Test với student: ${student.username} (ID: ${student.id})\n`,
     );
@@ -59,9 +60,9 @@ async function testStudentCoursesAPI() {
     );
 
     process.exit(0);
-  } catch (error: any) {
-    console.error("❌ Error:", error.message);
-    console.error(error.stack);
+  } catch (error) {
+    console.error("❌ Error:", getErrorMessage(error));
+    console.error(getErrorStack(error));
     process.exit(1);
   }
 }

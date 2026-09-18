@@ -2,7 +2,9 @@
 import pool from "../src/lib/db-mysql";
 import fs from "fs";
 import path from "path";
-
+
+import { getErrorCode, getErrorMessage } from "@/lib/errors";
+import type { RowDataPacket } from "mysql2/promise";
 async function runMigration() {
   console.log("🚀 Starting MySQL migration...\n");
 
@@ -47,14 +49,14 @@ async function runMigration() {
           const tableName = statement.match(/INSERT INTO.*?`?(\w+)`?/i)?.[1];
           console.log(`📝 Inserted data into: ${tableName}`);
         }
-      } catch (error: any) {
+      } catch (error) {
         // Bỏ qua lỗi "table already exists"
-        if (error.code === "ER_TABLE_EXISTS_ERROR") {
+        if (getErrorCode(error) === "ER_TABLE_EXISTS_ERROR") {
           console.log(`⚠️  Table already exists, skipping...`);
-        } else if (error.code === "ER_DUP_ENTRY") {
+        } else if (getErrorCode(error) === "ER_DUP_ENTRY") {
           console.log(`⚠️  Duplicate entry, skipping...`);
         } else {
-          console.error(`❌ Error executing statement:`, error.message);
+          console.error(`❌ Error executing statement:`, getErrorMessage(error));
           console.error("Statement:", statement.substring(0, 100) + "...");
         }
       }
@@ -68,10 +70,10 @@ async function runMigration() {
       console.log("✅ Tables created successfully:");
       for (const table of tables) {
         const tableName = Object.values(table)[0];
-        const [rows] = await pool.query(
+        const [rows] = await pool.query<RowDataPacket[]>(
           `SELECT COUNT(*) as count FROM ${tableName}`,
         );
-        const count = (rows as any)[0].count;
+        const count = rows[0].count;
         console.log(`   - ${tableName} (${count} rows)`);
       }
     }

@@ -5,7 +5,8 @@
 import mysql from "mysql2/promise";
 import * as fs from "fs";
 import * as path from "path";
-
+
+import { getErrorCode, getErrorMessage } from "@/lib/errors";
 async function runMigration() {
   const pool = mysql.createPool({
     host: process.env.MYSQL_HOST || "localhost",
@@ -44,11 +45,11 @@ async function runMigration() {
         try {
           await pool.query(statement);
           console.log(`   ✅ Done`);
-        } catch (err: any) {
-          if (err.code === "ER_TABLE_EXISTS_ERROR") {
+        } catch (err) {
+          if (getErrorCode(err) === "ER_TABLE_EXISTS_ERROR") {
             console.log(`   ⚠️  Table already exists`);
           } else {
-            console.error(`   ❌ Error: ${err.message}`);
+            console.error(`   ❌ Error: ${getErrorMessage(err)}`);
           }
         }
       }

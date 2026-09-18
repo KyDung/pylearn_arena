@@ -36,20 +36,6 @@ export default function AdminDashboard() {
   });
   const [createError, setCreateError] = useState("");
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    loadData();
-    loadStats();
-  }, [router]);
-
   const loadStats = async () => {
     try {
       const response = await fetch("/api/admin/stats");
@@ -59,17 +45,6 @@ export default function AdminDashboard() {
       console.error("Failed to load stats:", error);
     }
   };
-
-  useEffect(() => {
-    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    searchDebounceRef.current = setTimeout(() => {
-      loadData(
-        activeTab === "teachers" ? "teacher" : activeTab === "students" ? "student" : undefined,
-        searchText,
-      );
-    }, 300);
-    return () => { if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current); };
-  }, [searchText]);
 
   const loadData = async (role?: UserRole, search?: string) => {
     setLoading(true);
@@ -89,6 +64,31 @@ export default function AdminDashboard() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    const user = getUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (user.role !== "admin") {
+      router.push("/");
+      return;
+    }
+    loadData();
+    loadStats();
+  }, [router]);
+
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      loadData(
+        activeTab === "teachers" ? "teacher" : activeTab === "students" ? "student" : undefined,
+        searchText,
+      );
+    }, 300);
+    return () => { if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current); };
+  }, [searchText]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -799,7 +799,7 @@ export default function AdminDashboard() {
                   Chưa có người dùng
                 </h3>
                 <p className="text-gray-500">
-                  Bấm nút "Thêm người dùng" để tạo tài khoản mới
+                  Bấm nút “Thêm người dùng” để tạo tài khoản mới
                 </p>
               </div>
             )}

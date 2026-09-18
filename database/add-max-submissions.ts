@@ -1,5 +1,6 @@
 import pool from "../src/lib/db";
-
+
+import { getErrorCode, getErrorMessage } from "@/lib/errors";
 async function addMaxSubmissions() {
   try {
     console.log("🔄 Thêm cột max_submissions vào bảng sessions...");
@@ -20,11 +21,11 @@ async function addMaxSubmissions() {
     console.table(columns);
 
     process.exit(0);
-  } catch (error: any) {
-    if (error.code === "ER_DUP_FIELDNAME") {
+  } catch (error) {
+    if (getErrorCode(error) === "ER_DUP_FIELDNAME") {
       console.log("⚠️  Cột max_submissions đã tồn tại rồi!");
     } else {
-      console.error("❌ Error:", error.message);
+      console.error("❌ Error:", getErrorMessage(error));
     }
     process.exit(1);
   }

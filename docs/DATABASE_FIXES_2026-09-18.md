@@ -83,25 +83,30 @@ nên chỉ lùi khi đồng thời quay lại bản code cũ.
 1. **Code chưa deploy.** Sửa database không tự sửa website đang host. Cho tới khi code được triển
    khai, bản đang chạy vẫn ghi bài nộp của phiên luyện nhanh vào sai bảng. Bảng mới sẽ rỗng và bảng
    cũ sẽ nhận hàng có khóa ngoại trỏ sai chỗ.
-2. **Điểm vẫn do client gửi.** Ràng buộc mới chỉ chặn nộp trùng, không làm điểm đáng tin hơn. Chưa
-   có chấm điểm phía server.
+2. **Điểm vẫn do client gửi, và đây là quyết định chứ không phải thiếu sót.** Người dùng chốt ngày
+   19/09/2026: website hướng tới luyện tập và làm bài, chạy trên hạ tầng miễn phí, nên không làm
+   chấm điểm phía máy chủ. Ràng buộc nộp trùng vẫn có tác dụng. Hệ quả cần chấp nhận: học sinh biết
+   sửa yêu cầu mạng có thể khai điểm, nên đừng dùng điểm này để chấm điểm thật.
 3. **RLS bật nhưng chưa có policy nào.** Vai trò `anon` và `authenticated` vẫn giữ toàn bộ quyền
    bảng theo mặc định của Supabase, nên RLS không policy chính là thứ đang chặn Data API công khai.
    Đừng thêm policy cho tới khi quyết định rõ mô hình truy cập, vì thêm một policy lỏng sẽ mở lại
    đúng cánh cửa mà migration 003 vừa đóng.
-4. **`created_by` của 29 tài khoản cũ vẫn trống.** Giáo viên chỉ thấy tài khoản do mình tạo, nên số
-   tài khoản này hiện do admin quản lý. Không suy ra giáo viên từ thành viên lớp, vì một học sinh có
-   thể học nhiều lớp.
+4. **`created_by` đã được điền ngày 19/09/2026** bằng migration 004. Học sinh nhận người tạo là
+   giáo viên chủ lớp mà em đó đang học; giáo viên nhận admin. Tài khoản admin gốc giữ nguyên trạng
+   thái trống vì không có tài khoản nào tạo ra nó.
 5. **Quy tắc nộp bài** vẫn là một bài cuối cho mỗi học sinh mỗi phiên lớp. Trường `max_submissions`
    có trong schema nhưng chưa dùng.
 
 ## Việc nên làm tiếp
 
-1. Commit và deploy code, rồi kiểm thử luồng giáo viên và học sinh trên môi trường thật. Đây là việc
-   gấp nhất vì DB và code đang lệch phiên bản.
-2. Chuẩn hóa `created_by` cho tài khoản cũ, cần quyết định của người dùng về việc gán ai cho ai.
-3. Hợp nhất bốn hệ bảng phiên và bài tập: `sessions`, `lesson_sessions`, `assignments` cùng hai hệ
+1. Kiểm thử luồng giáo viên và học sinh trên site thật. Code đã deploy ngày 18/09/2026 nên DB và
+   code không còn lệch phiên bản, nhưng chưa ai chạy thử một buổi học đầy đủ.
+2. Gộp hai service cuộc thi `contests.ts` và `contests-new.ts` làm một. Giữ hai bản song song là
+   nguồn sai lệch, bất kể có dùng chức năng cuộc thi hay không.
+3. Hợp nhất bốn hệ bảng phiên và bài tập: `sessions`, `lesson_sessions`, `assignments` cùng hệ
    contest. Migration 002 mới tách đúng quyền sở hữu bài nộp, chưa hợp nhất mô hình.
-4. Thiết kế chấm điểm phía server cho bài nộp tính điểm.
-5. Quyết định mô hình RLS thật nếu sau này muốn dùng Data API của Supabase, hoặc thu hồi hẳn quyền
+4. Quyết định mô hình RLS thật nếu sau này muốn dùng Data API của Supabase, hoặc thu hồi hẳn quyền
    bảng của `anon` và `authenticated` nếu chắc chắn chỉ dùng kết nối server.
+
+**Không làm:** chấm điểm phía máy chủ. Người dùng đã chốt bỏ hạng mục này, lý do ghi ở mục lưu ý
+phía trên.

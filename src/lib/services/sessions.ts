@@ -28,6 +28,10 @@ export interface SessionWithDetails extends Session {
   class_name?: string;
   game_title?: string;
   creator_name?: string;
+  /** Present only on the student listing, which computes them per viewer. */
+  game_path?: string;
+  remaining_minutes?: number;
+  has_submitted?: boolean;
 }
 
 export interface CreateSessionData {

@@ -61,6 +61,14 @@ export interface SubmissionData {
   executionTime?: number;
 }
 
+/** One row of a contest leaderboard, as the contest API returns it. */
+export interface ContestRanking {
+  rank_position: number;
+  username: string;
+  full_name: string;
+  score: number;
+}
+
 export interface SubmissionResult {
   success: boolean;
   submission?: {
@@ -68,12 +76,7 @@ export interface SubmissionResult {
     score: number;
     attemptNumber: number;
   };
-  rankings?: Array<{
-    rank_position: number;
-    username: string;
-    full_name: string;
-    score: number;
-  }>;
+  rankings?: ContestRanking[];
   error?: string;
 }
 
@@ -408,7 +411,7 @@ export async function initContestFeature(
 ): Promise<{
   contestInfo: ContestInfo;
   submitScore: (data: SubmissionData) => Promise<SubmissionResult>;
-  updateRankings: (rankings: any[]) => void;
+  updateRankings: (rankings: ContestRanking[]) => void;
   isInContest: boolean;
 }> {
   // Kiểm tra trạng thái cuộc thi
@@ -512,7 +515,7 @@ export async function initContestFeature(
   };
 
   // Hàm cập nhật rankings
-  const updateRankings = (rankings: any[]) => {
+  const updateRankings = (rankings: ContestRanking[]) => {
     const rankingsContainer = root.querySelector(".contest-rankings tbody");
     if (!rankingsContainer || !rankings) return;
 

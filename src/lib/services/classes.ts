@@ -10,7 +10,8 @@ import type {
 } from "@/types";
 import type { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 import { nanoid } from "nanoid";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // ============================================================
 // CLASS QUERIES
 // ============================================================
@@ -310,10 +311,10 @@ export async function hardDeleteClass(id: number): Promise<boolean> {
     for (const { query, params } of tablesToClean) {
       try {
         await connection.query(query, params);
-      } catch (err: any) {
+      } catch (err) {
         // Ignore "table doesn't exist" errors
-        if (!err.message?.includes("doesn't exist")) {
-          console.warn(`Warning cleaning class data:`, err.message);
+        if (!getErrorMessage(err)?.includes("doesn't exist")) {
+          console.warn(`Warning cleaning class data:`, getErrorMessage(err));
         }
       }
     }

@@ -145,7 +145,7 @@ export const ContestService = {
     data: Partial<CreateContestData>,
   ): Promise<boolean> {
     const fields: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
 
     if (data.title !== undefined) {
       fields.push("title = ?");
@@ -213,7 +213,7 @@ export const ContestService = {
     filters: ContestFilters,
   ): Promise<{ items: ContestWithDetails[]; total: number }> {
     const conditions: string[] = ["1=1"];
-    const params: any[] = [];
+    const params: unknown[] = [];
 
     if (filters.class_id) {
       conditions.push("c.class_id = ?");
@@ -274,7 +274,7 @@ export const ContestService = {
     );
 
     // Parse prizes JSON
-    const items = rows.map((row: any) => ({
+    const items = rows.map((row: RowDataPacket) => ({
       ...row,
       prizes: parseJsonField<Record<string, string>>(row.prizes),
     }));
@@ -576,7 +576,7 @@ export const ContestService = {
       [userId],
     );
 
-    return rows.map((row: any) => ({
+    return rows.map((row: RowDataPacket) => ({
       ...row,
       prizes: parseJsonField<Record<string, string>>(row.prizes),
     })) as ContestWithDetails[];

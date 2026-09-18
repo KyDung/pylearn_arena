@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
-
+
+import { getErrorMessage } from "@/lib/errors";
 interface PreviewUser {
   username: string;
   password: string;
@@ -125,8 +126,8 @@ export default function BulkImportPage() {
           fileInputRef.current.value = "";
         }
       }
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      alert(getErrorMessage(error));
     } finally {
       setImporting(false);
     }

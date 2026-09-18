@@ -1,5 +1,58 @@
 # Bàn giao cho Claude — 18/09/2026
 
+## ĐỢT 3 — 19/09/2026: gán người tạo, dọn lint, chốt vài quyết định
+
+**Đọc mục này trước, nó mới nhất.**
+
+### Đã làm
+
+| Việc | Kết quả |
+| --- | --- |
+| Migration 004 gán `created_by` | Đã apply và commit. 25 học sinh, 2 giáo viên có người tạo; admin gốc giữ trống |
+| Lỗi ESLint | 422 → 8 |
+| `pnpm exec tsc --noEmit` | Sạch |
+| `pnpm build` | Đạt |
+| `pnpm test:foundation` | 59/59 |
+
+Cách gán: học sinh nhận giáo viên chủ lớp mà em đó đang học, giáo viên nhận admin. Kết quả thực tế
+là giáo viên id 7 quản lý 5 học sinh, admin id 5 quản lý 20 học sinh và 2 giáo viên. Không ai tự làm
+người tạo chính mình.
+
+### Về 422 lỗi lint
+
+Không phải tất cả đều được sửa bằng cách gắn kiểu. Ba nhóm được xử lý theo ba cách khác nhau, lý do
+ghi thẳng trong `eslint.config.mjs`:
+
+1. **Ngừng lint file không thuộc mã nguồn**: thư viện Pyodide tải về, các bản backup có ngày tháng,
+   và bốn thư mục công cụ soạn nội dung mà `.gitignore` đã loại. Sửa mấy file đó cũng không commit
+   được.
+2. **Khoanh vùng quy tắc cho `src/content`**: file game mở đầu bằng `@ts-nocheck` một cách có chủ ý,
+   và lối viết Phaser cần gán `this` ra biến. Gắn kiểu cho chúng không làm game đúng hơn.
+3. **Sửa kiểu thật cho mã ứng dụng**: 73 khối `catch (e: any)` chuyển sang dùng `src/lib/errors.ts`,
+   các truy vấn được gắn kiểu kết quả đúng, và một loạt kiểu cục bộ được đặt tên.
+
+Một ngoại lệ có chủ ý: `RowDataPacket` trong `src/lib/dbTypes.ts` vẫn là `any`. Siết thành `unknown`
+tốn 105 lỗi TypeScript, đã đo thật. Lý do ghi ngay trong file, kèm một dòng tắt quy tắc đúng chỗ đó.
+
+### Việc sửa lint làm lộ hai lỗi thật
+
+- `database/test.ts` và `database/fix-passwords.ts` đọc `result.rows`, nhưng lớp tương thích trả về
+  mảng hai phần tử. Hai script này vốn đã hỏng khi chạy, `any` che mất. Đã sửa.
+- `SessionWithDetails` thiếu ba trường mà truy vấn thật có trả về. Đã bổ sung.
+
+### 8 lỗi còn lại, cố ý giữ
+
+Tất cả đều là `react-hooks/set-state-in-effect` trên các trang đọc thông tin đăng nhập từ trình
+duyệt sau khi trang đã gắn. Đây là khuyến nghị thiết kế của React, không phải lỗi chạy sai. Cách sửa
+là đọc trong lúc render, nhưng dữ liệu nằm ở localStorage nên làm vậy sẽ lệch giữa máy chủ và trình
+duyệt. Nên sửa khi có thể mở app lên kiểm tra từng trang.
+
+### Quyết định của người dùng ngày 19/09/2026
+
+- **Không làm chấm điểm phía máy chủ.** Website hướng tới luyện tập trên hạ tầng miễn phí.
+- **Tài khoản hiện tại đều là tài khoản thử.** Chỉ cần giữ tài khoản admin để người dùng tự kiểm tra.
+
+
 ## TRẠNG THÁI MỚI NHẤT — 18/09/2026, Claude Code tiếp nhận từ Codex
 
 **Đọc phần này trước.** Phần "ĐIỂM TIẾP TỤC MỚI NHẤT" bên dưới là mốc dừng của Codex và vẫn

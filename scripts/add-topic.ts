@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import * as readline from "readline";
 import pool from "../src/lib/db";
+import type { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -26,10 +27,10 @@ async function addTopic() {
     console.log("\n✅ Đang thêm vào database...\n");
 
     // Get course ID by slug
-    const [courseRows] = (await pool.query(
+    const [courseRows] = await pool.query<RowDataPacket[]>(
       "SELECT id FROM courses WHERE slug = ?",
       [courseId],
-    )) as any;
+    );
 
     if (!courseRows || courseRows.length === 0) {
       console.log("❌ Course không tồn tại!");
@@ -41,11 +42,11 @@ async function addTopic() {
     const dbCourseId = courseRows[0].id;
     const slug = title.toLowerCase().replace(/\s+/g, "-");
 
-    const [result] = (await pool.query(
+    const [result] = await pool.query<ResultSetHeader>(
       `INSERT INTO topics (course_id, slug, title, description, order_num)
        VALUES (?, ?, ?, ?, ?)`,
       [dbCourseId, slug, title, description, parseInt(order)],
-    )) as any;
+    );
 
     const topicId = result.insertId;
 

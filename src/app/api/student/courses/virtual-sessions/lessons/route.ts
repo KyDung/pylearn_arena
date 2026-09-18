@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import SessionService from "@/lib/services/sessions";
-
+
+import { getErrorMessage } from "@/lib/errors";
 // GET /api/student/courses/virtual-sessions/lessons - Lấy danh sách sessions như lessons
 export const GET = withAuth(
   async (
@@ -18,7 +19,7 @@ export const GET = withAuth(
       );
 
       // Format như lessons để FE dễ xử lý
-      const lessons = sessions.map((session: any) => ({
+      const lessons = sessions.map((session) => ({
         id: `session-${session.id}`,
         title: session.title,
         description:
@@ -39,9 +40,9 @@ export const GET = withAuth(
         lessons,
         total: lessons.length,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Get sessions as lessons error:", error);
-      return errorResponse(error.message, 500);
+      return errorResponse(getErrorMessage(error), 500);
     }
   },
   ["student"],

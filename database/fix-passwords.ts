@@ -21,9 +21,10 @@ async function updatePasswords() {
     console.log("✅ Passwords updated successfully!");
 
     // Verify
-    const result = await client.query("SELECT username, password FROM users");
+    // The compatibility layer returns [rows, header], not a pg result object.
+    const [rows] = await client.query("SELECT username, password FROM users");
     console.log("\n📋 Updated users:");
-    console.log(result.rows);
+    console.log(rows);
 
     client.release();
     await pool.end();

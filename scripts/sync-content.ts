@@ -13,6 +13,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import mysql from "mysql2/promise";
+import type { RowDataPacket } from "mysql2/promise";
 
 const colors = {
   reset: "\x1b[0m",
@@ -54,7 +55,7 @@ async function syncContent() {
 
   try {
     // Lấy tất cả games
-    const [games]: any = await conn.query(
+    const [games] = await conn.query<RowDataPacket[]>(
       `SELECT g.*, 
               l.slug as lesson_slug,
               t.slug as topic_slug,

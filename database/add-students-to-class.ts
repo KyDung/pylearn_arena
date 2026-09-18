@@ -1,5 +1,7 @@
 import pool from "../src/lib/db";
-
+
+import { getErrorMessage } from "@/lib/errors";
+import type { RowDataPacket } from "mysql2/promise";
 async function addStudentToClass() {
   try {
     console.log("➕ Thêm học sinh vào lớp 10A2...\n");
@@ -14,7 +16,7 @@ async function addStudentToClass() {
       process.exit(1);
     }
 
-    const classId = (classes as any)[0].id;
+    const classId = classes[0].id;
     console.log(`✅ Tìm thấy lớp 10A2 (ID: ${classId})`);
 
     // Lấy danh sách học sinh
@@ -24,7 +26,7 @@ async function addStudentToClass() {
 
     console.log("\n👨‍🎓 Thêm học sinh vào lớp:");
 
-    for (const student of students as any[]) {
+    for (const student of students as RowDataPacket[]) {
       try {
         await pool.query(
           `
@@ -43,8 +45,8 @@ async function addStudentToClass() {
 
     console.log("\n🎉 Hoàn thành! Giờ học sinh có thể thấy sessions rồi!");
     process.exit(0);
-  } catch (error: any) {
-    console.error("❌ Error:", error.message);
+  } catch (error) {
+    console.error("❌ Error:", getErrorMessage(error));
     process.exit(1);
   }
 }

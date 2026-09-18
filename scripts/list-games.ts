@@ -10,6 +10,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import mysql from "mysql2/promise";
+import type { RowDataPacket } from "mysql2/promise";
 
 const colors = {
   reset: "\x1b[0m",
@@ -34,7 +35,7 @@ async function listGames() {
   });
 
   try {
-    const [courses]: any = await conn.query(
+    const [courses] = await conn.query<RowDataPacket[]>(
       "SELECT * FROM courses ORDER BY id",
     );
 
@@ -45,7 +46,7 @@ async function listGames() {
         `\n${colors.cyan}📘 ${course.title}${colors.reset} (${course.slug})`,
       );
 
-      const [topics]: any = await conn.query(
+      const [topics] = await conn.query<RowDataPacket[]>(
         "SELECT * FROM topics WHERE course_id = ? ORDER BY order_num",
         [course.id],
       );
@@ -55,13 +56,13 @@ async function listGames() {
           `   ${colors.blue}📂 ${topic.title}${colors.reset} (${topic.slug})`,
         );
 
-        const [lessons]: any = await conn.query(
+        const [lessons] = await conn.query<RowDataPacket[]>(
           "SELECT * FROM lessons WHERE topic_id = ? ORDER BY order_num",
           [topic.id],
         );
 
         for (const lesson of lessons) {
-          const [games]: any = await conn.query(
+          const [games] = await conn.query<RowDataPacket[]>(
             "SELECT * FROM games WHERE lesson_id = ? ORDER BY order_num",
             [lesson.id],
           );
@@ -87,13 +88,13 @@ async function listGames() {
     }
 
     // Summary
-    const [totalGames]: any = await conn.query(
+    const [totalGames] = await conn.query<RowDataPacket[]>(
       "SELECT COUNT(*) as count FROM games",
     );
-    const [totalLessons]: any = await conn.query(
+    const [totalLessons] = await conn.query<RowDataPacket[]>(
       "SELECT COUNT(*) as count FROM lessons",
     );
-    const [totalTopics]: any = await conn.query(
+    const [totalTopics] = await conn.query<RowDataPacket[]>(
       "SELECT COUNT(*) as count FROM topics",
     );
 

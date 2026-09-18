@@ -2,8 +2,9 @@
  * 📚 Course Service - Quản lý truy vấn courses
  */
 import pool from "@/lib/db";
-import { RowDataPacket } from "@/lib/dbTypes";
+import { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
 
+import { getErrorMessage } from "@/lib/errors";
 export interface Course {
   id: number;
   slug: string;
@@ -76,7 +77,7 @@ export const CourseService = {
     },
   ): Promise<Course | null> {
     const fields: string[] = [];
-    const values: (string | boolean)[] = [];
+    const values: (string | number | boolean)[] = [];
 
     if (data.title !== undefined) {
       fields.push("title = ?");
@@ -96,7 +97,7 @@ export const CourseService = {
     }
     if (data.order_num !== undefined) {
       fields.push("order_num = ?");
-      values.push(data.order_num as any);
+      values.push(data.order_num);
     }
 
     if (fields.length === 0) return null;
@@ -135,9 +136,9 @@ export const CourseService = {
 
       await connection.commit();
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       await connection.rollback();
-      return { success: false, error: error.message };
+      return { success: false, error: getErrorMessage(error) };
     } finally {
       connection.release();
     }
@@ -177,9 +178,9 @@ export const CourseService = {
 
       await connection.commit();
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       await connection.rollback();
-      return { success: false, error: error.message };
+      return { success: false, error: getErrorMessage(error) };
     } finally {
       connection.release();
     }
@@ -233,9 +234,9 @@ export const CourseService = {
 
       await connection.commit();
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       await connection.rollback();
-      return { success: false, error: error.message };
+      return { success: false, error: getErrorMessage(error) };
     } finally {
       connection.release();
     }
@@ -304,9 +305,9 @@ export const CourseService = {
 
       await connection.commit();
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       await connection.rollback();
-      return { success: false, error: error.message };
+      return { success: false, error: getErrorMessage(error) };
     } finally {
       connection.release();
     }
@@ -323,7 +324,7 @@ export const CourseService = {
     is_published?: boolean;
   }): Promise<{ success: boolean; courseId?: number; error?: string }> {
     try {
-      const [result] = await pool.query<any>(
+      const [result] = await pool.query<ResultSetHeader>(
         `INSERT INTO courses (slug, title, description, difficulty, is_published)
          VALUES (?, ?, ?, ?, ?)`,
         [
@@ -335,8 +336,8 @@ export const CourseService = {
         ],
       );
       return { success: true, courseId: result.insertId };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error) {
+      return { success: false, error: getErrorMessage(error) };
     }
   },
 
@@ -351,7 +352,7 @@ export const CourseService = {
     order_num: number;
   }): Promise<{ success: boolean; topicId?: number; error?: string }> {
     try {
-      const [result] = await pool.query<any>(
+      const [result] = await pool.query<ResultSetHeader>(
         `INSERT INTO topics (course_id, slug, title, description, order_num)
          VALUES (?, ?, ?, ?, ?)`,
         [
@@ -363,8 +364,8 @@ export const CourseService = {
         ],
       );
       return { success: true, topicId: result.insertId };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error) {
+      return { success: false, error: getErrorMessage(error) };
     }
   },
 
@@ -380,7 +381,7 @@ export const CourseService = {
     order_num: number;
   }): Promise<{ success: boolean; lessonId?: string; error?: string }> {
     try {
-      const [result] = await pool.query<any>(
+      const [result] = await pool.query<ResultSetHeader>(
         `INSERT INTO lessons (topic_id, slug, title, description, summary, order_num)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [
@@ -393,8 +394,8 @@ export const CourseService = {
         ],
       );
       return { success: true, lessonId: result.insertId.toString() };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error) {
+      return { success: false, error: getErrorMessage(error) };
     }
   },
 
@@ -411,7 +412,7 @@ export const CourseService = {
     game_type?: string;
   }): Promise<{ success: boolean; gameId?: string; error?: string }> {
     try {
-      const [result] = await pool.query<any>(
+      const [result] = await pool.query<ResultSetHeader>(
         `INSERT INTO games (lesson_id, slug, title, description, order_num, path, game_type)
          VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
@@ -425,8 +426,8 @@ export const CourseService = {
         ],
       );
       return { success: true, gameId: result.insertId.toString() };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error) {
+      return { success: false, error: getErrorMessage(error) };
     }
   },
 };

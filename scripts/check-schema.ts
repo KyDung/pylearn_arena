@@ -1,4 +1,5 @@
 import pool from "../src/lib/db";
+import type { RowDataPacket } from "@/lib/dbTypes";
 
 async function checkSchema() {
   try {
@@ -8,10 +9,10 @@ async function checkSchema() {
     console.log("📋 Users table columns:");
     console.log(columns);
 
-    const [adminRows] = (await pool.query(
+    const [adminRows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM users WHERE username = ?",
       ["admin"],
-    )) as any;
+    );
 
     if (!Array.isArray(adminRows) || adminRows.length === 0) {
       console.log("\n❌ Admin account not found");

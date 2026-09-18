@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { getUser } from "@/lib/auth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+
+import { getErrorMessage } from "@/lib/errors";
 interface Course {
   id: number;
   title: string;
@@ -79,8 +80,8 @@ export default function ClassCoursesPage() {
       alert("Đã thêm khóa học vào lớp!");
       setShowAddModal(false);
       loadData();
-    } catch (err: any) {
-      alert("Lỗi: " + err.message);
+    } catch (err) {
+      alert("Lỗi: " + getErrorMessage(err));
     }
   };
 
@@ -99,8 +100,8 @@ export default function ClassCoursesPage() {
 
       alert("Đã xóa khóa học khỏi lớp!");
       loadData();
-    } catch (err: any) {
-      alert("Lỗi: " + err.message);
+    } catch (err) {
+      alert("Lỗi: " + getErrorMessage(err));
     }
   };
 

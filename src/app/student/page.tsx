@@ -20,16 +20,6 @@ export default function StudentDashboard() {
   const [classCode, setClassCode] = useState("");
   const [joinError, setJoinError] = useState("");
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    setCurrentUser(user);
-    loadData();
-  }, [router]);
-
   const loadData = async () => {
     setLoading(true);
     try {
@@ -51,6 +41,16 @@ export default function StudentDashboard() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    const user = getUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    setCurrentUser(user);
+    loadData();
+  }, [router]);
 
   const handleJoinClass = async (e: React.FormEvent) => {
     e.preventDefault();

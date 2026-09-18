@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
+
+import { getErrorMessage } from "@/lib/errors";
 export default function JoinClassPage() {
   const router = useRouter();
   const [code, setCode] = useState("");
@@ -39,9 +40,9 @@ export default function JoinClassPage() {
       setTimeout(() => {
         router.push("/profile"); // Redirect to profile or classes page
       }, 2000);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Join class error:", err);
-      setError(err.message);
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -150,7 +151,7 @@ export default function JoinClassPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-blue-500 mt-0.5">3.</span>
-                      <span>Nhấn "Tham gia lớp" để hoàn tất</span>
+                      <span>Nhấn “Tham gia lớp” để hoàn tất</span>
                     </li>
                   </ul>
                 </div>
