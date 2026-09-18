@@ -4,6 +4,7 @@ import {
   successResponse,
   errorResponse,
   notFoundResponse,
+  canManageUser,
 } from "@/lib/apiAuth";
 import {
   getUserById,
@@ -25,10 +26,7 @@ export const GET = withAuth(
     if (!targetUser) return notFoundResponse("Không tìm thấy user");
 
     // Teachers can only view their students
-    if (
-      currentUser.role === "teacher" &&
-      targetUser.createdBy !== currentUser.id
-    ) {
+    if (!canManageUser(currentUser, targetUser)) {
       return errorResponse("Không có quyền xem thông tin user này", 403);
     }
 
@@ -47,15 +45,19 @@ export const PUT = withAuth(
     if (!targetUser) return notFoundResponse("Không tìm thấy user");
 
     // Teachers can only edit their students
-    if (
-      currentUser.role === "teacher" &&
-      targetUser.createdBy !== currentUser.id
-    ) {
+    if (!canManageUser(currentUser, targetUser)) {
       return errorResponse("Không có quyền chỉnh sửa user này", 403);
     }
 
     const body = await request.json();
     const { fullName, email, phone, avatar, status, newPassword } = body;
+
+    if (status !== undefined && !["active", "inactive", "suspended"].includes(status)) {
+      return errorResponse("Trạng thái tài khoản không hợp lệ");
+    }
+    if (userId === currentUser.id && status !== undefined && status !== "active") {
+      return errorResponse("Không thể tự khóa tài khoản của mình", 403);
+    }
 
     // Update user info
     const updated = await updateUser(userId, {
@@ -91,10 +93,7 @@ export const DELETE = withAuth(
     }
 
     // Teachers can only delete their students
-    if (
-      currentUser.role === "teacher" &&
-      targetUser.createdBy !== currentUser.id
-    ) {
+    if (!canManageUser(currentUser, targetUser)) {
       return errorResponse("Không có quyền xóa user này", 403);
     }
 
@@ -135,11 +134,18 @@ export const PATCH = withAuth(
     const targetUser = await getUserById(userId);
     if (!targetUser) return notFoundResponse("Không tìm thấy user");
 
+    if (!canManageUser(currentUser, targetUser)) {
+      return errorResponse("Không có quyền quản lý user này", 403);
+    }
+
     const body = await request.json();
     const { action } = body;
 
     switch (action) {
       case "suspend":
+        if (userId === currentUser.id) {
+          return errorResponse("Không thể tự khóa tài khoản của mình", 403);
+        }
         await suspendUser(userId);
         return successResponse(null, "Đã khóa tài khoản");
 

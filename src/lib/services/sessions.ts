@@ -3,6 +3,7 @@
  */
 import pool from "@/lib/db";
 import { RowDataPacket, ResultSetHeader } from "@/lib/dbTypes";
+import { sessionAcceptingSql } from "@/lib/sessionPolicy";
 
 export interface Session {
   id: number;
@@ -78,7 +79,7 @@ export const SessionService = {
     filters: SessionFilters,
   ): Promise<{ items: SessionWithDetails[]; total: number }> {
     const conditions: string[] = ["1=1"];
-    const params: any[] = [];
+    const params: (string | number)[] = [];
 
     if (filters.class_id) {
       conditions.push("s.class_id = ?");
@@ -174,10 +175,10 @@ export const SessionService = {
    */
   async isSessionActive(id: number): Promise<boolean> {
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT status FROM sessions WHERE id = ?`,
+      `SELECT s.id FROM sessions s WHERE s.id = ? AND ${sessionAcceptingSql("s")}`,
       [id],
     );
-    return rows.length > 0 && rows[0].status === "active";
+    return rows.length > 0;
   },
 
   /**
@@ -217,9 +218,8 @@ export const SessionService = {
        INNER JOIN class_members cm ON c.id = cm.class_id
        LEFT JOIN games g ON s.game_id = g.id
        LEFT JOIN users u ON s.created_by = u.id
-       WHERE cm.user_id = ? AND cm.status = 'active' AND s.status = 'active'
-         AND (s.duration_minutes IS NULL OR
-              FLOOR(EXTRACT(EPOCH FROM (NOW() - s.started_at)) / 60) < s.duration_minutes)
+       WHERE cm.user_id = ? AND cm.status = 'active'
+         AND ${sessionAcceptingSql("s")}
        ORDER BY s.created_at DESC`,
       [userId, userId],
     );

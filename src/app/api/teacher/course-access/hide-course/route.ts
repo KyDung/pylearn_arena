@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import pool from "@/lib/db";
+import { canManageClassById } from "@/lib/classAccess";
 
 // POST /api/teacher/course-access/hide-course - Ẩn khóa học khỏi lớp
 export const POST = withAuth(
@@ -13,6 +14,10 @@ export const POST = withAuth(
 
       if (!classId || !courseId) {
         return errorResponse("Missing classId or courseId", 400);
+      }
+
+      if (!await canManageClassById(user, Number(classId))) {
+        return errorResponse("Không có quyền quản lý lớp này", 403);
       }
 
       // Xóa course_access để ẩn khóa học
@@ -28,8 +33,9 @@ export const POST = withAuth(
       );
 
       return successResponse({ classId, courseId }, "Đã ẩn khóa học khỏi lớp");
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      console.error("Hide course error:", error);
+      return errorResponse("Không thể ẩn khóa học", 500);
     }
   },
   ["admin", "teacher"],

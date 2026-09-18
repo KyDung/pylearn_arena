@@ -21,6 +21,11 @@ interface UserRow extends RowDataPacket {
   full_name: string | null;
   email: string | null;
   role: UserRole;
+  status: UserStatus | "banned";
+  created_by: number | null;
+  phone: string | null;
+  avatar: string | null;
+  last_login: Date | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -31,7 +36,11 @@ const mapUserRow = (row: UserRow): User => ({
   fullName: row.full_name ?? undefined,
   email: row.email ?? undefined,
   role: row.role,
-  status: "active", // Default since column doesn't exist
+  status: row.status === "banned" ? "suspended" : row.status,
+  createdBy: row.created_by ?? undefined,
+  phone: row.phone ?? undefined,
+  avatar: row.avatar ?? undefined,
+  lastLogin: row.last_login ?? undefined,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -79,7 +88,7 @@ export async function getUserWithPassword(
 
 export interface UserFilters {
   role?: UserRole;
-  status?: UserStatus;
+  status?: UserStatus | "banned";
   createdBy?: number;
   search?: string;
   page?: number;
@@ -89,7 +98,11 @@ export interface UserFilters {
 export async function getUsers(
   filters: UserFilters = {},
 ): Promise<PaginatedResponse<User>> {
-  const { role, search, page = 1, pageSize = 20 } = filters;
+  const { role, status, createdBy, search } = filters;
+  const page = Number.isSafeInteger(filters.page) && filters.page! > 0 ? filters.page! : 1;
+  const pageSize = Number.isSafeInteger(filters.pageSize) && filters.pageSize! > 0
+    ? Math.min(filters.pageSize!, 1000)
+    : 20;
 
   let query = "SELECT * FROM users WHERE 1=1";
   let countQuery = "SELECT COUNT(*) as total FROM users WHERE 1=1";
@@ -101,6 +114,23 @@ export async function getUsers(
     countQuery += " AND role = ?";
     params.push(role);
     countParams.push(role);
+  }
+
+  if (status) {
+    const locked = status === "suspended" || status === "banned";
+    const condition = locked ? " AND status IN (?, ?)" : " AND status = ?";
+    const statuses = locked ? ["suspended", "banned"] : [status];
+    query += condition;
+    countQuery += condition;
+    params.push(...statuses);
+    countParams.push(...statuses);
+  }
+
+  if (createdBy !== undefined) {
+    query += " AND created_by = ?";
+    countQuery += " AND created_by = ?";
+    params.push(createdBy);
+    countParams.push(createdBy);
   }
 
   if (search) {
@@ -139,15 +169,15 @@ export async function getUsers(
 // ============================================================
 
 export async function createUser(input: UserCreateInput): Promise<User> {
-  const { username, password, fullName, email, role } = input;
+  const { username, password, fullName, email, role, phone, createdBy } = input;
 
   // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const [result] = await pool.query<ResultSetHeader>(
-    `INSERT INTO users (username, password, full_name, email, role)
-     VALUES (?, ?, ?, ?, ?)`,
-    [username, hashedPassword, fullName, email, role],
+    `INSERT INTO users (username, password, full_name, email, role, phone, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [username, hashedPassword, fullName ?? null, email ?? null, role, phone ?? null, createdBy ?? null],
   );
 
   const user = await getUserById(result.insertId);
@@ -227,6 +257,7 @@ export async function verifyPassword(
 
   const isValid = await bcrypt.compare(password, user.password);
   if (!isValid) return null;
+  if (user.status !== "active") return null;
 
   // Update last login
   await pool.query("UPDATE users SET last_login = NOW() WHERE id = ?", [
@@ -234,8 +265,9 @@ export async function verifyPassword(
   ]);
 
   // Remove password from returned user
-  const { password: _, ...userWithoutPassword } = user;
-  return userWithoutPassword;
+  const publicUser: User = { ...user };
+  delete publicUser.password;
+  return publicUser;
 }
 
 // ============================================================
@@ -291,9 +323,9 @@ export async function hardDeleteUser(id: number): Promise<boolean> {
     for (const table of tablesToClean) {
       try {
         await connection.query(`DELETE FROM ${table} WHERE user_id = ?`, [id]);
-      } catch (err: any) {
+      } catch (err) {
         // Ignore "table doesn't exist" errors, but log others
-        if (!err.message?.includes("doesn't exist")) {
+        if (err instanceof Error && !err.message.includes("doesn't exist")) {
           console.warn(`Warning cleaning ${table}:`, err.message);
         }
       }
@@ -389,7 +421,8 @@ export async function getUserStats(): Promise<{
     suspended: 0,
   };
   for (const row of statusStats) {
-    byStatus[row.status as UserStatus] = row.count;
+    const status = row.status === "banned" ? "suspended" : row.status as UserStatus;
+    if (status in byStatus) byStatus[status as UserStatus] += Number(row.count);
   }
 
   return {
@@ -422,19 +455,20 @@ export async function bulkCreateUsers(
       const hashedPassword = await bcrypt.hash(user.password, 10);
 
       await pool.query(
-        `INSERT INTO users (username, password, full_name, email, role)
-         VALUES (?, ?, ?, ?, ?)`,
-        [user.username, hashedPassword, user.fullName, user.email, user.role],
+        `INSERT INTO users (username, password, full_name, email, role, created_by)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [user.username, hashedPassword, user.fullName ?? null, user.email ?? null, user.role, createdBy],
       );
 
       success++;
-    } catch (error: any) {
+    } catch (error) {
       failed++;
       let errorMsg = "Lỗi không xác định";
 
-      if (error.code === "ER_DUP_ENTRY") {
+      if (error instanceof Error && "code" in error &&
+          (error.code === "ER_DUP_ENTRY" || error.code === "23505")) {
         errorMsg = "Username đã tồn tại";
-      } else if (error.message) {
+      } else if (error instanceof Error) {
         errorMsg = error.message;
       }
 

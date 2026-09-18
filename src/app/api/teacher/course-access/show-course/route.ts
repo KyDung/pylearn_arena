@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import pool from "@/lib/db";
+import { canManageClassById } from "@/lib/classAccess";
 
 // POST /api/teacher/course-access/show-course - Hiện khóa học cho lớp
 export const POST = withAuth(
@@ -15,6 +16,10 @@ export const POST = withAuth(
         return errorResponse("Missing classId or courseId", 400);
       }
 
+      if (!await canManageClassById(user, Number(classId))) {
+        return errorResponse("Không có quyền quản lý lớp này", 403);
+      }
+
       // Tạo course_access để hiện khóa học
       await pool.query(
         `INSERT INTO course_access (class_id, course_id, granted_at)
@@ -26,8 +31,9 @@ export const POST = withAuth(
       );
 
       return successResponse({ classId, courseId }, "Đã hiện khóa học cho lớp");
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      console.error("Show course error:", error);
+      return errorResponse("Không thể hiện khóa học", 500);
     }
   },
   ["admin", "teacher"],

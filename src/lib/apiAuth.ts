@@ -1,33 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
 import type { UserRole, User, ApiResponse } from "@/types";
 import { getUserById } from "@/lib/services/users";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET || "pylearn-secret-key-change-in-production";
-
-// ============================================================
-// JWT TOKEN HELPERS
-// ============================================================
-
-export interface TokenPayload {
-  userId: number;
-  username: string;
-  role: UserRole;
-}
-
-export function createToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
-}
-
-export function verifyToken(token: string): TokenPayload | null {
-  try {
-    return jwt.verify(token, JWT_SECRET) as TokenPayload;
-  } catch {
-    return null;
-  }
-}
+import { verifyToken } from "@/lib/authToken";
+export { createToken, verifyToken } from "@/lib/authToken";
+export type { TokenPayload } from "@/lib/authToken";
 
 // ============================================================
 // GET CURRENT USER FROM REQUEST
@@ -38,25 +16,17 @@ export async function getCurrentUser(
 ): Promise<User | null> {
   // Try to get token from cookie
   const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-
-  if (!token) {
-    // Try Authorization header
-    const authHeader = request.headers.get("Authorization");
-    if (authHeader?.startsWith("Bearer ")) {
-      const bearerToken = authHeader.slice(7);
-      const payload = verifyToken(bearerToken);
-      if (payload) {
-        return getUserById(payload.userId);
-      }
-    }
-    return null;
-  }
+  const authHeader = request.headers.get("Authorization");
+  const token = cookieStore.get("auth-token")?.value ||
+    (authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : undefined);
+  if (!token) return null;
 
   const payload = verifyToken(token);
   if (!payload) return null;
 
-  return getUserById(payload.userId);
+  const user = await getUserById(payload.userId);
+  // Also protects local authoring routes which call getCurrentUser directly.
+  return user?.status === "active" ? user : null;
 }
 
 // ============================================================
@@ -75,11 +45,10 @@ export function checkRole(userRole: UserRole, required: RoleCheck): boolean {
 // API ROUTE WRAPPER WITH AUTH
 // ============================================================
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ApiHandler = (
   request: NextRequest,
   context: { params?: Record<string, string>; user: User },
-) => Promise<NextResponse<ApiResponse<any>>>;
+) => Promise<NextResponse>;
 
 export function withAuth(
   handler: ApiHandler,
@@ -88,42 +57,29 @@ export function withAuth(
   return async (
     request: NextRequest,
     context: { params?: Promise<Record<string, string>> },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<NextResponse<ApiResponse<any>>> => {
-    const user = await getCurrentUser(request);
-
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Chưa đăng nhập" },
-        { status: 401 },
-      );
-    }
-
-    if (user.status !== "active") {
-      return NextResponse.json(
-        { success: false, error: "Tài khoản đã bị khóa" },
-        { status: 403 },
-      );
-    }
-
-    if (!checkRole(user.role, requiredRole)) {
-      return NextResponse.json(
-        { success: false, error: "Không có quyền truy cập" },
-        { status: 403 },
-      );
-    }
-
-    // Await params if it's a Promise
-    const params = context.params ? await context.params : undefined;
-
+  ): Promise<NextResponse> => {
     try {
+      const user = await getCurrentUser(request);
+      if (!user) {
+        return NextResponse.json(
+          { success: false, error: "Chưa đăng nhập hoặc tài khoản đã bị khóa" },
+          { status: 401 },
+        );
+      }
+      if (!checkRole(user.role, requiredRole)) {
+        return NextResponse.json(
+          { success: false, error: "Không có quyền truy cập" },
+          { status: 403 },
+        );
+      }
+      const params = context.params ? await context.params : undefined;
       return await handler(request, { params, user });
     } catch (error) {
       console.error("API Error:", error);
       return NextResponse.json(
         {
           success: false,
-          error: error instanceof Error ? error.message : "Lỗi server",
+          error: "Lỗi server",
         },
         { status: 500 },
       );
@@ -163,6 +119,13 @@ export function canManageClass(user: User, classTeacherId: number): boolean {
   if (user.role === "admin") return true;
   if (user.role === "teacher" && user.id === classTeacherId) return true;
   return false;
+}
+
+export function canManageUser(actor: User, target: User): boolean {
+  return actor.role === "admin" || (
+    actor.role === "teacher" && target.role === "student" &&
+    target.createdBy === actor.id
+  );
 }
 
 export function canViewSubmission(

@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useState, useRef } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { createPortal } from "react-dom";
-import courses from "@/data/courses.json";
-import type { Course, User } from "@/types";
+import type { User } from "@/types";
 import { getUser } from "@/lib/auth";
+import { findPlaySession } from "@/lib/playSession";
 
 const SESSION_SUBMIT_EVENT = "pylearn:submit-session";
 const SESSION_SUBMIT_STATE_EVENT = "pylearn:session-submit-state";
@@ -32,6 +32,14 @@ interface ActiveSession {
   game_title: string;
   started_at: string;
   duration_minutes: number;
+  game_path?: string;
+  has_submitted?: boolean;
+}
+
+interface GameInfo {
+  game: { id: number; title: string; path: string };
+  lesson: { id: number; title: string };
+  course: { slug: string; title: string };
 }
 
 interface SessionGameInstance {
@@ -68,7 +76,6 @@ function SessionSubmitPortal({
 
   useEffect(() => {
     if (!active) {
-      setMountNode(null);
       return;
     }
 
@@ -159,106 +166,101 @@ function PlayContent() {
   const pathParam = searchParams.get("path");
   const sessionIdParam = searchParams.get("sessionId");
   const isSessionMode = sessionIdParam !== null;
+  const contextKey = JSON.stringify([pathParam, sessionIdParam]);
+  const [loadedContextKey, setLoadedContextKey] = useState<string | null>(null);
+  const [sessionError, setSessionError] = useState<string | null>(null);
   const [effectivePathParam, setEffectivePathParam] = useState<string | null>(
-    pathParam,
+    isSessionMode ? null : pathParam,
   );
 
   // Fetch game info from database instead of courses.json
-  const [gameInfo, setGameInfo] = useState<any>(null);
-  const [gameInfoLoading, setGameInfoLoading] = useState(true);
+  const [gameInfo, setGameInfo] = useState<GameInfo | null>(null);
+  const [loadedGamePath, setLoadedGamePath] = useState<string | null>(null);
 
   useEffect(() => {
     const currentUser = getUser();
     if (!currentUser) {
-      const redirect = pathParam
-        ? `/login?next=play&path=${encodeURIComponent(pathParam)}`
-        : "/login";
-      router.push(redirect);
+      const params = new URLSearchParams({ next: "play" });
+      if (pathParam) params.set("path", pathParam);
+      if (sessionIdParam) params.set("sessionId", sessionIdParam);
+      router.push(`/login?${params}`);
     } else {
       setUser(currentUser);
       setLoading(false);
     }
-  }, [router, pathParam]);
+  }, [router, pathParam, sessionIdParam]);
 
   // Fetch active sessions for student
   useEffect(() => {
     if (!user) return;
+    let cancelled = false;
 
     const fetchActiveSessions = async () => {
       try {
         const res = await fetch("/api/student/sessions/active");
         const data = await res.json();
-        if (data.success && data.data) {
-          const sessions: ActiveSession[] = data.data;
-
-          if (sessionIdParam) {
-            // Find specific session by ID
-            const session = sessions.find(
-              (s) => s.id === parseInt(sessionIdParam),
-            );
-            if (session) {
-              setActiveSession(session);
-              setHasAlreadySubmitted(!!(session as any).has_submitted);
-              // Dùng game_path từ session
-              if ((session as any).game_path) {
-                setEffectivePathParam((session as any).game_path);
-              }
-              return;
-            }
-          }
-
-          if (pathParam && sessions.length > 0) {
-            // Find session for this game path
-            const session = sessions.find(
-              (s) => (s as any).game_path === pathParam,
-            );
-            if (session) {
-              setActiveSession(session);
-              setHasAlreadySubmitted(!!(session as any).has_submitted);
-            } else if (sessions.length > 0) {
-              // Set first available session as fallback
-              setActiveSession(sessions[0]);
-              setHasAlreadySubmitted(!!(sessions[0] as any).has_submitted);
-            }
-          }
+        if (cancelled) return;
+        const sessions: ActiveSession[] = data.success && Array.isArray(data.data) ? data.data : [];
+        const session = findPlaySession(sessions, sessionIdParam, pathParam);
+        setActiveSession(session);
+        setHasAlreadySubmitted(!!session?.has_submitted);
+        setSubmitSuccess(false);
+        setSubmitError(null);
+        setEffectivePathParam(sessionIdParam !== null ? session?.game_path ?? null : pathParam);
+        setSessionError(sessionIdParam !== null && (!session || !session.game_path)
+          ? "Phiên không tồn tại, đã hết giờ hoặc bạn không có quyền tham gia."
+          : null);
+        if (!res.ok && sessionIdParam !== null) {
+          setSessionError(data.error || "Không thể tải phiên làm bài.");
         }
       } catch (error) {
         console.error("Error fetching active sessions:", error);
+        if (!cancelled) {
+          setActiveSession(null);
+          setEffectivePathParam(pathParam);
+          setSessionError("Không thể tải phiên làm bài. Vui lòng tải lại trang.");
+        }
+      } finally {
+        if (!cancelled) setLoadedContextKey(contextKey);
       }
     };
 
     fetchActiveSessions();
-  }, [user, pathParam, sessionIdParam]);
+    return () => { cancelled = true; };
+  }, [user, pathParam, sessionIdParam, contextKey]);
 
   // Fetch game info from API
   useEffect(() => {
     if (!effectivePathParam) return;
+    let cancelled = false;
 
     const fetchGameInfo = async () => {
       try {
-        setGameInfoLoading(true);
         const res = await fetch(
           `/api/games/info?path=${encodeURIComponent(effectivePathParam)}`,
         );
         const data = await res.json();
-
+        if (cancelled) return;
         if (data.success && data.data) {
           setGameInfo(data.data);
         } else {
+          setGameInfo(null);
           console.error("Failed to fetch game info:", data.error);
         }
       } catch (error) {
         console.error("Error fetching game info:", error);
+        if (!cancelled) setGameInfo(null);
       } finally {
-        setGameInfoLoading(false);
+        if (!cancelled) setLoadedGamePath(effectivePathParam);
       }
     };
 
     fetchGameInfo();
+    return () => { cancelled = true; };
   }, [effectivePathParam]);
 
-  const handleSubmitCode = async () => {
-    if (!activeSession) return;
+  const handleSubmitCode = useCallback(async () => {
+    if (!activeSession || loadedContextKey !== contextKey) return;
     if (submitting || hasAlreadySubmitted) return;
 
     const gameInstance = (
@@ -360,6 +362,7 @@ function PlayContent() {
         setSubmitSuccess(true);
         setHasAlreadySubmitted(true);
       } else {
+        if (res.status === 409) setHasAlreadySubmitted(true);
         setSubmitError(data.error || "Có lỗi xảy ra khi nộp bài");
       }
     } catch (error) {
@@ -368,7 +371,7 @@ function PlayContent() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [activeSession, loadedContextKey, contextKey, submitting, hasAlreadySubmitted]);
 
   useEffect(() => {
     if (!isSessionMode) return;
@@ -405,7 +408,20 @@ function PlayContent() {
     );
   }
 
-  if (gameInfoLoading) {
+  if (isSessionMode && loadedContextKey !== contextKey) {
+    return <main className="flex-1 p-8 text-center">Đang tải phiên làm bài...</main>;
+  }
+
+  if (isSessionMode && sessionError) {
+    return (
+      <main className="flex-1 p-8 text-center">
+        <p className="text-red-700 mb-4">{sessionError}</p>
+        <Link href="/student/sessions" className="text-blue-600 underline">Quay lại danh sách phiên</Link>
+      </main>
+    );
+  }
+
+  if (effectivePathParam && loadedGamePath !== effectivePathParam) {
     return (
       <main className="flex-1 flex items-center justify-center">
         <div className="text-center">
@@ -504,13 +520,14 @@ function PlayContent() {
           )}
 
           <PlayGameContent
+            key={effectivePathParam}
             pathParam={effectivePathParam}
             sessionMode={isSessionMode}
             sessionSubmitted={hasAlreadySubmitted}
             sessionSubmitting={submitting}
           />
           <SessionSubmitPortal
-            active={!!activeSession}
+            active={!!activeSession && loadedContextKey === contextKey}
             submitting={submitting}
             submitted={hasAlreadySubmitted}
             pathKey={effectivePathParam}

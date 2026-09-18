@@ -14,7 +14,8 @@ interface ActiveSession {
   game_title: string;
   game_path: string;
   started_at: string;
-  duration_minutes: number;
+  duration_minutes: number | null;
+  auto_close?: boolean;
   remaining_minutes?: number;
 }
 
@@ -175,7 +176,9 @@ export default function StudentSessionsPage() {
                     <p>
                       <span className="font-medium">Thời gian còn lại:</span>{" "}
                       <span className="text-red-600 font-medium">
-                        {formatTimeRemaining(session.remaining_minutes)}
+                          {session.auto_close === false || session.duration_minutes === null
+                            ? "Đến khi giáo viên đóng phiên"
+                            : formatTimeRemaining(session.remaining_minutes)}
                       </span>
                     </p>
                     {session.description && (
@@ -188,14 +191,14 @@ export default function StudentSessionsPage() {
 
                   <button
                     onClick={() => joinSession(session)}
-                    disabled={
-                      !session.remaining_minutes ||
-                      session.remaining_minutes <= 0
+                      disabled={
+                        session.auto_close !== false && session.duration_minutes !== null &&
+                        (!session.remaining_minutes || session.remaining_minutes <= 0)
                     }
                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                   >
-                    {!session.remaining_minutes ||
-                    session.remaining_minutes <= 0
+                      {session.auto_close !== false && session.duration_minutes !== null &&
+                      (!session.remaining_minutes || session.remaining_minutes <= 0)
                       ? "Đã hết hạn"
                       : "Tham gia ngay"}
                   </button>

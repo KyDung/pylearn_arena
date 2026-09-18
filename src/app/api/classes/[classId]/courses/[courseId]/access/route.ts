@@ -59,7 +59,7 @@ export const GET = withAuth(
 
     const lessonsWithStatus = allLessons.map((lesson) => {
       const access = accessList.find(
-        (a) => a.content_type === "lesson" && a.content_id === lesson.id,
+        (a) => a.content_type === "lesson" && String(a.content_id) === String(lesson.id),
       );
       return {
         ...lesson,
@@ -98,6 +98,16 @@ export const POST = withAuth(
 
     if (!action || !contentType) {
       return errorResponse("Missing action or contentType");
+    }
+
+    if (!["topic", "lesson"].includes(contentType)) {
+      return errorResponse("Invalid content type");
+    }
+    if (contentIds !== undefined && (
+      !Array.isArray(contentIds) || contentIds.length > 1000 ||
+      contentIds.some((id: unknown) => !Number.isSafeInteger(Number(id)) || Number(id) <= 0)
+    )) {
+      return errorResponse("Invalid content IDs");
     }
 
     if (action === "unlock") {

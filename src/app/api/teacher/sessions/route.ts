@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import SessionService from "@/lib/services/sessions";
 import type { SessionFilters } from "@/lib/services/sessions";
+import { canManageClassById } from "@/lib/classAccess";
 
 // GET /api/teacher/sessions - Lấy danh sách sessions
 export const GET = withAuth(
@@ -61,21 +62,20 @@ export const POST = withAuth(
       const body = await request.json();
       const { class_id, game_id, title, description, duration_minutes } = body;
 
-      if (!class_id || !game_id || !title) {
+      if (!Number.isSafeInteger(Number(class_id)) || Number(class_id) <= 0 ||
+          !Number.isSafeInteger(Number(game_id)) || Number(game_id) <= 0 ||
+          typeof title !== "string" || !title.trim()) {
         return errorResponse("Missing required fields", 400);
       }
 
-      // Check if teacher owns this class (admin skip)
-      if (user.role === "teacher") {
-        const [rows]: any = await (
-          await import("@/lib/db")
-        ).default.query(
-          "SELECT id FROM classes WHERE id = ? AND teacher_id = ?",
-          [class_id, user.id],
-        );
-        if (rows.length === 0) {
-          return errorResponse("You don't have permission for this class", 403);
-        }
+      if (duration_minutes !== undefined && (
+        !Number.isSafeInteger(Number(duration_minutes)) || Number(duration_minutes) <= 0
+      )) {
+        return errorResponse("Thời lượng phải là số phút nguyên dương", 400);
+      }
+
+      if (!await canManageClassById(user, Number(class_id))) {
+        return errorResponse("You don't have permission for this class", 403);
       }
 
       const sessionId = await SessionService.createSession({
@@ -90,8 +90,9 @@ export const POST = withAuth(
       });
 
       return successResponse({ sessionId }, "Session created successfully");
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      console.error("Create session error:", error);
+      return errorResponse("Không thể tạo phiên làm bài", 500);
     }
   },
   ["admin", "teacher"],

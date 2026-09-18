@@ -10,7 +10,7 @@ interface User {
   fullName: string | null;
   email: string | null;
   role: "student" | "teacher" | "admin";
-  status: "active" | "inactive" | "banned";
+  status: "active" | "inactive" | "suspended";
   createdAt: string;
   classIds?: number[];
   classNames?: string[];
@@ -653,7 +653,7 @@ export default function AccountsManagementPage() {
                 <option value="all">Tất cả trạng thái</option>
                 <option value="active">Hoạt động</option>
                 <option value="inactive">Không hoạt động</option>
-                <option value="banned">Bị khóa</option>
+                <option value="suspended">Bị khóa</option>
               </select>
             </div>
 
@@ -829,14 +829,14 @@ export default function AccountsManagementPage() {
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
                             user.status === "active"
                               ? "bg-green-100 text-green-800"
-                              : user.status === "banned"
+                              : user.status === "suspended"
                                 ? "bg-red-100 text-red-800"
                                 : "bg-gray-100 text-gray-800"
                           }`}
                         >
                           {user.status === "active"
                             ? "Hoạt động"
-                            : user.status === "banned"
+                            : user.status === "suspended"
                               ? "Bị khóa"
                               : "Không hoạt động"}
                         </span>

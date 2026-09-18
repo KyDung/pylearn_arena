@@ -8,6 +8,7 @@ import {
 } from "@/lib/services/courseAccess";
 import pool from "@/lib/db";
 import { RowDataPacket } from "@/lib/dbTypes";
+import { canManageClassById } from "@/lib/classAccess";
 
 // GET /api/teacher/course-access - Lấy danh sách lớp và quyền truy cập
 export const GET = withAuth(
@@ -19,6 +20,9 @@ export const GET = withAuth(
 
       // Nếu có classId và courseId, lấy chi tiết content access
       if (classId && courseId) {
+        if (!await canManageClassById(context.user, Number(classId))) {
+          return errorResponse("Không có quyền quản lý lớp này", 403);
+        }
         const access = await getClassCourseAccess(
           parseInt(classId),
           parseInt(courseId),
@@ -49,8 +53,9 @@ export const GET = withAuth(
       );
 
       return successResponse({ classes });
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      console.error("Get course access error:", error);
+      return errorResponse("Không thể tải quyền truy cập", 500);
     }
   },
   ["admin", "teacher"],
@@ -72,14 +77,19 @@ export const POST = withAuth(
         return errorResponse("Invalid content type", 400);
       }
 
+      if (!await canManageClassById(user, Number(classId))) {
+        return errorResponse("Không có quyền quản lý lớp này", 403);
+      }
+
       await unlockContent(classId, courseId, contentType, contentId, user.id);
 
       return successResponse(
         { classId, courseId, contentType, contentId },
         `${contentType} has been unlocked for the class`,
       );
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      console.error("Unlock content error:", error);
+      return errorResponse("Không thể mở khóa nội dung", 500);
     }
   },
   ["admin", "teacher"],
@@ -96,14 +106,22 @@ export const DELETE = withAuth(
         return errorResponse("Missing required fields", 400);
       }
 
+      if (!["topic", "lesson"].includes(contentType)) {
+        return errorResponse("Invalid content type", 400);
+      }
+      if (!await canManageClassById(context.user, Number(classId))) {
+        return errorResponse("Không có quyền quản lý lớp này", 403);
+      }
+
       await lockContent(classId, courseId, contentType, contentId);
 
       return successResponse(
         { classId, courseId, contentType, contentId },
         `${contentType} has been locked for the class`,
       );
-    } catch (error: any) {
-      return errorResponse(error.message, 500);
+    } catch (error) {
+      console.error("Lock content error:", error);
+      return errorResponse("Không thể khóa nội dung", 500);
     }
   },
   ["admin", "teacher"],

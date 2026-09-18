@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/apiAuth";
 
 // GET - Lấy tiến độ học tập của user
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const authToken = cookieStore.get("auth-token");
-
-    if (!authToken) {
+    const user = await getCurrentUser(request);
+    if (!user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 },
       );
     }
 
-    const user = JSON.parse(authToken.value);
     const { searchParams } = new URL(request.url);
     const courseId = searchParams.get("courseId");
 
@@ -27,7 +24,7 @@ export async function GET(request: NextRequest) {
       INNER JOIN lessons l ON g.lesson_id = l.id
       WHERE up.user_id = ?
     `;
-    const params: any[] = [user.id];
+    const params: (number | string)[] = [user.id];
 
     if (courseId) {
       query += ` AND l.topic_id IN (

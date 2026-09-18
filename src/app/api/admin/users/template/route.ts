@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/apiAuth";
 
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth-token")?.value;
-
-  if (!authToken) {
-    return NextResponse.json({ error: "Chưa đăng nhập" }, { status: 401 });
-  }
-
   try {
-    const user = JSON.parse(authToken);
-    if (!user || (user.role !== "admin" && user.role !== "teacher")) {
+    const user = await getCurrentUser(request);
+    if (!user) {
+      return NextResponse.json({ error: "Chưa đăng nhập" }, { status: 401 });
+    }
+    if (user.role !== "admin" && user.role !== "teacher") {
       return NextResponse.json({ error: "Không có quyền" }, { status: 403 });
     }
   } catch {
-    return NextResponse.json({ error: "Token không hợp lệ" }, { status: 401 });
+    return NextResponse.json({ error: "Lỗi server" }, { status: 500 });
   }
 
   const { searchParams } = new URL(request.url);

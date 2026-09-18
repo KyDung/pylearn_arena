@@ -1,21 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/apiAuth";
+import type { ResultSetHeader } from "@/lib/dbTypes";
 
 // POST - Nộp bài
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const authToken = cookieStore.get("auth-token");
-
-    if (!authToken) {
+    const user = await getCurrentUser(request);
+    if (!user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 },
       );
     }
 
-    const user = JSON.parse(authToken.value);
     const { gameId, code, status, score } = await request.json();
 
     if (!gameId || !code) {
@@ -26,11 +24,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert submission
-    const [result] = (await pool.query(
+    const [result] = await pool.query<ResultSetHeader>(
       `INSERT INTO submissions (user_id, game_id, code, status, score) 
        VALUES (?, ?, ?, ?, ?)`,
       [user.id, gameId, code, status || "completed", score || 0],
-    )) as any;
+    );
 
     // Update user progress
     const isCompleted = status === "completed";
@@ -65,17 +63,14 @@ export async function POST(request: NextRequest) {
 // GET - Lấy danh sách submissions
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const authToken = cookieStore.get("auth-token");
-
-    if (!authToken) {
+    const user = await getCurrentUser(request);
+    if (!user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 },
       );
     }
 
-    const user = JSON.parse(authToken.value);
     const { searchParams } = new URL(request.url);
     const gameId = searchParams.get("gameId");
 
@@ -86,7 +81,7 @@ export async function GET(request: NextRequest) {
       INNER JOIN games g ON s.game_id = g.id
       WHERE s.user_id = ?
     `;
-    const params: any[] = [user.id];
+    const params: (number | string)[] = [user.id];
 
     if (gameId) {
       query += " AND s.game_id = ?";

@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import type { User } from "@/types";
 import ContestService from "@/lib/services/contests-new";
+import type { ContestFilters } from "@/lib/services/contests-new";
+import { canManageClassById } from "@/lib/classAccess";
 
 // GET /api/teacher/contests - Lấy danh sách contests
 export const GET = withAuth(
@@ -22,10 +24,15 @@ export const GET = withAuth(
       const page = parseInt(searchParams.get("page") || "1");
       const pageSize = parseInt(searchParams.get("pageSize") || "20");
 
-      const filters: any = { page, pageSize };
+      const filters: ContestFilters = { page, pageSize };
 
       if (class_id) filters.class_id = parseInt(class_id);
-      if (status) filters.status = status;
+      if (status) {
+        if (!["draft", "published", "ongoing", "ended", "archived"].includes(status)) {
+          return errorResponse("Invalid contest status", 400);
+        }
+        filters.status = status as ContestFilters["status"];
+      }
 
       // Teacher chỉ thấy contests của mình
       if (user.role === "teacher") {
@@ -78,11 +85,15 @@ export const POST = withAuth(
         return errorResponse("Missing required fields", 400);
       }
 
+      if (!await canManageClassById(user, Number(class_id))) {
+        return errorResponse("Không có quyền quản lý lớp này", 403);
+      }
+
       // Validate dates
       const startDate = new Date(start_time);
       const endDate = new Date(end_time);
 
-      if (startDate >= endDate) {
+      if (!Number.isFinite(startDate.getTime()) || !Number.isFinite(endDate.getTime()) || startDate >= endDate) {
         return errorResponse("Start time must be before end time", 400);
       }
 

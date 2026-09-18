@@ -1,36 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import pool from "@/lib/db";
-
-const JWT_SECRET =
-  process.env.JWT_SECRET || "pylearn-secret-key-change-in-production";
+import { createToken } from "@/lib/authToken";
+import { getUserWithPassword } from "@/lib/services/users";
 
 export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json();
 
-    if (!username || !password) {
+    if (typeof username !== "string" || typeof password !== "string" || !username || !password) {
       return NextResponse.json(
         { error: "Username và password là bắt buộc" },
         { status: 400 },
       );
     }
 
-    // Query user từ database
-    const [rows] = (await pool.query(
-      "SELECT id, username, password, full_name, email, role FROM users WHERE username = ?",
-      [username],
-    )) as any;
-
-    if (!Array.isArray(rows) || rows.length === 0) {
+    const user = await getUserWithPassword(username);
+    if (!user) {
       return NextResponse.json(
         { error: "Tên đăng nhập hoặc mật khẩu không đúng" },
         { status: 401 },
       );
     }
-
-    const user = rows[0];
 
     // Verify password
     const isValidPassword = await bcrypt.compare(password, user.password);
@@ -42,20 +32,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (user.status !== "active") {
+      return NextResponse.json({ error: "Tài khoản đã bị khóa" }, { status: 403 });
+    }
+
     // Tạo response với user info (không trả password)
     const userInfo = {
       id: user.id,
       username: user.username,
-      fullName: user.full_name,
+      fullName: user.fullName,
       email: user.email,
       role: user.role,
+      status: user.status,
     };
 
     // Create JWT token
-    const token = jwt.sign(
+    const token = createToken(
       { userId: user.id, username: user.username, role: user.role },
-      JWT_SECRET,
-      { expiresIn: "7d" },
     );
 
     // Tạo response và set cookie
@@ -70,6 +63,7 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
     });
 
     // Also set user info cookie for client-side access
@@ -78,6 +72,7 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
     });
 
     return response;

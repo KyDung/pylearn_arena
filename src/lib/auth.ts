@@ -2,6 +2,7 @@ import type { User } from "@/types";
 
 const STORAGE_KEY = "pylearn-user";
 const AUTH_CHANGE_EVENT = "pylearn-auth-change";
+let authVersion = 0;
 
 const notifyAuthChange = (): void => {
   window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
@@ -36,14 +37,39 @@ export const getUser = (): User | null => {
 
 export const setUser = (user: User): void => {
   if (typeof window === "undefined") return;
+  authVersion++;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
   notifyAuthChange();
 };
 
 export const clearUser = (): void => {
   if (typeof window === "undefined") return;
+  authVersion++;
   localStorage.removeItem(STORAGE_KEY);
+  // Otherwise getUser() would restore a stale identity from this cookie.
+  document.cookie = "user-info=; Max-Age=0; Path=/";
   notifyAuthChange();
+};
+
+export const refreshUser = async (): Promise<User | null> => {
+  const version = authVersion;
+  try {
+    const response = await fetch("/api/auth/me", { cache: "no-store" });
+    const data = await response.json();
+    // A slow session check must not undo a newer login or logout.
+    if (version !== authVersion) return getUser();
+    if (response.ok && data.success && data.user) {
+      setUser(data.user);
+      return data.user;
+    }
+    if (response.status === 401 || response.status === 403 ||
+        (response.ok && !data.success)) {
+      clearUser();
+    }
+  } catch {
+    // A network failure should not erase a user's cached profile.
+  }
+  return null;
 };
 
 export const subscribeToAuthChanges = (

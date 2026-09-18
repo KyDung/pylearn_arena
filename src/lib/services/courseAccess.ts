@@ -90,37 +90,7 @@ export async function unlockContent(
   contentId: string,
   teacherId: number,
 ): Promise<void> {
-  console.log("🔓 unlockContent called with:", {
-    classId,
-    courseId,
-    contentType,
-    contentId,
-    teacherId,
-  });
-
-  // Tự động grant course cho class nếu chưa có
-  const [result] = await pool.query(
-    `INSERT INTO course_access (class_id, course_id, granted_at)
-     VALUES (?, ?, NOW())
-     ON CONFLICT (class_id, course_id) DO UPDATE SET
-       is_active = TRUE,
-       granted_at = NOW()`,
-    [classId, courseId],
-  );
-  console.log("✅ course_access created/updated:", result);
-
-  // Unlock content
-  await pool.query(
-    `INSERT INTO course_content_access 
-     (class_id, course_id, content_type, content_id, is_unlocked, unlocked_by, unlocked_at)
-     VALUES (?, ?, ?, ?, TRUE, ?, NOW())
-     ON CONFLICT (class_id, course_id, content_type, content_id) DO UPDATE SET
-       is_unlocked = TRUE, 
-       unlocked_by = ?, 
-       unlocked_at = NOW()`,
-    [classId, courseId, contentType, contentId, teacherId, teacherId],
-  );
-  console.log("✅ content unlocked successfully");
+  await bulkUnlockContent(classId, courseId, contentType, [contentId], teacherId);
 }
 
 // ============================================================
@@ -181,31 +151,48 @@ export async function bulkUnlockContent(
 ): Promise<number> {
   if (contentIds.length === 0) return 0;
 
-  const values = contentIds.map((id) => [
+  const uniqueIds = [...new Set(contentIds.map(String))];
+  const values = uniqueIds.map((id) => [
     classId,
     courseId,
     contentType,
     id,
     teacherId,
-    teacherId,
   ]);
 
-  const placeholders = contentIds
+  const placeholders = uniqueIds
     .map(() => "(?, ?, ?, ?, TRUE, ?, NOW())")
     .join(", ");
 
-  const [result] = await pool.query<ResultSetHeader>(
-    `INSERT INTO course_content_access 
-     (class_id, course_id, content_type, content_id, is_unlocked, unlocked_by, unlocked_at)
-     VALUES ${placeholders}
-     ON CONFLICT (class_id, course_id, content_type, content_id) DO UPDATE SET
-       is_unlocked = TRUE, 
-       unlocked_by = EXCLUDED.unlocked_by, 
-       unlocked_at = NOW()`,
-    values.flat(),
-  );
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+    await connection.query(
+      `INSERT INTO course_access (class_id, course_id, granted_at)
+       VALUES (?, ?, NOW())
+       ON CONFLICT (class_id, course_id) DO UPDATE SET
+         is_active = TRUE, granted_at = NOW()`,
+      [classId, courseId],
+    );
+    const [result] = await connection.query<ResultSetHeader>(
+      `INSERT INTO course_content_access
+       (class_id, course_id, content_type, content_id, is_unlocked, unlocked_by, unlocked_at)
+       VALUES ${placeholders}
+       ON CONFLICT (class_id, course_id, content_type, content_id) DO UPDATE SET
+         is_unlocked = TRUE,
+         unlocked_by = EXCLUDED.unlocked_by,
+         unlocked_at = NOW()`,
+      values.flat(),
+    );
 
-  return result.affectedRows;
+    await connection.commit();
+    return result.affectedRows;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 }
 
 // ============================================================

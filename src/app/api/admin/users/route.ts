@@ -3,7 +3,6 @@ import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import {
   getUsers,
   createUser,
-  getUserStats,
   type UserFilters,
 } from "@/lib/services/users";
 import type { UserRole, UserStatus } from "@/types";
@@ -37,10 +36,15 @@ export const GET = withAuth(
 export const POST = withAuth(
   async (request: NextRequest, { user }) => {
     const body = await request.json();
-    const { username, password, fullName, email, role, phone } = body;
+    const { username, password, fullName, email, phone } = body;
+    const role = body.role ?? "student";
 
-    if (!username || !password) {
+    if (typeof username !== "string" || typeof password !== "string" || !username || !password) {
       return errorResponse("Username và password là bắt buộc");
+    }
+
+    if (!["admin", "teacher", "student"].includes(role)) {
+      return errorResponse("Vai trò không hợp lệ");
     }
 
     // Teachers can only create students
@@ -68,7 +72,10 @@ export const POST = withAuth(
 
       return successResponse(newUser, "Tạo tài khoản thành công");
     } catch (error) {
-      if (error instanceof Error && error.message.includes("Duplicate")) {
+      if (error instanceof Error && (
+        error.message.includes("Duplicate") ||
+        ("code" in error && error.code === "23505")
+      )) {
         return errorResponse("Username đã tồn tại");
       }
       throw error;

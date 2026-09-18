@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getUser, login } from "@/lib/auth";
+import { login, refreshUser } from "@/lib/auth";
 
 function LoginContent() {
   const router = useRouter();
@@ -17,14 +17,18 @@ function LoginContent() {
   );
   const [loading, setLoading] = useState(false);
 
-  const getNextPage = () => {
+  const getNextPage = useCallback(() => {
     const next = searchParams.get("next");
     const course = searchParams.get("course");
     const lesson = searchParams.get("lesson");
     const path = searchParams.get("path");
+    const sessionId = searchParams.get("sessionId");
 
-    if (next === "play" && path) {
-      return `/play?path=${encodeURIComponent(path)}`;
+    if (next === "play" && (path || sessionId)) {
+      const params = new URLSearchParams();
+      if (path) params.set("path", path);
+      if (sessionId) params.set("sessionId", sessionId);
+      return `/play?${params}`;
     }
 
     if (next === "lesson" && course && lesson) {
@@ -48,23 +52,20 @@ function LoginContent() {
     }
 
     return "/";
-  };
+  }, [searchParams]);
 
   useEffect(() => {
-    const user = getUser();
-    if (user) {
-      // If already logged in, redirect to appropriate page based on next param or role
+    let cancelled = false;
+    const checkSession = async () => {
+      const user = await refreshUser();
+      if (cancelled || !user) return;
+
       const next = searchParams.get("next");
       if (next === "contests") {
-        if (user.role === "admin" || user.role === "teacher") {
-          router.push("/contests");
-        } else {
-          router.push("/student/contests");
-        }
+        router.push(user.role === "student" ? "/student/contests" : "/contests");
       } else if (next) {
         router.push(getNextPage());
       } else {
-        // Default redirect based on role
         if (user.role === "admin") {
           router.push("/admin");
         } else if (user.role === "teacher") {
@@ -73,8 +74,10 @@ function LoginContent() {
           router.push("/profile");
         }
       }
-    }
-  }, [router, searchParams]);
+    };
+    void checkSession();
+    return () => { cancelled = true; };
+  }, [router, searchParams, getNextPage]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
