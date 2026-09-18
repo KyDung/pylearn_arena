@@ -83,7 +83,7 @@ export const GameService = {
        INNER JOIN lessons l ON g.lesson_id = l.id
        INNER JOIN topics t ON l.topic_id = t.id
        INNER JOIN courses c ON t.course_id = c.id
-       ORDER BY c.id, t.order_num, l.order_num, g.order_num`,
+       ORDER BY c.order_num, c.id, t.order_num, l.order_num, g.order_num`,
     );
     return rows as GameWithContext[];
   },

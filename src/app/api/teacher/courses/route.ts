@@ -19,14 +19,15 @@ export const GET = withAuth(
 
       // Admin và Teacher đều thấy tất cả courses published
       const query = `
-        SELECT DISTINCT 
+        SELECT DISTINCT
           c.id,
           c.slug,
           c.title,
-          c.description
+          c.description,
+          c.order_num
         FROM courses c
         WHERE c.is_published = TRUE
-        ORDER BY c.title ASC
+        ORDER BY c.order_num ASC, c.title ASC
       `;
 
       const [rows] = await pool.query<RowDataPacket[]>(query);

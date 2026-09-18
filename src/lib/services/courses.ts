@@ -22,10 +22,10 @@ export const CourseService = {
    */
   async getPublishedCourses(): Promise<Course[]> {
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT id, slug, title, description, difficulty, is_published, created_at, updated_at 
-       FROM courses 
+      `SELECT id, slug, title, description, difficulty, order_num, is_published, created_at, updated_at
+       FROM courses
        WHERE is_published = true
-       ORDER BY created_at ASC`,
+       ORDER BY order_num ASC, created_at ASC, id ASC`,
     );
     return rows as Course[];
   },
@@ -640,7 +640,7 @@ export const GameService = {
       LEFT JOIN lessons l ON g.lesson_id = l.id
       LEFT JOIN topics t ON l.topic_id = t.id
       LEFT JOIN courses c ON t.course_id = c.id
-      ORDER BY c.title, t.order_num, l.order_num, g.order_num
+      ORDER BY c.order_num, c.title, t.order_num, l.order_num, g.order_num
     `);
     return rows as Game[];
   },
@@ -674,7 +674,7 @@ export const CourseAccessService = {
       JOIN courses c ON c.id = ca.course_id
       JOIN classes cl ON cl.id = ca.class_id
       WHERE ca.class_id = ? AND ca.is_active = TRUE
-      ORDER BY c.title
+      ORDER BY c.order_num ASC, c.title ASC
     `,
       [classId],
     );
@@ -743,7 +743,7 @@ export const CourseAccessService = {
         AND cm.status = 'active'
         AND c.is_published = TRUE
         AND (ca.expires_at IS NULL OR ca.expires_at > NOW())
-      ORDER BY c.title
+      ORDER BY c.order_num ASC, c.title ASC
     `,
       [userId],
     );

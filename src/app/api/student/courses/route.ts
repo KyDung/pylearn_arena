@@ -30,6 +30,7 @@ export const GET = withAuth(
            c.slug,
            c.thumbnail as image_url,
            c.difficulty as difficulty_level,
+           c.order_num,
            NULL as estimated_duration,
            NULL as tags,
            ca.granted_at,
@@ -41,7 +42,7 @@ export const GET = withAuth(
          WHERE cm.user_id = ? 
            AND cm.status = 'active'
            AND c.is_published = TRUE
-         ORDER BY ca.granted_at DESC, c.title ASC`,
+         ORDER BY c.order_num ASC, ca.granted_at DESC, c.title ASC`,
         [user.id],
       );
       console.log("📚 Found courses:", rows.length);
