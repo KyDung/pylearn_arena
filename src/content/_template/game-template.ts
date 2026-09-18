@@ -74,7 +74,7 @@ const buildLayout = () => `
     .lesson-header { margin-bottom: 1.5rem; }
     .lesson-header h2 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.75rem; }
     .lesson-header p { color: #4b5563; line-height: 1.625; white-space: pre-line; }
-    .lesson-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .lesson-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem; }
     .lesson-game { display: flex; flex-direction: column; }
     .game-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .phaser-frame { background: #121425; border-radius: 0.5rem; overflow: hidden; aspect-ratio: 720/520; width: 100%; }

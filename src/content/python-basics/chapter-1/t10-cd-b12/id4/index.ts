@@ -351,15 +351,19 @@ export default function initGame(
     sceneProgress.textContent = `Scene ${currentScene + 1}/${GAME_CONFIG.testCases.length}`;
   };
 
+  // Program output is untrusted text, never markup.
+  const escapeCell = (value: unknown) =>
+    String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
   const updateTestCaseTable = () => {
     testcaseBody.innerHTML = "";
     testResults.forEach((result, index) => {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>Scene ${index + 1}</td>
-        <td class="input">${result.input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>
-        <td class="input">${result.expected}</td>
-        <td class="output">${result.actual}</td>
+        <td class="input">${escapeCell(result.input)}</td>
+        <td class="input">${escapeCell(result.expected)}</td>
+        <td class="output">${escapeCell(result.actual)}</td>
         <td class="${result.passed ? "pass" : "fail"}">${result.passed ? "✓ Pass" : "✗ Fail"}</td>
       `;
       testcaseBody.appendChild(row);

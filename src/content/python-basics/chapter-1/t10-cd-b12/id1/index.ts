@@ -118,7 +118,7 @@ const buildLayout = () => `
     .lesson-header { margin-bottom: 1rem; }
     .lesson-header h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #1f2937; }
     .lesson-header p { color: #4b5563; line-height: 1.6; white-space: pre-line; font-size: 0.875rem; }
-    .lesson-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .lesson-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
     .lesson-game { display: flex; flex-direction: column; }
     .game-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     .phaser-frame { 
@@ -160,7 +160,7 @@ const buildLayout = () => `
     }
     
     /* Test Case Table */
-    .testcase-table { margin-top: 1rem; display: none; }
+    .testcase-table { margin-top: 1rem; display: none; min-width: 0; overflow-x: auto; }
     .testcase-table.visible { display: block; }
     .testcase-table h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: #1f2937; }
     .testcase-table table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
@@ -392,15 +392,19 @@ export default function initGame(
     sceneProgress.textContent = `Scene ${currentScene + 1}/${GAME_CONFIG.testCases.length}`;
   };
 
+  // Program output is untrusted text, never markup.
+  const escapeCell = (value: unknown) =>
+    String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
   const updateTestCaseTable = () => {
     testcaseBody.innerHTML = "";
     testResults.forEach((result, index) => {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>Scene ${index + 1}</td>
-        <td class="input">${result.input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>
-        <td class="input">${result.expected}</td>
-        <td class="output">${result.actual}</td>
+        <td class="input">${escapeCell(result.input)}</td>
+        <td class="input">${escapeCell(result.expected)}</td>
+        <td class="output">${escapeCell(result.actual)}</td>
         <td class="${result.passed ? "pass" : "fail"}">${result.passed ? "✓ Pass" : "✗ Fail"}</td>
       `;
       testcaseBody.appendChild(row);
