@@ -1,5 +1,75 @@
 # Bàn giao cho Claude — 18/09/2026
 
+## ĐỢT 6 — 19/09/2026: chốt ba quyết định, xoá ba hệ không dùng
+
+**Đọc mục này trước, nó mới nhất.**
+
+### Ba quyết định của người dùng
+
+1. **Một lần nộp mỗi phiên, giữ nguyên.** Đây là chủ ý: học sinh chạy thử code bao nhiêu lần tuỳ
+   thích, đến khi chắc hoặc hết giờ thì nộp. Ràng buộc UNIQUE của migration 002 đúng là thứ cần
+   giữ. `max_submissions` trên bảng `sessions` vẫn nằm không, và đó là trạng thái mong muốn.
+2. **Cuộc thi: giữ, dùng bản `contests-new.ts` làm bản chính.** Chưa gộp trong đợt này.
+3. **Xoá ba hệ không dùng:** bài tập, phiên nhanh vào bằng mã, và cặp thông báo/nhật ký.
+
+### Đã xoá
+
+| Nhóm | Bảng | Mã |
+| --- | --- | --- |
+| Bài tập | `assignments`, `assignment_submissions`, `submissions`, `rankings` | 2 service, 4 API route, 3 trang, view `v_assignment_leaderboard` |
+| Phiên nhanh | `lesson_sessions`, `lesson_session_submissions` | `LessonSessionService`, 2 API route, trang `/student/submit` |
+| Không ai ghi | `activity_log`, `notifications`, `class_students` | không có mã nào dùng |
+
+Tất cả 9 bảng đều **rỗng** tại thời điểm xoá, đã kiểm tra từng bảng một trước khi viết migration.
+
+Ba trang phải sửa lại vì bài tập ăn sâu vào chúng: bảng điều khiển học sinh (bỏ hẳn tab, còn danh
+sách lớp), bảng điều khiển giáo viên (4 thẻ thống kê còn 2), và trang chi tiết lớp (bỏ tab bài tập).
+View `v_class_stats` được dựng lại không còn cột đếm bài tập, và bật lại `security_invoker` vì tạo
+lại view làm mất thiết lập của migration 003.
+
+### Điều quan trọng về `schema.sql`
+
+**Không sửa file này.** Nó là bản nền lịch sử và migration 002 vẫn phải chạy lại được trên đó.
+Trạng thái đúng của database là bản nền **cộng toàn bộ migration**, không phải bản nền một mình.
+Ai định "dọn cho gọn" bằng cách xoá bảng khỏi `schema.sql` sẽ làm hỏng `db:init` và bài kiểm thử
+dựng schema sạch.
+
+### Trạng thái migration 006
+
+**CHƯA ÁP DỤNG.** `db:check` đã chạy thử và **đạt**, rollback sạch. Lệnh apply bị môi trường
+Claude Code chặn vì migration xoá 9 bảng.
+
+Mã mới **không còn tham chiếu** tới bất kỳ bảng nào trong số đó, nên deploy code trước rồi xoá bảng
+sau hoàn toàn an toàn. Chín bảng thừa nằm đó không ảnh hưởng gì. Người dùng chạy khi nào tiện:
+
+```
+pnpm db:migrate --target=05ca2564a33332d0
+```
+
+Sau đó chạy `pnpm db:status`, `pnpm db:audit`, `pnpm db:check`. Bộ kiểm chứng đã có sẵn một khẳng
+định mới: chín bảng đó phải **không** tồn tại, nên nếu ai đó dựng lại chúng thì `db:check` sẽ báo.
+
+### Kiểm tra
+
+| Hạng mục | Kết quả |
+| --- | --- |
+| TypeScript | sạch |
+| ESLint | 0 lỗi, 0 cảnh báo |
+| Test foundation | 57/57 |
+| Build | đạt |
+| `db:check` kèm migration 006 | đạt, rollback sạch |
+
+Hai test phải bỏ vì đối tượng chúng kiểm đã không còn: một test nạp route `/api/submissions`, một
+test kiểm `LessonSessionService`. Ngưỡng đếm bảng trong bài kiểm thử schema sạch hạ từ hơn 20 xuống
+ít nhất 15, vì schema nay còn 18 bảng.
+
+### Việc còn lại
+
+- Chạy migration 006 (xem trên).
+- Gộp hai service cuộc thi, làm lúc chạy thử cuộc thi thật lần đầu.
+- Người dùng chưa tự chạy thử một buổi học đầy đủ trên site.
+
+
 ## ĐỢT 5 — 19/09/2026: đóng nốt 35 mục lint bằng ba hook, có kiểm chứng trên trình duyệt
 
 **Đọc mục này trước, nó mới nhất.**

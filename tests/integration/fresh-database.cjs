@@ -22,7 +22,10 @@ async function verifyFreshDatabase(client) {
     assert.equal((await client.query('SELECT count(*)::int AS n FROM users')).rows[0].n, 0);
     assert.equal((await client.query('SELECT count(*)::int AS n FROM settings')).rows[0].n, 6);
     const rls = await client.query('SELECT relrowsecurity FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=$1 AND c.relkind=\'r\'', [schema]);
-    assert(rls.rows.length > 20 && rls.rows.every(row => row.relrowsecurity));
+    // Migration 006 removed nine tables, so the floor moved with it. What
+    // matters is that the schema really built and every table has RLS on.
+    assert(rls.rows.length >= 15 && rls.rows.every(row => row.relrowsecurity),
+      `expected a built schema with RLS everywhere, saw ${rls.rows.length} tables`);
 
     await client.query("INSERT INTO users(id,username,password,role) VALUES (1,'check_teacher','not-a-login-hash','teacher'),(2,'check_student','not-a-login-hash','student')");
     await client.query("INSERT INTO courses(id,slug,title) VALUES (1,'check','check')");
@@ -33,7 +36,6 @@ async function verifyFreshDatabase(client) {
     await client.query("INSERT INTO class_members(class_id,user_id) VALUES (1,2)");
     await client.query("INSERT INTO sessions(id,class_id,game_id,title,created_by,auto_close,duration_minutes) VALUES (1,1,1,'check',1,false,1),(2,1,1,'expired',1,true,1)");
     await client.query("UPDATE sessions SET started_at=now()-interval '1 day'");
-    await client.query("INSERT INTO lesson_sessions(id,lesson_id,game_id,session_code,created_by,expires_at) VALUES (1,1,1,'check',1,now()+interval '1 hour')");
 
     // Retain the service's begin/commit/rollback boundary as savepoints beneath
     // the outer rollback transaction. No client can accidentally commit fixtures.
@@ -52,22 +54,15 @@ async function verifyFreshDatabase(client) {
     } }, { process: { env: { DATABASE_URL: 'postgresql://unused-for-injected-client' } } });
     const pool = dbLoader('src/lib/db.ts').default;
     const load = createLoader({ '@/lib/db': pool });
-    const { LessonSessionService, CourseService } = load('src/lib/services/courses.ts');
+    const { CourseService } = load('src/lib/services/courses.ts');
     const { submitSessionCode } = load('src/lib/services/sessionSubmissions.ts');
     assert.equal((await CourseService.getAllCourses()).length, 1);
     await submitSessionCode(1, 2, { code: 'classroom', score: 40, passed_tests: 1, total_tests: 2 });
     await assert.rejects(submitSessionCode(1, 2, { code: 'duplicate', score: 40, passed_tests: 1, total_tests: 2 }), error => error.status === 409);
     await assert.rejects(submitSessionCode(2, 2, { code: 'late', score: 40, passed_tests: 1, total_tests: 2 }), error => error.status === 403);
-    for (const score of [50, 90, 60]) {
-      await LessonSessionService.submitToSession(1, 2, { code: 'quick-' + score, score, isCorrect: false });
-    }
-    const rankings = await LessonSessionService.getSessionRankings(1);
-    assert.equal(rankings.length, 1);
-    assert.equal(Number(rankings[0].score), 90);
-    assert.equal(rankings[0].code, 'quick-90');
     assert.equal(Number((await client.query('SELECT score FROM session_submissions')).rows[0].score), 40);
+    assert.equal((await client.query('SELECT count(*)::int AS n FROM session_submissions')).rows[0].n, 1);
     assert.equal((await client.query('SELECT total_submissions FROM sessions WHERE id=1')).rows[0].total_submissions, 1);
-    assert.equal(Number((await LessonSessionService.getTeacherSessions(1))[0].submission_count), 1);
   } finally {
     await client.query('ROLLBACK TO SAVEPOINT fresh_database');
     await client.query('RELEASE SAVEPOINT fresh_database');

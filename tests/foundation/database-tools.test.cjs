@@ -69,18 +69,6 @@ test('bootstrap rejects bcrypt-truncated passwords before connecting or writing'
   await assert.rejects(bootstrap({}, { username: 'admin', password: 'é'.repeat(40) }), /72 UTF-8 bytes/);
 });
 
-test('quick sessions use independent submission storage and atomic best-score upsert', async () => {
-  const calls = [];
-  const load = createLoader({ '@/lib/db': { async query(sql, args) { calls.push({ sql, args }); return [[]]; } } });
-  const { LessonSessionService } = load('src/lib/services/courses.ts');
-  await LessonSessionService.submitToSession(1, 2, { code: 'print(1)', score: 90, isCorrect: true, executionTime: 0 });
-  await LessonSessionService.getTeacherSessions(3);
-  assert.match(calls[0].sql, /INSERT INTO lesson_session_submissions/);
-  assert.match(calls[0].sql, /WHERE EXCLUDED.score > lesson_session_submissions.score/);
-  assert.equal(calls[0].args.at(-1), 0);
-  assert(calls.every(call => !/\b(?:FROM|INTO|UPDATE) session_submissions\b/.test(call.sql)));
-});
-
 test('course list does not hide connection errors behind a fallback query', async () => {
   let calls = 0;
   const load = createLoader({ '@/lib/db': { async query() { calls++; throw new Error('unavailable'); } } });

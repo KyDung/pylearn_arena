@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { usePageUser } from "@/hooks/usePageUser";
-import type { Class, Assignment } from "@/types";
+import type { Class } from "@/types";
 
 // Extended Class type with teacher info for admin view
 interface ExtendedClass extends Class {
@@ -14,7 +14,6 @@ export default function TeacherDashboard() {
   const router = useRouter();
   const currentUser = usePageUser("admin,teacher");
   const [classes, setClasses] = useState<ExtendedClass[]>([]);
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(() => {
@@ -22,13 +21,6 @@ export default function TeacherDashboard() {
       const classData = await classRes.json();
       if (classData.success) {
         setClasses(classData.data.items || []);
-      }
-
-      // Load assignments
-      const assignmentRes = await fetch("/api/assignments");
-      const assignmentData = await assignmentRes.json();
-      if (assignmentData.success) {
-        setAssignments(assignmentData.data.items || []);
       }
 
     }).catch((error) => {
@@ -148,7 +140,7 @@ export default function TeacherDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-3xl font-bold text-blue-600">
               {classes.length}
@@ -160,18 +152,6 @@ export default function TeacherDashboard() {
               {classes.reduce((sum, c) => sum + (c.studentCount || 0), 0)}
             </div>
             <div className="text-gray-500">Học sinh</div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-3xl font-bold text-purple-600">
-              {assignments.length}
-            </div>
-            <div className="text-gray-500">Bài tập</div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-3xl font-bold text-orange-600">
-              {assignments.filter((a) => a.status === "published").length}
-            </div>
-            <div className="text-gray-500">Đang mở</div>
           </div>
         </div>
 

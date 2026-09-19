@@ -29,7 +29,6 @@ interface ClassRow extends RowDataPacket {
   status: ClassStatus;
   student_count: number;
   course_count: number;
-  assignment_count: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -47,7 +46,6 @@ const mapClassRow = (row: ClassRow): Class => ({
   status: row.status,
   studentCount: row.student_count ?? 0,
   courseCount: row.course_count ?? 0,
-  assignmentCount: row.assignment_count ?? 0,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -60,8 +58,7 @@ export async function getClassById(id: number): Promise<Class | null> {
   const [rows] = await pool.query<ClassRow[]>(
     `SELECT c.*, u.full_name as teacher_name,
             (SELECT COUNT(*) FROM class_members cm WHERE cm.class_id = c.id AND cm.status = 'active') as student_count,
-            (SELECT COUNT(*) FROM course_access ca WHERE ca.class_id = c.id) as course_count,
-            (SELECT COUNT(*) FROM assignments a WHERE a.class_id = c.id AND a.status = 'published') as assignment_count
+            (SELECT COUNT(*) FROM course_access ca WHERE ca.class_id = c.id) as course_count
      FROM classes c
      LEFT JOIN users u ON c.teacher_id = u.id
      WHERE c.id = ?`,
@@ -74,8 +71,7 @@ export async function getClassByCode(code: string): Promise<Class | null> {
   const [rows] = await pool.query<ClassRow[]>(
     `SELECT c.*, u.full_name as teacher_name,
             (SELECT COUNT(*) FROM class_members cm WHERE cm.class_id = c.id AND cm.status = 'active') as student_count,
-            (SELECT COUNT(*) FROM course_access ca WHERE ca.class_id = c.id) as course_count,
-            (SELECT COUNT(*) FROM assignments a WHERE a.class_id = c.id AND a.status = 'published') as assignment_count
+            (SELECT COUNT(*) FROM course_access ca WHERE ca.class_id = c.id) as course_count
      FROM classes c
      LEFT JOIN users u ON c.teacher_id = u.id
      WHERE c.code = ?`,
@@ -156,8 +152,7 @@ export async function getClasses(
   const [rows] = await pool.query<ClassRow[]>(
     `SELECT c.*, u.full_name as teacher_name,
             (SELECT COUNT(*) FROM class_members cm WHERE cm.class_id = c.id AND cm.status = 'active') as student_count,
-            (SELECT COUNT(*) FROM course_access ca WHERE ca.class_id = c.id) as course_count,
-            (SELECT COUNT(*) FROM assignments a WHERE a.class_id = c.id AND a.status = 'published') as assignment_count
+            (SELECT COUNT(*) FROM course_access ca WHERE ca.class_id = c.id) as course_count
      ${baseQuery}
      ORDER BY c.created_at DESC
      LIMIT ? OFFSET ?`,
@@ -181,8 +176,7 @@ export async function getClassesByStudent(userId: number): Promise<Class[]> {
   const [rows] = await pool.query<ClassRow[]>(
     `SELECT c.*, u.full_name as teacher_name,
             (SELECT COUNT(*) FROM class_members cm WHERE cm.class_id = c.id AND cm.status = 'active') as student_count,
-            (SELECT COUNT(*) FROM course_access ca WHERE ca.class_id = c.id) as course_count,
-            (SELECT COUNT(*) FROM assignments a WHERE a.class_id = c.id AND a.status = 'published') as assignment_count
+            (SELECT COUNT(*) FROM course_access ca WHERE ca.class_id = c.id) as course_count
      FROM classes c
      LEFT JOIN users u ON c.teacher_id = u.id
      INNER JOIN class_members cm ON c.id = cm.class_id
@@ -300,7 +294,6 @@ export async function hardDeleteClass(id: number): Promise<boolean> {
       { query: "DELETE FROM class_course_settings WHERE class_id = ?", params: [id] },
       { query: "DELETE FROM course_access WHERE class_id = ?", params: [id] },
       { query: "DELETE FROM course_content_access WHERE class_id = ?", params: [id] },
-      { query: "DELETE FROM assignments WHERE class_id = ?", params: [id] },
       { query: "DELETE FROM sessions WHERE class_id = ?", params: [id] },
       {
         query: "UPDATE contests SET class_id = NULL WHERE class_id = ?",

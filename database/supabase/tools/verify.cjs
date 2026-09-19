@@ -24,24 +24,21 @@ async function verify(client) {
   await client.query("INSERT INTO public.games(id,lesson_id,slug,title,path) VALUES ($1,$1,$2,'DB check',$2)", [id, token]);
   await client.query("INSERT INTO public.classes(id,code,name,teacher_id) VALUES ($1,$2,'DB check',$1)", [id, token]);
   await client.query("INSERT INTO public.sessions(id,class_id,game_id,title,created_by) VALUES ($1,$1,$1,'DB check',$1)", [id]);
-  await client.query("INSERT INTO public.lesson_sessions(id,lesson_id,game_id,session_code,created_by,expires_at) VALUES ($1,$1,$1,$2,$1,now()+interval '1 hour'),($3,$1,$1,$4,$1,now()+interval '1 hour')", [id, token, other, 'b' + token]);
   await client.query("INSERT INTO public.session_submissions(id,session_id,user_id,code,score) VALUES ($1,$1,$2,'classroom',40)", [id, other]);
   await expectSqlError(client, '23505', "INSERT INTO public.session_submissions(id,session_id,user_id,code) VALUES ($1,$2,$3,'duplicate')", [other, id, other]);
-  await client.query("INSERT INTO public.lesson_session_submissions(id,session_id,user_id,code,score) VALUES ($1,$1,$2,'quick',50),($2,$2,$2,'quick-only',60)", [id, other]);
-  // A quick-only session cannot receive a classroom submission with the same ID.
-  await expectSqlError(client, '23503', "INSERT INTO public.session_submissions(id,session_id,user_id,code) VALUES ($1,$1,$1,'wrong namespace')", [other]);
+  // A submission must name a session that exists.
+  await expectSqlError(client, '23503', "INSERT INTO public.session_submissions(id,session_id,user_id,code) VALUES ($1,$1,$1,'no such session')", [other]);
   assert.equal(Number((await client.query('SELECT score FROM public.session_submissions WHERE id=$1', [id])).rows[0].score), 40);
-  assert.equal(Number((await client.query('SELECT score FROM public.lesson_session_submissions WHERE id=$1', [id])).rows[0].score), 50);
   assert.equal((await client.query('SELECT order_num FROM public.courses WHERE id=$1', [id])).rows[0].order_num, 7);
   assert.equal((await client.query('SELECT class_id FROM public.v_class_stats WHERE class_id=$1', [id])).rowCount, 1);
   // Migration 005 took every privilege away from the Data API roles, so these
-  // reads must now be refused outright rather than merely return no rows.
-  // Both views and a base table are checked: a future permissive policy must
-  // not be able to re-open anything on its own.
+  // reads must be refused outright rather than merely return no rows. A view
+  // and a base table are both checked: a future permissive policy must not be
+  // able to re-open anything on its own.
   for (const role of ['anon', 'authenticated']) {
     const exists = (await client.query('SELECT 1 FROM pg_roles WHERE rolname=$1', [role])).rowCount;
     if (!exists) continue; // Plain PostgreSQL installations need not have Supabase roles.
-    for (const relation of ['public.v_class_stats', 'public.v_assignment_leaderboard', 'public.users']) {
+    for (const relation of ['public.v_class_stats', 'public.users']) {
       await client.query('SAVEPOINT api_role');
       await client.query(`SET LOCAL ROLE ${role}`);
       let refused;
@@ -55,9 +52,15 @@ async function verify(client) {
       assert.equal(refused, '42501', `${role} must not be able to read ${relation}`);
     }
   }
-  const views = await client.query("SELECT relname,reloptions FROM pg_class WHERE oid IN ('public.v_class_stats'::regclass,'public.v_assignment_leaderboard'::regclass)");
+  const views = await client.query("SELECT relname,reloptions FROM pg_class WHERE oid = 'public.v_class_stats'::regclass");
   assert(views.rows.every(row => row.reloptions.includes('security_invoker=true')));
-  assert.equal((await client.query("SELECT relrowsecurity FROM pg_class WHERE oid='public.lesson_session_submissions'::regclass")).rows[0].relrowsecurity, true);
+  // Migration 006 removed the unused subsystems; nothing may recreate them.
+  const removed = await client.query(
+    `SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename = ANY($1)`,
+    [['assignments', 'assignment_submissions', 'submissions', 'rankings',
+      'lesson_sessions', 'lesson_session_submissions',
+      'activity_log', 'class_students', 'notifications']]);
+  assert.equal(removed.rowCount, 0, 'Dropped tables must stay dropped');
   await require('../../../tests/integration/fresh-database.cjs').verifyFreshDatabase(client);
 }
 

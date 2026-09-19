@@ -19,8 +19,6 @@ export { ProgressService } from "./progress";
 // Management services
 export * as UserService from "./users";
 export * as ClassService from "./classes";
-export * as AssignmentService from "./assignments";
-export * as SubmissionService from "./submissions";
 
 // Re-export types from services
 export type { Course } from "./courses";

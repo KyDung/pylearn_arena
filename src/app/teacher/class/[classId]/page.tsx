@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, use } from "react";
 import { useRouter } from "next/navigation";
 import { usePageUser } from "@/hooks/usePageUser";
-import type { User, Class, ClassMember, Assignment } from "@/types";
+import type { User, Class, ClassMember } from "@/types";
 
 interface ClassWithMembers extends Class {
   members: ClassMember[];
@@ -18,10 +18,9 @@ export default function ClassDetailPage({
   const router = useRouter();
   const currentUser = usePageUser("admin,teacher");
   const [classData, setClassData] = useState<ClassWithMembers | null>(null);
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "info" | "members" | "courses" | "assignments"
+    "info" | "members" | "courses"
   >("info");
 
   // Add student modal
@@ -34,13 +33,6 @@ export default function ClassDetailPage({
       const classJson = await classRes.json();
       if (classJson.success) {
         setClassData(classJson.data);
-      }
-
-      // Load assignments for this class
-      const assignmentRes = await fetch(`/api/assignments?classId=${classId}`);
-      const assignmentJson = await assignmentRes.json();
-      if (assignmentJson.success) {
-        setAssignments(assignmentJson.data.items || []);
       }
     }).catch((error) => {
       console.error("Failed to load class:", error);
@@ -173,12 +165,6 @@ export default function ClassDetailPage({
             <div className="text-sm text-gray-500">Học sinh</div>
           </div>
           <div className="bg-white rounded-lg shadow p-4">
-            <div className="text-2xl font-bold text-green-600">
-              {assignments.length}
-            </div>
-            <div className="text-sm text-gray-500">Bài tập</div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
             <div className="text-2xl font-bold text-purple-600">
               {classData.schoolYear || "-"}
             </div>
@@ -205,10 +191,6 @@ export default function ClassDetailPage({
                 {
                   key: "courses",
                   label: "Khóa học",
-                },
-                {
-                  key: "assignments",
-                  label: `Bài tập (${assignments.length})`,
                 },
               ].map((tab) => (
                 <button
@@ -357,78 +339,6 @@ export default function ClassDetailPage({
                         ))}
                       </tbody>
                     </table>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Assignments Tab */}
-            {activeTab === "assignments" && (
-              <>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-medium">Danh sách bài tập</h3>
-                  <button
-                    onClick={() =>
-                      router.push(
-                        `/teacher/assignment/create?classId=${classId}`,
-                      )
-                    }
-                    className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                  >
-                    + Tạo bài tập
-                  </button>
-                </div>
-
-                {assignments.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    Chưa có bài tập nào
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {assignments.map((assignment) => (
-                      <div
-                        key={assignment.id}
-                        className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                        onClick={() =>
-                          router.push(`/teacher/assignment/${assignment.id}`)
-                        }
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium">{assignment.title}</h4>
-                            <p className="text-sm text-gray-500 mt-1">
-                              {formatDate(assignment.startTime)} -{" "}
-                              {formatDate(assignment.endTime)}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span
-                              className={`px-2 py-1 text-xs rounded-full ${
-                                assignment.status === "published"
-                                  ? "bg-green-100 text-green-800"
-                                  : assignment.status === "closed"
-                                    ? "bg-gray-100 text-gray-800"
-                                    : "bg-yellow-100 text-yellow-800"
-                              }`}
-                            >
-                              {assignment.status === "published"
-                                ? "Đang mở"
-                                : assignment.status === "closed"
-                                  ? "Đã đóng"
-                                  : "Nháp"}
-                            </span>
-                            <div className="text-sm">
-                              <span className="text-green-600 font-medium">
-                                {assignment.passedCount || 0}
-                              </span>
-                              <span className="text-gray-400">
-                                /{assignment.submissionCount || 0} bài nộp
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 )}
               </>

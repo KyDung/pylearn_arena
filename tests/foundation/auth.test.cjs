@@ -172,7 +172,7 @@ test("admin cannot accidentally suspend their own account", async () => {
   assert.equal(response.status, 403);
 });
 
-for (const route of ["progress", "submissions", "admin/users/template"]) {
+for (const route of ["progress", "admin/users/template"]) {
   test(`${route} rejects unsigned JSON cookies and accepts normal JWT login`, async () => {
     const { load, setCookie } = harness({ cookie: '{"id":1,"role":"admin"}', extraQuery: () => [[]] });
     const api = load(`src/app/api/${route}/route.ts`);
