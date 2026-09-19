@@ -1,5 +1,5 @@
 import mysql from "mysql2/promise";
-import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import type { ResultSetHeader } from "mysql2/promise";
 
 async function cleanup() {
   const connection = await mysql.createConnection({

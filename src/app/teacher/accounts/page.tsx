@@ -231,7 +231,6 @@ export default function AccountsManagementPage() {
   };
 
   const handleDeleteUser = async (user: User, permanent: boolean = false) => {
-    const deleteType = permanent ? "XÓA VĨNH VIỄN" : "VÔ HIỆU HÓA";
     const confirmMessage = permanent
       ? `⚠️ CẢNH BÁO: Bạn có chắc muốn XÓA VĨNH VIỄN tài khoản "${user.fullName || user.username}"?\n\nHành động này KHÔNG THỂ HOÀN TÁC và sẽ xóa:\n- Tài khoản\n- Tất cả bài nộp\n- Tiến độ học tập\n- Các dữ liệu liên quan\n\nNhập "XOA" để xác nhận:`
       : `Bạn có chắc muốn vô hiệu hóa tài khoản "${user.fullName || user.username}"?\n\n(Tài khoản sẽ bị khóa nhưng dữ liệu vẫn được lưu)`;

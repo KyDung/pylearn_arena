@@ -100,7 +100,7 @@ export default function StudentContestDetailPage() {
       } else {
         setError(data.error || "Không thể tải cuộc thi");
       }
-    } catch (err) {
+    } catch {
       setError("Lỗi kết nối server");
     }
   };

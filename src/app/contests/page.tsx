@@ -147,7 +147,7 @@ export default function ContestsPage() {
       } else {
         router.replace("/login?next=contests");
       }
-    } catch (error) {
+    } catch {
       router.replace("/login?next=contests");
     }
   };
@@ -222,7 +222,7 @@ export default function ContestsPage() {
       } else {
         alert(data.error || "Lỗi tạo cuộc thi");
       }
-    } catch (error) {
+    } catch {
       alert("Lỗi kết nối server");
     }
   };

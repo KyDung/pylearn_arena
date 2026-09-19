@@ -6,13 +6,7 @@
  * DELETE - Xóa cuộc thi
  * PATCH  - Thay đổi trạng thái (active/closed)
  */
-import { NextRequest, NextResponse } from "next/server";
-import {
-  withAuth,
-  successResponse,
-  errorResponse,
-  canManageContest,
-} from "@/lib/apiAuth";
+import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import {
   ContestService,
   ContestGameService,

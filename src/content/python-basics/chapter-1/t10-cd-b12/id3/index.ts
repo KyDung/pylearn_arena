@@ -1,6 +1,6 @@
 // @ts-nocheck
 import * as Phaser from "phaser";
-import { isPyodideTimeout, withPyodideTimeout } from "@/lib/pyodideTimeout";
+import { withPyodideTimeout } from "@/lib/pyodideTimeout";
 import { gradeCodeRunnerForSession } from "@/lib/sessionGrading";
 import {
   buildCodeEditorStyles,

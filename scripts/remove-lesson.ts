@@ -1,5 +1,5 @@
 import mysql from "mysql2/promise";
-import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import type { RowDataPacket } from "mysql2/promise";
 
 const LESSON_SLUG = process.argv[2];
 

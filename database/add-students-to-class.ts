@@ -38,7 +38,7 @@ async function addStudentToClass() {
         );
 
         console.log(`  ✅ ${student.username} (${student.full_name})`);
-      } catch (err) {
+      } catch {
         console.log(`  ⚠️  ${student.username} - đã có trong lớp`);
       }
     }

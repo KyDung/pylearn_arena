@@ -1,7 +1,7 @@
 import mysql from "mysql2/promise";
 import fs from "fs";
 import path from "path";
-import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import type { RowDataPacket } from "mysql2/promise";
 
 const GAME_SLUG = process.argv[2];
 

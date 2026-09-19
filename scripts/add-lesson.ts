@@ -23,7 +23,6 @@ async function addLesson() {
     const courseId = await question("Course ID (vd: python-basics): ");
     const lessonId = await question("Lesson ID (vd: t10-cd-b12-id5): ");
     const title = await question("Tiêu đề bài học: ");
-    const description = await question("Mô tả ngắn: ");
     const order = await question("Thứ tự (vd: 5): ");
     const duration = await question("Thời lượng phút (vd: 15): ");
     const gameType = await question("Loại game (string/list/dict/loop): ");

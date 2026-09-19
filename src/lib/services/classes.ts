@@ -391,13 +391,13 @@ export async function addClassMember(
   if (existing.length > 0) {
     // Reactivate if removed
     await pool.query(
-      "UPDATE class_members SET status = 'active' WHERE class_id = ? AND user_id = ?",
-      [classId, userId],
+      "UPDATE class_members SET status = 'active', role = ? WHERE class_id = ? AND user_id = ?",
+      [role, classId, userId],
     );
   } else {
     await pool.query<ResultSetHeader>(
-      "INSERT INTO class_members (class_id, user_id, status) VALUES (?, ?, 'active')",
-      [classId, userId],
+      "INSERT INTO class_members (class_id, user_id, role, status) VALUES (?, ?, ?, 'active')",
+      [classId, userId, role],
     );
   }
 

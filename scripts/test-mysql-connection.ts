@@ -17,7 +17,7 @@ async function main() {
       const [dbs] = await pool.query<RowDataPacket[]>("SELECT DATABASE() as db");
       console.log(
         "🗄️  Current Database:",
-        rows[0].db || "pylearn_arena",
+        dbs[0].db || "pylearn_arena",
       );
 
       // Kiểm tra tables

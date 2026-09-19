@@ -235,7 +235,7 @@ export const buildContestHTML = (
   let rankingsHTML = "";
   if (contest.showRanking && rankings && rankings.length > 0) {
     const rows = rankings
-      .map((r, i) => {
+      .map((r) => {
         const isCurrentUser = r.username === currentUsername;
         const rankClass = r.rank_position <= 3 ? `rank-${r.rank_position}` : "";
         return `<tr class="${isCurrentUser ? "current-user" : ""}">
@@ -524,7 +524,7 @@ export async function initContestFeature(
       ?.getAttribute("data-username");
 
     rankingsContainer.innerHTML = rankings
-      .map((r, i) => {
+      .map((r) => {
         const isCurrentUser = r.username === currentUsername;
         const rankClass = r.rank_position <= 3 ? `rank-${r.rank_position}` : "";
         return `<tr class="${isCurrentUser ? "current-user" : ""}">
@@ -578,7 +578,7 @@ export async function setupContestSubmission(
     onSubmitted?: (result: SubmissionResult) => void;
   },
 ): Promise<{ isInContest: boolean }> {
-  const { contestInfo, submitScore, isInContest } = await initContestFeature(
+  const { submitScore, isInContest } = await initContestFeature(
     root,
     gamePath,
   );

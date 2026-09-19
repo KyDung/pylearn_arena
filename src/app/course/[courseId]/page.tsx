@@ -62,7 +62,6 @@ export default function CoursePage({
   }>({});
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isVirtualCourse, setIsVirtualCourse] = useState(false);
-  const [unlockedTopics, setUnlockedTopics] = useState<string[]>([]);
   const [unlockedLessons, setUnlockedLessons] = useState<string[]>([]);
   const { courseId } = use(params);
 
@@ -151,7 +150,6 @@ export default function CoursePage({
             if (accessData.success) {
               allowedTopics = accessData.data.topics || [];
               allowedLessons = accessData.data.lessons || [];
-              setUnlockedTopics(allowedTopics);
               setUnlockedLessons(allowedLessons);
               console.log("🔓 Unlocked topics:", allowedTopics);
               console.log("🔓 Unlocked lessons:", allowedLessons);

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getUser } from "@/lib/auth";
-import type { User, Class, Assignment, PaginatedResponse } from "@/types";
+import type { User, Class, Assignment } from "@/types";
 
 // Extended Class type with teacher info for admin view
 interface ExtendedClass extends Class {
@@ -14,15 +14,10 @@ export default function TeacherDashboard() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [classes, setClasses] = useState<ExtendedClass[]>([]);
-  const [allTeachers, setAllTeachers] = useState<
-    { id: number; fullName: string }[]
-  >([]);
-  const [selectedTeacherId, setSelectedTeacherId] = useState<string>("all");
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = async (user?: User | null) => {
-    const currentRole = user?.role || currentUser?.role;
     setLoading(true);
     try {
       // Load classes
@@ -39,23 +34,6 @@ export default function TeacherDashboard() {
         setAssignments(assignmentData.data.items || []);
       }
 
-      // Admin: load list of teachers for filter
-      if (currentRole === "admin") {
-        const teacherRes = await fetch(
-          "/api/admin/users?role=teacher&pageSize=100",
-        );
-        const teacherData = await teacherRes.json();
-        if (teacherData.success) {
-          setAllTeachers(
-            (teacherData.data.items || []).map(
-              (t: { id: number; fullName?: string; username: string }) => ({
-                id: t.id,
-                fullName: t.fullName || t.username,
-              }),
-            ),
-          );
-        }
-      }
     } catch (error) {
       console.error("Failed to load data:", error);
     }
@@ -75,12 +53,6 @@ export default function TeacherDashboard() {
     setCurrentUser(user);
     loadData(user);
   }, [router]);
-
-  // Filter classes by selected teacher (for admin)
-  const filteredClasses =
-    currentUser?.role === "admin" && selectedTeacherId !== "all"
-      ? classes.filter((c) => c.teacherId === parseInt(selectedTeacherId))
-      : classes;
 
   if (!currentUser) return null;
 
@@ -244,10 +216,6 @@ export default function TeacherDashboard() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {classes.slice(0, 6).map((cls) => {
-                const canManage =
-                  currentUser?.role === "admin" ||
-                  cls.teacherId === currentUser?.id;
-
                 return (
                   <div
                     key={cls.id}

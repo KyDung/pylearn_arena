@@ -5,7 +5,6 @@
  *
  * GET /api/games/[gamePath]/contest-status
  */
-import { NextResponse } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import {
   ContestGameService,

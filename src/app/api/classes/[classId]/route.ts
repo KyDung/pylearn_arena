@@ -6,15 +6,7 @@ import {
   notFoundResponse,
   canManageClass,
 } from "@/lib/apiAuth";
-import {
-  getClassById,
-  updateClass,
-  hardDeleteClass,
-  getClassMembers,
-  addClassMember,
-  removeClassMember,
-  bulkAddClassMembers,
-} from "@/lib/services/classes";
+import { getClassById, updateClass, hardDeleteClass, getClassMembers } from "@/lib/services/classes";
 
 // GET /api/classes/[classId] - Lấy thông tin lớp
 export const GET = withAuth(async (request: NextRequest, { params, user }) => {

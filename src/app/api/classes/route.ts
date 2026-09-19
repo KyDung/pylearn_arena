@@ -1,10 +1,5 @@
 import { NextRequest } from "next/server";
-import {
-  withAuth,
-  successResponse,
-  errorResponse,
-  canManageClass,
-} from "@/lib/apiAuth";
+import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import {
   getClasses,
   getClassesByStudent,

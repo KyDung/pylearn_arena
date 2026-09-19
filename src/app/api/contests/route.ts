@@ -4,7 +4,6 @@
  * GET  - Lấy danh sách cuộc thi (admin/teacher)
  * POST - Tạo cuộc thi mới
  */
-import { NextRequest, NextResponse } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import { ContestService, ContestGameService } from "@/lib/services/contests";
 

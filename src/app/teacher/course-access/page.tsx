@@ -337,7 +337,7 @@ export default function CourseAccessPage() {
                   } else {
                     alert("❌ Lỗi: " + data.message);
                   }
-                } catch (error) {
+                } catch {
                   alert("❌ Có lỗi xảy ra!");
                 } finally {
                   setSubmitting(false);
@@ -371,7 +371,7 @@ export default function CourseAccessPage() {
                   } else {
                     alert("❌ Lỗi: " + data.message);
                   }
-                } catch (error) {
+                } catch {
                   alert("❌ Có lỗi xảy ra!");
                 } finally {
                   setSubmitting(false);

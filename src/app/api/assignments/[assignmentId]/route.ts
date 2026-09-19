@@ -14,7 +14,7 @@ import {
   deleteAssignment,
   canUserSubmit,
 } from "@/lib/services/assignments";
-import { getClassById, getClassMembers } from "@/lib/services/classes";
+import { getClassById } from "@/lib/services/classes";
 import { getRankings, getUserRanking } from "@/lib/services/submissions";
 
 // GET /api/assignments/[assignmentId] - Lấy thông tin bài tập

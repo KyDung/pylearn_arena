@@ -413,9 +413,9 @@ export default function initGame(
       this.displayText.setColor(passed ? "#00ff00" : "#ff0000");
 
       if (passed) {
-        correctSound && correctSound.play();
+        correctSound?.play();
       } else {
-        wrongSound && wrongSound.play();
+        wrongSound?.play();
       }
     }
   }

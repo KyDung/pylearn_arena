@@ -1,5 +1,68 @@
 # Bàn giao cho Claude — 18/09/2026
 
+## ĐỢT 4 — 19/09/2026: dọn cảnh báo, siết quyền database, và bốn lỗi thật lộ ra
+
+**Đọc mục này trước, nó mới nhất.**
+
+### Bốn lỗi thật tìm được trong lúc dọn dẹp
+
+1. **Chức năng cuộc thi hỏng hẳn ở mối nối giữa hai service.** Giáo viên tạo cuộc thi qua
+   `contests-new.ts`, lưu trạng thái `draft` rồi `published`. Nhưng game hỏi
+   `/api/games/[gamePath]/contest-status`, chạy qua `contests.ts`, và nó chỉ tìm trạng thái
+   `active`. Hai nửa không bao giờ gặp nhau, nên dù có tạo cuộc thi thì game cũng không thấy.
+   Đã sửa: nửa cũ nay chấp nhận cả `active`, `published` và `ongoing`, không đổi cách ghi của
+   bên nào.
+2. **`addClassMember` bỏ rơi tham số vai trò.** API nhận `body.role`, truyền qua hai lớp, rồi câu
+   lệnh chèn chỉ ghi `(class_id, user_id, status)`. Mọi thành viên lớp đều thành học sinh. Đã sửa
+   cả nhánh chèn mới lẫn nhánh kích hoạt lại.
+3. **`scripts/test-mysql-connection.ts` in sai.** Nó truy vấn tên database nhưng đọc kết quả của
+   truy vấn phiên bản, nên tên database không bao giờ hiện. Đã sửa.
+4. Hai script `database/test.ts` và `database/fix-passwords.ts` đọc sai hình dạng kết quả (ghi ở
+   đợt 3) — cùng một họ lỗi: `any` che mất.
+
+### Hai chức năng xây dở, đã gỡ phần chết ở giao diện
+
+- **Khóa/mở theo chương.** Database và API vẫn hỗ trợ, nhưng nút bấm của giáo viên
+  (`toggleTopic`) và phần chặn phía học sinh (`unlockedTopics`) đều không còn được nối vào đâu.
+  Đã gỡ mã chết ở client. Muốn khôi phục thì lấy lại từ lịch sử Git.
+- **Bộ lọc lớp theo giáo viên cho admin.** Còn state, còn lệnh gọi API lấy danh sách giáo viên,
+  còn biến `filteredClasses`, nhưng không còn ô chọn nào và danh sách vẫn hiển thị `classes`.
+  Đã gỡ.
+
+### Migration 005: thu hồi quyền của Data API
+
+Supabase mặc định cấp toàn quyền trên schema `public` cho vai trò `anon` và `authenticated`. Dự án
+này không dùng Data API: không có thư viện `@supabase/supabase-js`, không có khóa anon, và ứng dụng
+kết nối thẳng bằng chủ sở hữu bảng. RLS không policy vốn đã chặn, nhưng chỉ cần thêm **một** policy
+dễ dãi về sau là mở toang. Nay hai vai trò đó không còn quyền nào, kể cả quyền mặc định cho bảng
+tạo sau. Bộ kiểm chứng đã đổi theo: nó đòi lệnh đọc bị **từ chối**, chứ không phải trả về rỗng.
+
+### Số liệu
+
+| Hạng mục | Trước đợt 3 | Sau đợt 4 |
+| --- | --- | --- |
+| Lỗi ESLint | 422 | 7 |
+| Cảnh báo ESLint | 104 | 28 |
+| TypeScript | sạch | sạch |
+| Test | 59/59 | 59/59 |
+| Build | đạt | đạt |
+
+### Việc còn lại, và vì sao chưa làm
+
+- **7 lỗi và 28 cảnh báo còn lại đều là hành vi effect của React.** Sửa mù có thể tạo vòng lặp gọi
+  API vô hạn. Máy này không có công cụ điều khiển trình duyệt nên không kiểm chứng được phía client.
+  Cần làm khi mở được app và bấm thử từng trang.
+- **`max_submissions` xung đột với chính migration 002.** Ràng buộc UNIQUE(session_id, user_id) khóa
+  quy tắc thành một bài nộp mỗi học sinh mỗi phiên. Bật `max_submissions` nghĩa là gỡ ràng buộc đó.
+  Hai thiết kế loại trừ nhau; đây là quyết định sản phẩm, không phải dọn dẹp.
+- **Gộp hai service cuộc thi là refactor thật, không phải dọn dẹp.** Chúng không phải bản sao:
+  `contests.ts` tách ba service và dùng bộ trạng thái active/closed, `contests-new.ts` gộp một
+  service và dùng draft/published/ongoing/ended/archived kèm lọc và phân trang. Gộp nghĩa là chọn
+  một mô hình trạng thái rồi viết lại khoảng mười file route, trong khi chưa có dữ liệu cuộc thi nào
+  để đối chiếu. Nên làm vào lúc chạy thử cuộc thi thật lần đầu.
+- **Hợp nhất bốn hệ bảng phiên và bài tập** vẫn là thiết kế lại, chưa động tới.
+
+
 ## ĐỢT 3 — 19/09/2026: gán người tạo, dọn lint, chốt vài quyết định
 
 **Đọc mục này trước, nó mới nhất.**

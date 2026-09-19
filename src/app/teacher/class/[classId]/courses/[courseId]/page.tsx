@@ -68,30 +68,6 @@ export default function CourseAccessManagementPage() {
     }
   };
 
-  const toggleTopic = async (topicId: number, currentStatus: boolean) => {
-    try {
-      const action = currentStatus ? "lock" : "unlock";
-      const res = await fetch(
-        `/api/classes/${classId}/courses/${courseId}/access`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action,
-            contentType: "topic",
-            contentId: topicId.toString(),
-          }),
-        },
-      );
-
-      if (!res.ok) throw new Error("Failed to update");
-
-      loadAccess();
-    } catch (err) {
-      alert("Lỗi: " + getErrorMessage(err));
-    }
-  };
-
   const toggleLesson = async (lessonId: string, currentStatus: boolean) => {
     try {
       const action = currentStatus ? "lock" : "unlock";

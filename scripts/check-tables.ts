@@ -15,7 +15,7 @@ async function check() {
       const [cols3] = await pool.query("DESCRIBE games");
       console.log("\n=== GAMES ===");
       console.log(cols3);
-    } catch (err) {
+    } catch {
       console.log("\n=== GAMES TABLE DOES NOT EXIST ===");
     }
   } catch (error) {

@@ -37,7 +37,6 @@ async function addLesson() {
     const title = await question("Tên bài học: ");
     const description = await question("Mô tả: ");
     const order = await question("Thứ tự trong topic (vd: 1, 2...): ");
-    const duration = await question("Thời lượng phút (vd: 30): ");
 
     console.log("\n✅ Đang thêm vào database...\n");
 

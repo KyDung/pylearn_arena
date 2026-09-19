@@ -17,6 +17,9 @@ const eslintConfig = defineConfig([
     // Dated copies the content manager leaves behind; not part of the build.
     "**/*.backup-*.ts",
     "**/*.ts.backup.*",
+    // A superseded page kept beside the live one. Next.js only routes page.tsx,
+    // so this never ships.
+    "**/page_old_backup.tsx",
     // Local-only authoring tools. These paths are in .gitignore on purpose, so
     // nothing here is ever committed and lint findings could not be shared.
     "src/app/dev/**",
@@ -37,6 +40,10 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-this-alias": "off",
+      // The templates ship helpers such as loadSceneContent that an author is
+      // meant to call from their own scene code. Unused in the template is the
+      // normal state, not a leftover.
+      "@typescript-eslint/no-unused-vars": "off",
     },
   },
 ]);

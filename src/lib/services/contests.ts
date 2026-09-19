@@ -27,7 +27,7 @@ export interface Contest {
   lesson_id: number | null;
   lesson_title?: string;
   open_all_games: boolean;
-  status: "draft" | "active" | "closed";
+  status: "draft" | "active" | "closed" | "published" | "ongoing" | "ended" | "archived";
   start_time: Date | null;
   end_time: Date | null;
   show_ranking: boolean;
@@ -237,7 +237,7 @@ export const ContestService = {
       courseId: number;
       lessonId: number;
       openAllGames: boolean;
-      status: "draft" | "active" | "closed";
+      status: "draft" | "active" | "closed" | "published" | "ongoing" | "ended" | "archived";
       startTime: Date;
       endTime: Date;
       showRanking: boolean;
@@ -334,7 +334,7 @@ export const ContestService = {
   async isContestActive(contestId: number): Promise<boolean> {
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT id FROM contests 
-       WHERE id = ? AND status = 'active'
+       WHERE id = ? AND status IN ('active', 'published', 'ongoing')
        AND (start_time IS NULL OR start_time <= NOW())
        AND (end_time IS NULL OR end_time > NOW())`,
       [contestId],
@@ -425,7 +425,7 @@ export const ContestGameService = {
        JOIN contest_games cg ON cg.contest_id = c.id
        WHERE cg.game_id = ? 
          AND cg.is_active = TRUE
-         AND c.status = 'active'
+         AND c.status IN ('active', 'published', 'ongoing')
          AND (c.start_time IS NULL OR c.start_time <= NOW())
          AND (c.end_time IS NULL OR c.end_time > NOW())
        LIMIT 1`,
@@ -464,7 +464,7 @@ export const ContestGameService = {
        LEFT JOIN classes cl ON cl.id = c.class_id
        WHERE cg.game_id = ? 
          AND cg.is_active = TRUE
-         AND c.status = 'active'
+         AND c.status IN ('active', 'published', 'ongoing')
          AND (c.start_time IS NULL OR c.start_time <= NOW())
          AND (c.end_time IS NULL OR c.end_time > NOW())`,
       [gameId],

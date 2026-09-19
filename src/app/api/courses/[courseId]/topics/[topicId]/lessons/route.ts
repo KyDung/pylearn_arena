@@ -6,7 +6,7 @@ export async function GET(
   request: Request,
   context: { params: Promise<{ courseId: string; topicId: string }> },
 ) {
-  const { courseId, topicId } = await context.params;
+  const { topicId } = await context.params;
 
   try {
     // Get topic by ID

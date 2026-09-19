@@ -366,9 +366,9 @@ export default function initGame(
         displayText.setColor(passed ? "#00ff00" : "#ff0000");
 
         if (passed) {
-          correctSound && correctSound.play();
+          correctSound?.play();
         } else {
-          wrongSound && wrongSound.play();
+          wrongSound?.play();
         }
 
         // Auto move to next scene after 1.5s

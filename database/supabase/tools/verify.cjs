@@ -34,14 +34,26 @@ async function verify(client) {
   assert.equal(Number((await client.query('SELECT score FROM public.lesson_session_submissions WHERE id=$1', [id])).rows[0].score), 50);
   assert.equal((await client.query('SELECT order_num FROM public.courses WHERE id=$1', [id])).rows[0].order_num, 7);
   assert.equal((await client.query('SELECT class_id FROM public.v_class_stats WHERE class_id=$1', [id])).rowCount, 1);
+  // Migration 005 took every privilege away from the Data API roles, so these
+  // reads must now be refused outright rather than merely return no rows.
+  // Both views and a base table are checked: a future permissive policy must
+  // not be able to re-open anything on its own.
   for (const role of ['anon', 'authenticated']) {
     const exists = (await client.query('SELECT 1 FROM pg_roles WHERE rolname=$1', [role])).rowCount;
     if (!exists) continue; // Plain PostgreSQL installations need not have Supabase roles.
-    await client.query(`SET LOCAL ROLE ${role}`);
-    try {
-      assert.equal((await client.query('SELECT class_id FROM public.v_class_stats WHERE class_id=$1', [id])).rowCount, 0);
-      assert.equal((await client.query('SELECT * FROM public.v_assignment_leaderboard')).rowCount, 0);
-    } finally { await client.query('RESET ROLE'); }
+    for (const relation of ['public.v_class_stats', 'public.v_assignment_leaderboard', 'public.users']) {
+      await client.query('SAVEPOINT api_role');
+      await client.query(`SET LOCAL ROLE ${role}`);
+      let refused;
+      try {
+        await client.query(`SELECT 1 FROM ${relation} LIMIT 1`);
+      } catch (error) {
+        refused = error.code;
+      }
+      await client.query('ROLLBACK TO SAVEPOINT api_role');
+      await client.query('RELEASE SAVEPOINT api_role');
+      assert.equal(refused, '42501', `${role} must not be able to read ${relation}`);
+    }
   }
   const views = await client.query("SELECT relname,reloptions FROM pg_class WHERE oid IN ('public.v_class_stats'::regclass,'public.v_assignment_leaderboard'::regclass)");
   assert(views.rows.every(row => row.reloptions.includes('security_invoker=true')));

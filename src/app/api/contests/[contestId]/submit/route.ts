@@ -4,7 +4,6 @@
  * POST - Học sinh nộp code vào cuộc thi
  * GET  - Lấy bảng xếp hạng của game trong cuộc thi
  */
-import { NextResponse } from "next/server";
 import { withAuth, successResponse, errorResponse } from "@/lib/apiAuth";
 import { getErrorMessage } from "@/lib/errors";
 import {

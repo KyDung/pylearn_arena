@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getUser } from "@/lib/auth";
-import type { User, Class, Assignment, Ranking } from "@/types";
+import type { User, Class, Assignment } from "@/types";
 
 export default function StudentDashboard() {
   const router = useRouter();

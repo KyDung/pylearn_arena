@@ -58,10 +58,6 @@ async function runMigration() {
     console.log("\n✅ Migration hoàn tất!");
 
     // Kiểm tra các tables đã được tạo
-    const [tables] = await pool.query<mysql.RowDataPacket[]>(
-      "SHOW TABLES LIKE '%session%' OR SHOW TABLES LIKE '%contest%'",
-    );
-
     const [sessionTable] = await pool.query<mysql.RowDataPacket[]>(
       "SHOW TABLES LIKE 'sessions'",
     );
