@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "output/playwright/**",
+    ".playwright-cli/**",
     // Vendored Pyodide runtime, copied in by scripts/copy-pyodide-assets.mjs.
     "public/pyodide/**",
     // Dated copies the content manager leaves behind; not part of the build.
@@ -20,6 +22,7 @@ const eslintConfig = defineConfig([
     // A superseded page kept beside the live one. Next.js only routes page.tsx,
     // so this never ships.
     "**/page_old_backup.tsx",
+    "**/page_old.tsx",
     // Local-only authoring tools. These paths are in .gitignore on purpose, so
     // nothing here is ever committed and lint findings could not be shared.
     "src/app/dev/**",

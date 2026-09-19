@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { usePageUser } from "@/hooks/usePageUser";
+
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { User } from "@/types";
 
 interface Class {
   id: number;
@@ -75,7 +76,7 @@ interface ContestLeaderboardRow {
 
 export default function ContestsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const user = usePageUser("admin,teacher", "/login?next=contests", "/student/contests");
   const [loading, setLoading] = useState(true);
   const [contests, setContests] = useState<Contest[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
@@ -106,55 +107,30 @@ export default function ContestsPage() {
     maxAttempts: "",
   });
 
-  const fetchContests = async () => {
-    const res = await fetch("/api/contests");
-    const data = await res.json();
+  const fetchContests = useCallback(() => fetch("/api/contests").then(res => res.json()).then(data => {
     if (data.success) {
       setContests(data.data);
     }
-  };
+  }), []);
 
-  const fetchClasses = async () => {
-    const res = await fetch("/api/classes");
-    const data = await res.json();
+  const fetchClasses = useCallback(() => fetch("/api/classes").then(res => res.json()).then(data => {
     if (data.success) {
       setClasses(data.data?.items || data.data || []);
     }
-  };
+  }), []);
 
-  const fetchCourses = async () => {
-    const res = await fetch("/api/admin/courses");
-    const data = await res.json();
+  const fetchCourses = useCallback(() => fetch("/api/admin/courses").then(res => res.json()).then(data => {
     if (data.success) {
       setCourses(data.data || []);
     }
-  };
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      const data = await res.json();
-      if (data.success && data.user) {
-        if (data.user.role === "admin" || data.user.role === "teacher") {
-          setUser(data.user);
-          setLoading(false);
-          await Promise.all([fetchContests(), fetchClasses(), fetchCourses()]);
-        } else {
-          // Student - redirect to student contests page
-          router.replace("/student/contests");
-          return;
-        }
-      } else {
-        router.replace("/login?next=contests");
-      }
-    } catch {
-      router.replace("/login?next=contests");
-    }
-  };
+  }), []);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    if (!user) return;
+    void Promise.all([fetchContests(), fetchClasses(), fetchCourses()])
+      .catch(error => console.error("Failed to load contests:", error))
+      .finally(() => setLoading(false));
+  }, [user, fetchContests, fetchClasses, fetchCourses]);
 
   const fetchLessonsForCourse = async (courseId: number) => {
     // Fetch all lessons for this course through topics

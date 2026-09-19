@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getUser } from "@/lib/auth";
-import type { User } from "@/types";
+import { usePageUser } from "@/hooks/usePageUser";
 
 interface SystemStats {
   totalUsers: number;
@@ -100,7 +99,7 @@ const StatCard = ({
 
 export default function AdminOverviewPage() {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const currentUser = usePageUser("admin");
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [teacherStats, setTeacherStats] = useState<TeacherStats[]>([]);
@@ -108,15 +107,12 @@ export default function AdminOverviewPage() {
     "overview" | "teachers" | "activity"
   >("overview");
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      // Load system stats
-      const [usersRes, classesRes, contestsRes] = await Promise.all([
+  const loadData = useCallback(() => {
+    return Promise.all([
         fetch("/api/admin/users?pageSize=1000"),
         fetch("/api/classes"),
         fetch("/api/contests"),
-      ]);
+      ]).then(async ([usersRes, classesRes, contestsRes]) => {
 
       const usersData = await usersRes.json();
       const classesData = await classesRes.json();
@@ -174,25 +170,14 @@ export default function AdminOverviewPage() {
       });
 
       setTeacherStats(teacherStatsData);
-    } catch (error) {
+    }).catch(error => {
       console.error("Failed to load data:", error);
-    }
-    setLoading(false);
-  };
+    }).finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    setCurrentUser(user);
-    loadData();
-  }, [router]);
+    if (currentUser) void loadData();
+  }, [currentUser, loadData]);
 
   if (!currentUser) return null;
 

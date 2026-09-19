@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getUser } from "@/lib/auth";
-import type { User, Class, Assignment } from "@/types";
+import { usePageUser } from "@/hooks/usePageUser";
+import type { Class, Assignment } from "@/types";
 
 // Extended Class type with teacher info for admin view
 interface ExtendedClass extends Class {
@@ -12,16 +12,13 @@ interface ExtendedClass extends Class {
 
 export default function TeacherDashboard() {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const currentUser = usePageUser("admin,teacher");
   const [classes, setClasses] = useState<ExtendedClass[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadData = async (user?: User | null) => {
-    setLoading(true);
-    try {
-      // Load classes
-      const classRes = await fetch("/api/classes");
+  const loadData = useCallback(() => {
+    return fetch("/api/classes").then(async (classRes) => {
       const classData = await classRes.json();
       if (classData.success) {
         setClasses(classData.data.items || []);
@@ -34,25 +31,14 @@ export default function TeacherDashboard() {
         setAssignments(assignmentData.data.items || []);
       }
 
-    } catch (error) {
+    }).catch((error) => {
       console.error("Failed to load data:", error);
-    }
-    setLoading(false);
-  };
+    }).finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "teacher" && user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    setCurrentUser(user);
-    loadData(user);
-  }, [router]);
+    if (currentUser) void loadData();
+  }, [currentUser, loadData]);
 
   if (!currentUser) return null;
 

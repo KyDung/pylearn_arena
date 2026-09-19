@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getUser } from "@/lib/auth";
+import { usePageUser } from "@/hooks/usePageUser";
+import { useLatestRequest } from "@/hooks/useLatestRequest";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+
 import { getErrorMessage } from "@/lib/errors";
 interface Course {
   id: number;
@@ -34,23 +35,18 @@ export default function ClassCoursesPage() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user || (user.role !== "admin" && user.role !== "teacher")) {
-      router.push("/login");
-      return;
-    }
-    loadData();
-  }, [classId]);
+  const user = usePageUser("admin,teacher");
+  const { start, cancel } = useLatestRequest();
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
+  const loadData = useCallback(() => {
+    const signal = start();
+
 
       // Load class courses
-      const coursesRes = await fetch(`/api/classes/${classId}/courses`);
+    return fetch(`/api/classes/${classId}/courses`, { signal }).then(async coursesRes => {
       if (coursesRes.ok) {
         const data = await coursesRes.json();
+        if (signal.aborted) return;
         setClassCourses(data.data ?? []);
       }
 
@@ -58,14 +54,19 @@ export default function ClassCoursesPage() {
       const allRes = await fetch("/api/courses");
       if (allRes.ok) {
         const data = await allRes.json();
+        if (signal.aborted) return;
         setAllCourses(data.courses ?? []);
       }
-    } catch (err) {
+    }).catch(err => {
+      if (signal.aborted) return;
       console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    }).finally(() => { if (!signal.aborted) setLoading(false); });
+  }, [classId, start]);
+
+  useEffect(() => {
+    if (user) void loadData();
+    return cancel;
+  }, [user, loadData, cancel]);
 
   const handleAddCourse = async (courseId: number) => {
     try {

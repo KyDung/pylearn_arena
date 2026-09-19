@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 interface Class {
@@ -62,13 +62,7 @@ export default function CourseAccessPage() {
     }
   }, [selectedClassId]);
 
-  // Lấy cấu trúc khóa học và quyền truy cập khi chọn khóa học
-  useEffect(() => {
-    if (selectedClassId && selectedCourseId && selectedCourseSlug) {
-      fetchCourseStructure();
-      fetchContentAccess();
-    }
-  }, [selectedClassId, selectedCourseId, selectedCourseSlug]);
+
 
   const fetchClasses = async () => {
     try {
@@ -96,7 +90,7 @@ export default function CourseAccessPage() {
     }
   };
 
-  const fetchCourseStructure = async () => {
+  const fetchCourseStructure = useCallback(async () => {
     try {
       console.log("🔍 Fetching course structure for slug:", selectedCourseSlug);
       // Dùng slug để fetch topics
@@ -131,9 +125,9 @@ export default function CourseAccessPage() {
     } catch (error) {
       console.error("Error fetching course structure:", error);
     }
-  };
+  }, [selectedCourseSlug]);
 
-  const fetchContentAccess = async () => {
+  const fetchContentAccess = useCallback(async () => {
     try {
       const res = await fetch(
         `/api/teacher/course-access?classId=${selectedClassId}&courseId=${selectedCourseId}`,
@@ -145,7 +139,15 @@ export default function CourseAccessPage() {
     } catch (error) {
       console.error("Error fetching content access:", error);
     }
-  };
+  }, [selectedClassId, selectedCourseId]);
+
+  // Lấy cấu trúc khóa học và quyền truy cập khi chọn khóa học
+  useEffect(() => {
+    if (selectedClassId && selectedCourseId && selectedCourseSlug) {
+      fetchCourseStructure();
+      fetchContentAccess();
+    }
+  }, [selectedClassId, selectedCourseId, selectedCourseSlug, fetchCourseStructure, fetchContentAccess]);
 
   const isContentUnlocked = (
     contentType: string,

@@ -1,10 +1,9 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { User } from "@/types";
-import { getUser } from "@/lib/auth";
+import { usePageUser } from "@/hooks/usePageUser";
 import { preloadLocalPyodide } from "@/lib/pyodideLoader";
 
 interface Course {
@@ -50,7 +49,6 @@ export default function CoursePage({
   params: Promise<{ courseId: string }>;
 }) {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [course, setCourse] = useState<Course | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -61,31 +59,12 @@ export default function CoursePage({
     [key: number]: Lesson[];
   }>({});
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [isVirtualCourse, setIsVirtualCourse] = useState(false);
   const [unlockedLessons, setUnlockedLessons] = useState<string[]>([]);
   const { courseId } = use(params);
+  const user = usePageUser("admin,teacher,student", `/login?next=course&course=${encodeURIComponent(courseId)}`);
+  const isVirtualCourse = courseId === "virtual-sessions";
 
-  useEffect(() => {
-    const currentUser = getUser();
-    if (!currentUser) {
-      router.push(`/login?next=course&course=${encodeURIComponent(courseId)}`);
-    } else {
-      setUser(currentUser);
-    }
-  }, [router, courseId]);
 
-  // Fetch data khi user đã loaded
-  useEffect(() => {
-    if (!user) return;
-
-    // Kiểm tra nếu là virtual course
-    if (courseId === "virtual-sessions") {
-      setIsVirtualCourse(true);
-      fetchActiveSessions();
-    } else {
-      fetchCourseData();
-    }
-  }, [user, courseId]);
 
   useEffect(() => {
     if (!loading && (topics.length > 0 || sessions.length > 0)) {
@@ -93,7 +72,35 @@ export default function CoursePage({
     }
   }, [loading, topics.length, sessions.length]);
 
-  const fetchActiveSessions = async () => {
+  const loadLessonsWithFilter = useCallback(async (
+    topicId: number,
+    allowedLessons: string[],
+  ) => {
+
+    try {
+      const res = await fetch(
+        `/api/courses/${courseId}/topics/${topicId}/lessons`,
+      );
+      const data = await res.json();
+
+      if (data.success) {
+        let lessons = data.lessons;
+
+        if (user?.role === "student" && allowedLessons.length >= 0) {
+          lessons = data.lessons.filter((l: Lesson) =>
+            allowedLessons.includes(String(l.id)),
+          );
+          console.log(`📝 Filtered lessons for topic ${topicId}:`, lessons);
+        }
+
+        setLessonsMap((prev) => ({ ...prev, [topicId]: lessons }));
+      }
+    } catch (error) {
+      console.error("Error loading lessons:", error);
+    }
+  }, [courseId, user?.role]);
+
+  const fetchActiveSessions = useCallback(async () => {
     try {
       const res = await fetch("/api/student/sessions/active");
       const data = await res.json();
@@ -105,9 +112,9 @@ export default function CoursePage({
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchCourseData = async () => {
+  const fetchCourseData = useCallback(async () => {
     if (!user) {
       console.log("⚠️ User not loaded yet");
       return;
@@ -206,39 +213,18 @@ export default function CoursePage({
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, courseId, loadLessonsWithFilter]);
 
-  const loadLessonsWithFilter = async (
-    topicId: number,
-    allowedLessons: string[],
-  ) => {
-    if (lessonsMap[topicId]) return;
+  useEffect(() => {
+    if (!user) return;
+    if (isVirtualCourse) void fetchActiveSessions();
+    else void fetchCourseData();
+  }, [user, isVirtualCourse, fetchActiveSessions, fetchCourseData]);
 
-    try {
-      const res = await fetch(
-        `/api/courses/${courseId}/topics/${topicId}/lessons`,
-      );
-      const data = await res.json();
 
-      if (data.success) {
-        let lessons = data.lessons;
-
-        if (user?.role === "student" && allowedLessons.length >= 0) {
-          lessons = data.lessons.filter((l: Lesson) =>
-            allowedLessons.includes(String(l.id)),
-          );
-          console.log(`📝 Filtered lessons for topic ${topicId}:`, lessons);
-        }
-
-        setLessonsMap((prev) => ({ ...prev, [topicId]: lessons }));
-      }
-    } catch (error) {
-      console.error("Error loading lessons:", error);
-    }
-  };
 
   const loadLessons = async (topicId: number) => {
-    await loadLessonsWithFilter(topicId, unlockedLessons);
+    if (!lessonsMap[topicId]) await loadLessonsWithFilter(topicId, unlockedLessons);
   };
 
   const toggleTopic = (topicId: number) => {

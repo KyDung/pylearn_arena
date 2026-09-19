@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useNow } from "@/hooks/useNow";
+import { usePageUser } from "@/hooks/usePageUser";
+
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -22,42 +25,25 @@ interface Contest {
 
 export default function StudentContestsPage() {
   const router = useRouter();
+  const user = usePageUser("student");
+  const now = useNow();
   const [loading, setLoading] = useState(true);
   const [contests, setContests] = useState<Contest[]>([]);
   const [joinCode, setJoinCode] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      const data = await res.json();
-      if (data.success && data.user.role === "student") {
-        await fetchContests();
-      } else {
-        router.push("/login");
-      }
-    } catch {
-      router.push("/login");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchContests = async () => {
-    try {
-      const res = await fetch("/api/student/contests/active");
+  const fetchContests = useCallback(() => fetch("/api/student/contests/active").then(async res => {
       const data = await res.json();
       if (data.success) {
         setContests(data.data?.contests || []);
       }
-    } catch (err) {
+    }).catch(err => {
       console.error("Error fetching contests:", err);
-    }
-  };
+    }).finally(() => setLoading(false)), []);
+
+  useEffect(() => {
+    if (user) void fetchContests();
+  }, [user, fetchContests]);
 
   const handleJoinByCode = async () => {
     if (!joinCode.trim()) {
@@ -92,7 +78,7 @@ export default function StudentContestsPage() {
   const getTimeRemaining = (endTime: string | null) => {
     if (!endTime) return null;
     const end = new Date(endTime).getTime();
-    const now = Date.now();
+    if (now === null) return null;
     const diff = end - now;
     if (diff <= 0) return "Đã hết giờ";
     const hours = Math.floor(diff / (1000 * 60 * 60));

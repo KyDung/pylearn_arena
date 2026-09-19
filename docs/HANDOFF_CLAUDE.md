@@ -1,5 +1,69 @@
 # Bàn giao cho Claude — 18/09/2026
 
+## ĐỢT 5 — 19/09/2026: đóng nốt 35 mục lint bằng ba hook, có kiểm chứng trên trình duyệt
+
+**Đọc mục này trước, nó mới nhất.**
+
+Mục này do Claude viết lại sau khi Codex hết hạn mức giữa chừng và chưa kịp ghi bàn giao. Toàn bộ
+mã là của Codex; phần mô tả dưới đây dựng lại từ chính mã nguồn, từ bốn kịch bản QA và từ ảnh chụp
+mà Codex để lại, rồi chạy lại toàn bộ kiểm tra để xác nhận.
+
+### Vấn đề cần giải
+
+Ba đợt trước để lại 7 lỗi và 28 cảnh báo, tất cả cùng một nhóm: `set-state-in-effect` và
+`exhaustive-deps`. Không sửa được vì sửa mù dễ tạo vòng lặp gọi API vô hạn, mà lúc đó không có cách
+nào điều khiển trình duyệt để kiểm chứng.
+
+### Cách giải: ba hook dùng chung trong `src/hooks/`
+
+| Hook | Giải quyết |
+| --- | --- |
+| `usePageUser` | Thay khuôn mẫu đọc `getUser()` từ localStorage rồi `setState` ngay trong effect. Nay xác thực được giải quyết sau hydration qua `refreshUser()`, kèm luôn việc chuyển hướng khi chưa đăng nhập hoặc sai vai trò. |
+| `useLatestRequest` | Huỷ request cũ bằng `AbortController` khi có request mới hoặc khi rời trang. Dùng cho ô tìm kiếm. |
+| `useNow` | Đồng hồ đếm ngược bắt đầu bằng `null` nên máy chủ và lần render đầu ở trình duyệt khớp nhau, tránh lệch hydration. |
+
+20 trang đã chuyển sang dùng ba hook này. Tổng cộng 24 file đổi, thêm 397 dòng và bớt 786 dòng.
+
+### Thay đổi hành vi cần biết
+
+Trang không còn đọc thông tin đăng nhập từ localStorage một cách đồng bộ nữa, mà hỏi
+`/api/auth/me`. Đúng hơn về mặt bảo mật vì máy chủ là nguồn quyết định, nhưng đổi lại có một nhịp
+"Đang tải" ngắn trước khi nội dung hiện ra.
+
+### Kiểm chứng
+
+Codex dựng Playwright và viết bốn kịch bản QA, nay đã chuyển vào `tests/browser/` kèm README vì
+`.gitignore` đang loại thư mục `output/playwright/` và sẽ làm mất chúng.
+
+- Nạp 15 trang theo từng vai trò với API giả lập. Đếm số request sau khi trang đứng yên: **không
+  trang nào có vòng lặp gọi API**, không lỗi JavaScript, không trang nào kẹt ở "Đang tải".
+- Gõ tìm kiếm liên tiếp ở trang admin và trang tài khoản giáo viên: kết quả cũ bị huỷ đúng cách,
+  không ghi đè kết quả mới.
+- Chuyển hướng đúng khi sai vai trò và khi phiên hết hạn.
+- Game id2: đo chiều rộng khung code và khung game trước và sau khi chạy code, trong đó có đoạn cố
+  ý in 400 ký tự liền không dấu cách. Hai khung giữ nguyên tỉ lệ. Ảnh chụp ở
+  `output/playwright/game-id2-checked.png`.
+
+| Hạng mục | Trước đợt 5 | Sau đợt 5 |
+| --- | --- | --- |
+| Lỗi ESLint | 7 | 0 |
+| Cảnh báo ESLint | 28 | 0 |
+| TypeScript | sạch | sạch |
+| Test foundation | 59/59 | 59/59 |
+| Build | đạt | đạt |
+
+### Việc còn lại
+
+Không còn hạng mục kỹ thuật nào đang dở. Ba thứ còn lại đều chờ quyết định của người dùng, không
+phải chờ sửa:
+
+- **`max_submissions`** vẫn xung đột với ràng buộc UNIQUE của migration 002. Phải chọn một.
+- **Gộp hai service cuộc thi** nên làm lúc chạy thử cuộc thi thật lần đầu.
+- **Hợp nhất bốn hệ bảng phiên và bài tập** vẫn là thiết kế lại.
+
+Người dùng chưa tự chạy thử một buổi học đầy đủ trên site sau các đợt sửa.
+
+
 ## ĐỢT 4 — 19/09/2026: dọn cảnh báo, siết quyền database, và bốn lỗi thật lộ ra
 
 **Đọc mục này trước, nó mới nhất.**

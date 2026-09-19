@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getUser } from "@/lib/auth";
-
+import { usePageUser } from "@/hooks/usePageUser";
+import { useLatestRequest } from "@/hooks/useLatestRequest";
+
 import { getErrorMessage } from "@/lib/errors";
 interface User {
   id: number;
@@ -26,10 +27,8 @@ interface Class {
 
 export default function AccountsManagementPage() {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<{
-    id: number;
-    role: string;
-  } | null>(null);
+  const currentUser = usePageUser("admin,teacher");
+  const { start, cancel } = useLatestRequest();
   const [users, setUsers] = useState<User[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,85 +64,46 @@ export default function AccountsManagementPage() {
   >(null);
   const [bulkMessage, setBulkMessage] = useState("");
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "teacher" && user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    setCurrentUser(user);
-    loadData();
-  }, [router]);
+  const loadClasses = useCallback(() => fetch("/api/classes", { credentials: "include" })
+    .then(res => res.json()).then(data => {
+      if (data.success) setClasses(data.data?.items || []);
+    }).catch(error => console.error("Error loading classes:", error)), []);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadUsers = useCallback(async () => {
+    const signal = start();
     try {
-      // Load classes
-      const classRes = await fetch("/api/classes", { credentials: "include" });
-      const classData = await classRes.json();
-      if (classData.success) {
-        setClasses(classData.data?.items || []);
-      }
-
-      // Load users
-      await loadUsers();
-    } catch (error) {
-      console.error("Error loading data:", error);
-    }
-    setLoading(false);
-  };
-
-  const loadUsers = async () => {
-    try {
-      const params = new URLSearchParams();
-      if (filterRole !== "all") params.append("role", filterRole);
-      if (filterStatus !== "all") params.append("status", filterStatus);
-      if (searchQuery) params.append("search", searchQuery);
-      params.append("pageSize", "100");
-
-      const res = await fetch(`/api/admin/users?${params}`, {
-        credentials: "include",
-      });
+      const params = new URLSearchParams({ pageSize: "100" });
+      if (filterRole !== "all") params.set("role", filterRole);
+      if (filterStatus !== "all") params.set("status", filterStatus);
+      if (searchQuery) params.set("search", searchQuery);
+      const res = await fetch(`/api/admin/users?${params}`, { credentials: "include", signal });
       const data = await res.json();
-
-      if (data.success) {
-        let userList = data.data?.items || [];
-
-        // If teacher, only show students
-        if (currentUser?.role === "teacher") {
-          userList = userList.filter((u: User) => u.role === "student");
-        }
-
-        // Filter by class if selected
-        if (filterClass !== "all") {
-          const classId = parseInt(filterClass);
-          // Need to load members for this class
-          const membersRes = await fetch(`/api/classes/${classId}/members`, {
-            credentials: "include",
-          });
-          const membersData = await membersRes.json();
-          const memberIds = (membersData.data || []).map(
-            (m: { userId: number }) => m.userId,
-          );
-          userList = userList.filter((u: User) => memberIds.includes(u.id));
-        }
-
-        setUsers(userList);
+      if (!data.success || signal.aborted) return;
+      let userList: User[] = data.data?.items || [];
+      if (currentUser?.role === "teacher") userList = userList.filter(user => user.role === "student");
+      if (filterClass !== "all") {
+        const membersRes = await fetch(`/api/classes/${filterClass}/members`, { credentials: "include", signal });
+        const membersData = await membersRes.json();
+        const memberIds = (membersData.data || []).map((member: { userId: number }) => member.userId);
+        userList = userList.filter(user => memberIds.includes(user.id));
       }
+      if (!signal.aborted) setUsers(userList);
     } catch (error) {
-      console.error("Error loading users:", error);
+      if (!signal.aborted) console.error("Error loading users:", error);
+    } finally {
+      if (!signal.aborted) setLoading(false);
     }
-  };
+  }, [start, filterRole, filterStatus, searchQuery, filterClass, currentUser?.role]);
 
   useEffect(() => {
-    if (currentUser) {
-      loadUsers();
-    }
-  }, [filterRole, filterClass, filterStatus, searchQuery, currentUser]);
+    if (currentUser) void loadClasses();
+  }, [currentUser, loadClasses]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const timer = setTimeout(() => { setLoading(true); void loadUsers(); }, 250);
+    return () => { clearTimeout(timer); cancel(); };
+  }, [currentUser, loadUsers, cancel]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();

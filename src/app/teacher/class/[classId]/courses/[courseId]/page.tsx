@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getUser } from "@/lib/auth";
+import { usePageUser } from "@/hooks/usePageUser";
+import { useLatestRequest } from "@/hooks/useLatestRequest";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+
 import { getErrorMessage } from "@/lib/errors";
 interface Topic {
   id: number;
@@ -37,36 +38,34 @@ export default function CourseAccessManagementPage() {
   const [loading, setLoading] = useState(true);
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user || (user.role !== "admin" && user.role !== "teacher")) {
-      router.push("/login");
-      return;
-    }
-    loadAccess();
-  }, [classId, courseId]);
+  const user = usePageUser("admin,teacher");
+  const { start, cancel } = useLatestRequest();
 
-  const loadAccess = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(
+  const loadAccess = useCallback(() => {
+    const signal = start();
+
+    return fetch(
         `/api/classes/${classId}/courses/${courseId}/access`,
-      );
+        { signal }).then(async res => {
       if (res.ok) {
         const data = await res.json();
+        if (signal.aborted) return;
         const payload = data.data ?? data;
         setTopics(payload.topics || []);
         setLessons(payload.lessons || []);
-        if (payload.topics?.length > 0 && !selectedTopic) {
-          setSelectedTopic(payload.topics[0].id);
-        }
+        setSelectedTopic(previous => payload.topics?.some((topic: Topic) => topic.id === previous)
+          ? previous : payload.topics?.[0]?.id ?? null);
       }
-    } catch (err) {
+    }).catch(err => {
+      if (signal.aborted) return;
       console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    }).finally(() => { if (!signal.aborted) setLoading(false); });
+  }, [classId, courseId, start]);
+
+  useEffect(() => {
+    if (user) void loadAccess();
+    return cancel;
+  }, [user, loadAccess, cancel]);
 
   const toggleLesson = async (lessonId: string, currentStatus: boolean) => {
     try {

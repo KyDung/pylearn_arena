@@ -37,10 +37,6 @@ export default function PlayGameContent({
       if (!gameRootRef.current) return;
 
       try {
-        gameRootRef.current.dataset.sessionMode = String(sessionMode);
-        gameRootRef.current.dataset.sessionSubmitted = String(sessionSubmitted);
-        gameRootRef.current.dataset.sessionSubmitting = String(sessionSubmitting);
-
         // Load Pyodide from local npm package assets served by this app.
         setStatus("Đang tải Pyodide...");
         const pyodide = await loadLocalPyodide();

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { usePageUser } from "@/hooks/usePageUser";
+
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -8,7 +10,7 @@ interface Class {
   id: number;
   name: string;
   code: string;
-  student_count: number;
+  studentCount: number;
 }
 
 interface Game {
@@ -19,15 +21,9 @@ interface Game {
   lesson_name: string;
 }
 
-interface User {
-  id: number;
-  username: string;
-  role: string;
-}
-
 export default function CreateAssignmentPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const user = usePageUser("admin,teacher");
   const [classes, setClasses] = useState<Class[]>([]);
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,41 +42,13 @@ export default function CreateAssignmentPage() {
   const [showRanking, setShowRanking] = useState(true);
   const [publishNow, setPublishNow] = useState(false);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-  }, [user]);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      if (!res.ok) {
-        router.push("/login");
-        return;
-      }
-      const data = await res.json();
-      if (data.user.role !== "teacher" && data.user.role !== "admin") {
-        router.push("/");
-        return;
-      }
-      setUser(data.user);
-    } catch {
-      router.push("/login");
-    }
-  };
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       // Fetch classes
       const classRes = await fetch("/api/classes");
       if (classRes.ok) {
         const classData = await classRes.json();
-        setClasses(classData.data || []);
+        setClasses(classData.data?.items || []);
       }
 
       // Fetch games (all available games)
@@ -94,7 +62,11 @@ export default function CreateAssignmentPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (user) void fetchData();
+  }, [user, fetchData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -244,7 +216,7 @@ export default function CreateAssignmentPage() {
                         value={cls.id}
                         className="bg-[#1a1a2e]"
                       >
-                        {cls.name} ({cls.student_count} học sinh)
+                        {cls.name} ({cls.studentCount} học sinh)
                       </option>
                     ))}
                   </select>

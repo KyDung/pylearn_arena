@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
+import { useNow } from "@/hooks/useNow";
+import { usePageUser } from "@/hooks/usePageUser";
+
+import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
 
 interface Assignment {
@@ -41,20 +43,13 @@ interface RankingEntry {
   first_passed_at: string;
 }
 
-interface User {
-  id: number;
-  username: string;
-  role: string;
-}
-
 export default function StudentAssignmentPage({
   params,
 }: {
   params: Promise<{ assignmentId: string }>;
 }) {
   const resolvedParams = use(params);
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const user = usePageUser("student");
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [rankings, setRankings] = useState<RankingEntry[]>([]);
@@ -62,46 +57,10 @@ export default function StudentAssignmentPage({
   const [activeTab, setActiveTab] = useState<"game" | "history" | "ranking">(
     "game",
   );
-  const [timeLeft, setTimeLeft] = useState<string>("");
-  const [canSubmit, setCanSubmit] = useState(false);
+  const nowMs = useNow();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
-  useEffect(() => {
-    if (user) {
-      fetchAssignment();
-    }
-  }, [user, resolvedParams.assignmentId]);
-
-  useEffect(() => {
-    if (assignment) {
-      updateTimeLeft();
-      const interval = setInterval(updateTimeLeft, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [assignment]);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      if (!res.ok) {
-        router.push("/login");
-        return;
-      }
-      const data = await res.json();
-      if (data.user.role !== "student") {
-        router.push("/");
-        return;
-      }
-      setUser(data.user);
-    } catch {
-      router.push("/login");
-    }
-  };
-
-  const fetchAssignment = async () => {
+  const fetchAssignment = useCallback(async () => {
     try {
       const res = await fetch(
         `/api/assignments/${resolvedParams.assignmentId}`,
@@ -112,29 +71,22 @@ export default function StudentAssignmentPage({
       setSubmissions(data.data.submissions || []);
       setRankings(data.data.rankings || []);
 
-      // Check if can submit
-      const now = new Date();
-      const start = new Date(data.data.assignment.start_time);
-      const end = new Date(data.data.assignment.end_time);
-      const isInTime = now >= start && now <= end;
-      const hasAttempts =
-        !data.data.assignment.max_attempts ||
-        (data.data.submissions?.length || 0) <
-          data.data.assignment.max_attempts;
-      setCanSubmit(
-        isInTime && hasAttempts && data.data.assignment.status === "published",
-      );
+
     } catch (error) {
       console.error("Error fetching assignment:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [resolvedParams.assignmentId]);
 
-  const updateTimeLeft = () => {
-    if (!assignment) return;
+  useEffect(() => {
+    if (user) void fetchAssignment();
+  }, [user, fetchAssignment]);
 
-    const now = new Date();
+  const getTimeLeft = () => {
+    if (!assignment || nowMs === null) return "";
+
+    const now = new Date(nowMs ?? 0);
     const start = new Date(assignment.start_time);
     const end = new Date(assignment.end_time);
 
@@ -143,17 +95,24 @@ export default function StudentAssignmentPage({
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      setTimeLeft(`Bắt đầu sau: ${hours}h ${minutes}m ${seconds}s`);
+      return `Bắt đầu sau: ${hours}h ${minutes}m ${seconds}s`;
     } else if (now <= end) {
       const diff = end.getTime() - now.getTime();
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      setTimeLeft(`Còn lại: ${hours}h ${minutes}m ${seconds}s`);
+      return `Còn lại: ${hours}h ${minutes}m ${seconds}s`;
     } else {
-      setTimeLeft("Đã hết hạn");
+      return "Đã hết hạn";
     }
   };
+
+  const timeLeft = getTimeLeft();
+  const canSubmit = !!assignment && nowMs !== null &&
+    nowMs >= new Date(assignment.start_time).getTime() &&
+    (nowMs <= new Date(assignment.end_time).getTime() || assignment.late_submission) &&
+    (!assignment.max_attempts || submissions.length < assignment.max_attempts) &&
+    assignment.status === "published";
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString("vi-VN");

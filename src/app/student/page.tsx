@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getUser } from "@/lib/auth";
-import type { User, Class, Assignment } from "@/types";
+import { usePageUser } from "@/hooks/usePageUser";
+import type { Class, Assignment } from "@/types";
 
 export default function StudentDashboard() {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const currentUser = usePageUser("admin,teacher,student");
   const [classes, setClasses] = useState<Class[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,11 +20,8 @@ export default function StudentDashboard() {
   const [classCode, setClassCode] = useState("");
   const [joinError, setJoinError] = useState("");
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      // Load classes
-      const classRes = await fetch("/api/classes");
+  const loadData = useCallback(() => {
+    return fetch("/api/classes").then(async (classRes) => {
       const classData = await classRes.json();
       if (classData.success) {
         setClasses(classData.data.items || []);
@@ -36,21 +33,14 @@ export default function StudentDashboard() {
       if (assignmentData.success) {
         setAssignments(assignmentData.data.items || []);
       }
-    } catch (error) {
+    }).catch((error) => {
       console.error("Failed to load data:", error);
-    }
-    setLoading(false);
-  };
+    }).finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    setCurrentUser(user);
-    loadData();
-  }, [router]);
+    if (currentUser) void loadData();
+  }, [currentUser, loadData]);
 
   const handleJoinClass = async (e: React.FormEvent) => {
     e.preventDefault();

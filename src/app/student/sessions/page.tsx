@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { usePageUser } from "@/hooks/usePageUser";
+
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { preloadLocalPyodide } from "@/lib/pyodideLoader";
 
@@ -23,13 +25,6 @@ interface ActiveSessionFromApi extends Omit<ActiveSession, "remaining_minutes"> 
   remaining_minutes?: number | string | null;
 }
 
-interface AuthResponse {
-  success?: boolean;
-  user?: {
-    role?: string;
-  };
-}
-
 interface ActiveSessionsResponse {
   success?: boolean;
   data?: ActiveSessionFromApi[];
@@ -50,12 +45,9 @@ const parseRemainingMinutes = (value: number | string | null | undefined) => {
 
 export default function StudentSessionsPage() {
   const router = useRouter();
+  const user = usePageUser("student");
   const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState<ActiveSession[]>([]);
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
   useEffect(() => {
     if (!loading && sessions.length > 0) {
@@ -63,25 +55,8 @@ export default function StudentSessionsPage() {
     }
   }, [loading, sessions.length]);
 
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      const data = (await res.json()) as AuthResponse;
-      if (data.success && data.user && data.user.role === "student") {
-        await fetchActiveSessions();
-      } else {
-        router.push("/login");
-      }
-    } catch {
-      router.push("/login");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchActiveSessions = async () => {
-    try {
-      const res = await fetch("/api/student/sessions/active");
+  const fetchActiveSessions = useCallback(() => {
+    return fetch("/api/student/sessions/active").then(async (res) => {
       const data = (await res.json()) as ActiveSessionsResponse;
       if (data.success) {
         // Ensure remaining_minutes is a number
@@ -91,10 +66,14 @@ export default function StudentSessionsPage() {
         }));
         setSessions(sessions);
       }
-    } catch (error) {
+    }).catch((error) => {
       console.error("Error fetching sessions:", error);
-    }
-  };
+    }).finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (user) void fetchActiveSessions();
+  }, [user, fetchActiveSessions]);
 
   const joinSession = (session: ActiveSession) => {
     // Redirect to play page with session context

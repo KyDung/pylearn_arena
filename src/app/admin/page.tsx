@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getUser } from "@/lib/auth";
+import { usePageUser } from "@/hooks/usePageUser";
+import { useLatestRequest } from "@/hooks/useLatestRequest";
 import type { User, PaginatedResponse, UserRole, UserStatus } from "@/types";
 
 interface UserStats {
@@ -20,7 +21,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const currentUser = usePageUser("admin");
+  const { start, cancel } = useLatestRequest();
   const [activeTab, setActiveTab] = useState<
     "overview" | "teachers" | "students"
   >("overview");
@@ -36,17 +38,15 @@ export default function AdminDashboard() {
   });
   const [createError, setCreateError] = useState("");
 
-  const loadStats = async () => {
-    try {
-      const response = await fetch("/api/admin/stats");
+  const loadStats = useCallback(() => fetch("/api/admin/stats").then(async response => {
       const data = await response.json();
       if (data.success) setStats(data.data);
-    } catch (error) {
+    }).catch(error => {
       console.error("Failed to load stats:", error);
-    }
-  };
+    }), []);
 
-  const loadData = async (role?: UserRole, search?: string) => {
+  const loadData = useCallback(async (role?: UserRole, search?: string) => {
+    const signal = start();
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -54,41 +54,28 @@ export default function AdminDashboard() {
       if (search) params.set("search", search);
       params.set("pageSize", "50");
 
-      const response = await fetch(`/api/admin/users?${params}`);
+      const response = await fetch(`/api/admin/users?${params}`, { signal });
       const data = await response.json();
-      if (data.success) {
+      if (!signal.aborted && data.success) {
         setUsers(data.data);
       }
     } catch (error) {
-      console.error("Failed to load users:", error);
+      if (!signal.aborted) console.error("Failed to load users:", error);
     }
-    setLoading(false);
-  };
+    if (!signal.aborted) setLoading(false);
+  }, [start]);
 
   useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    loadData();
-    loadStats();
-  }, [router]);
+    if (currentUser) void loadStats();
+  }, [currentUser, loadStats]);
 
   useEffect(() => {
-    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    searchDebounceRef.current = setTimeout(() => {
-      loadData(
-        activeTab === "teachers" ? "teacher" : activeTab === "students" ? "student" : undefined,
-        searchText,
-      );
+    if (!currentUser) return;
+    const timer = setTimeout(() => {
+      void loadData(activeTab === "teachers" ? "teacher" : activeTab === "students" ? "student" : undefined, searchText);
     }, 300);
-    return () => { if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current); };
-  }, [searchText]);
+    return () => { clearTimeout(timer); cancel(); };
+  }, [currentUser, activeTab, searchText, loadData, cancel]);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,6 +105,7 @@ export default function AdminDashboard() {
             : activeTab === "students"
               ? "student"
               : undefined,
+          searchText,
         );
       } else {
         setCreateError(data.error || "Không thể tạo tài khoản");
@@ -145,6 +133,7 @@ export default function AdminDashboard() {
             : activeTab === "students"
               ? "student"
               : undefined,
+          searchText,
         );
       }
     } catch (error) {
@@ -168,6 +157,7 @@ export default function AdminDashboard() {
             : activeTab === "students"
               ? "student"
               : undefined,
+          searchText,
         );
       }
     } catch (error) {
@@ -580,13 +570,6 @@ export default function AdminDashboard() {
                   key={tab.key}
                   onClick={() => {
                     setActiveTab(tab.key as typeof activeTab);
-                    loadData(
-                      tab.key === "teachers"
-                        ? "teacher"
-                        : tab.key === "students"
-                          ? "student"
-                          : undefined,
-                    );
                   }}
                   className={`group relative px-8 py-5 text-sm font-semibold transition-all duration-300 ${
                     activeTab === tab.key

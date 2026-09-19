@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useNow } from "@/hooks/useNow";
+import { usePageUser } from "@/hooks/usePageUser";
+
+import { useState, useEffect, useCallback } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { preloadLocalPyodide } from "@/lib/pyodideLoader";
 
@@ -47,10 +50,11 @@ interface MyProgress {
 }
 
 export default function StudentContestDetailPage() {
-  const router = useRouter();
   const params = useParams();
   const contestId = params.contestId as string;
 
+  const user = usePageUser("student");
+  const now = useNow();
   const [loading, setLoading] = useState(true);
   const [contest, setContest] = useState<Contest | null>(null);
   const [games, setGames] = useState<ContestGame[]>([]);
@@ -58,11 +62,9 @@ export default function StudentContestDetailPage() {
   const [myProgress, setMyProgress] = useState<MyProgress | null>(null);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<"games" | "rankings">("games");
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-
-  useEffect(() => {
-    checkAuth();
-  }, [contestId]);
+  const currentUserId = user?.id ?? null;
+  const completionPercent = myProgress && myProgress.totalGames > 0
+    ? Math.round((myProgress.completedGames / myProgress.totalGames) * 100) : 0;
 
   useEffect(() => {
     if (!loading && games.length > 0) {
@@ -70,26 +72,8 @@ export default function StudentContestDetailPage() {
     }
   }, [loading, games.length]);
 
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      const data = await res.json();
-      if (data.success && data.user.role === "student") {
-        setCurrentUserId(data.user.id);
-        await fetchContestDetail();
-      } else {
-        router.push("/login");
-      }
-    } catch {
-      router.push("/login");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchContestDetail = async () => {
-    try {
-      const res = await fetch(`/api/student/contests/${contestId}`);
+  const fetchContestDetail = useCallback(() => {
+    return fetch(`/api/student/contests/${contestId}`).then(async (res) => {
       const data = await res.json();
 
       if (data.success) {
@@ -100,15 +84,19 @@ export default function StudentContestDetailPage() {
       } else {
         setError(data.error || "Không thể tải cuộc thi");
       }
-    } catch {
+    }).catch(() => {
       setError("Lỗi kết nối server");
-    }
-  };
+    }).finally(() => setLoading(false));
+  }, [contestId]);
+
+  useEffect(() => {
+    if (user) void fetchContestDetail();
+  }, [user, fetchContestDetail]);
 
   const getTimeRemaining = () => {
     if (!contest?.end_time) return null;
     const end = new Date(contest.end_time).getTime();
-    const now = Date.now();
+    if (now === null) return null;
     const diff = end - now;
     if (diff <= 0) return "Đã hết giờ";
     const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -117,16 +105,7 @@ export default function StudentContestDetailPage() {
     return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
 
-  const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (contest?.end_time) {
-      const timer = setInterval(() => {
-        setTimeRemaining(getTimeRemaining());
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [contest]);
+  const timeRemaining = getTimeRemaining();
 
   if (loading) {
     return (
@@ -222,9 +201,7 @@ export default function StudentContestDetailPage() {
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-purple-600">
-                  {Math.round(
-                    (myProgress.completedGames / myProgress.totalGames) * 100,
-                  )}
+                  {completionPercent}
                   %
                 </div>
                 <div className="text-sm text-gray-600">Hoàn thành</div>
@@ -237,7 +214,7 @@ export default function StudentContestDetailPage() {
                 <div
                   className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-500"
                   style={{
-                    width: `${(myProgress.completedGames / myProgress.totalGames) * 100}%`,
+                    width: `${completionPercent}%`,
                   }}
                 />
               </div>

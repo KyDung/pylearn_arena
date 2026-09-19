@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { getUser } from "@/lib/auth";
+import { usePageUser } from "@/hooks/usePageUser";
+import { useLatestRequest } from "@/hooks/useLatestRequest";
 
 interface Session {
   id: number;
@@ -67,7 +67,6 @@ const emptySessionForm = {
 };
 
 export default function TeacherSessionsPage() {
-  const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -83,18 +82,12 @@ export default function TeacherSessionsPage() {
 
   const [newSession, setNewSession] = useState(emptySessionForm);
 
-  useEffect(() => {
-    const user = getUser();
-    if (!user || (user.role !== "admin" && user.role !== "teacher")) {
-      router.push("/login");
-      return;
-    }
-    loadData();
-  }, [filter, selectedClass]);
+  const user = usePageUser("admin,teacher");
+  const { start, cancel } = useLatestRequest();
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
+  const loadData = useCallback(() => {
+    const signal = start();
+
 
       // Build query params
       const params = new URLSearchParams();
@@ -102,10 +95,11 @@ export default function TeacherSessionsPage() {
       if (selectedClass) params.append("class_id", selectedClass);
 
       // Load sessions
-      const sessionsRes = await fetch(
+    return fetch(
         `/api/teacher/sessions?${params.toString()}`,
-      );
+        { signal }).then(async sessionsRes => {
       const sessionsData = await sessionsRes.json();
+        if (signal.aborted) return;
       if (sessionsData.success) {
         setSessions(sessionsData.data.items || []);
       }
@@ -113,15 +107,20 @@ export default function TeacherSessionsPage() {
       // Load classes
       const classesRes = await fetch("/api/classes?pageSize=100");
       const classesData = await classesRes.json();
+        if (signal.aborted) return;
       if (classesData.success) {
         setClasses(classesData.data.items || []);
       }
-    } catch (error) {
+    }).catch(error => {
+      if (signal.aborted) return;
       console.error("Error loading data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    }).finally(() => { if (!signal.aborted) setLoading(false); });
+  }, [filter, selectedClass, start]);
+
+  useEffect(() => {
+    if (user) void loadData();
+    return cancel;
+  }, [user, loadData, cancel]);
 
   const loadCourses = async () => {
     try {

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import { useRouter } from "next/navigation";
-import { getUser } from "@/lib/auth";
+import { usePageUser } from "@/hooks/usePageUser";
 import type { User, Class, ClassMember, Assignment } from "@/types";
 
 interface ClassWithMembers extends Class {
@@ -16,7 +16,7 @@ export default function ClassDetailPage({
 }) {
   const { classId } = use(params);
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const currentUser = usePageUser("admin,teacher");
   const [classData, setClassData] = useState<ClassWithMembers | null>(null);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,11 +29,8 @@ export default function ClassDetailPage({
   const [availableStudents, setAvailableStudents] = useState<User[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
 
-  const loadClassData = async () => {
-    setLoading(true);
-    try {
-      // Load class details
-      const classRes = await fetch(`/api/classes/${classId}`);
+  const loadClassData = useCallback(() => {
+    return fetch(`/api/classes/${classId}`).then(async (classRes) => {
       const classJson = await classRes.json();
       if (classJson.success) {
         setClassData(classJson.data);
@@ -45,25 +42,14 @@ export default function ClassDetailPage({
       if (assignmentJson.success) {
         setAssignments(assignmentJson.data.items || []);
       }
-    } catch (error) {
+    }).catch((error) => {
       console.error("Failed to load class:", error);
-    }
-    setLoading(false);
-  };
+    }).finally(() => setLoading(false));
+  }, [classId]);
 
   useEffect(() => {
-    const user = getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    if (user.role !== "teacher" && user.role !== "admin") {
-      router.push("/");
-      return;
-    }
-    setCurrentUser(user);
-    loadClassData();
-  }, [router, classId]);
+    if (currentUser) void loadClassData();
+  }, [currentUser, loadClassData]);
 
   const loadAvailableStudents = async () => {
     try {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
+import { usePageUser } from "@/hooks/usePageUser";
+
+import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
 
 interface Assignment {
@@ -45,20 +46,13 @@ interface Stats {
   best_score: number;
 }
 
-interface User {
-  id: number;
-  username: string;
-  role: string;
-}
-
 export default function TeacherAssignmentPage({
   params,
 }: {
   params: Promise<{ assignmentId: string }>;
 }) {
   const resolvedParams = use(params);
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const user = usePageUser("admin,teacher");
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -72,35 +66,7 @@ export default function TeacherAssignmentPage({
   const [manualScore, setManualScore] = useState<number | null>(null);
   const [grading, setGrading] = useState(false);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      fetchAssignment();
-    }
-  }, [user, resolvedParams.assignmentId]);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      if (!res.ok) {
-        router.push("/login");
-        return;
-      }
-      const data = await res.json();
-      if (data.user.role !== "teacher" && data.user.role !== "admin") {
-        router.push("/");
-        return;
-      }
-      setUser(data.user);
-    } catch {
-      router.push("/login");
-    }
-  };
-
-  const fetchAssignment = async () => {
+  const fetchAssignment = useCallback(async () => {
     try {
       const res = await fetch(
         `/api/assignments/${resolvedParams.assignmentId}`,
@@ -134,7 +100,11 @@ export default function TeacherAssignmentPage({
     } finally {
       setLoading(false);
     }
-  };
+  }, [resolvedParams.assignmentId]);
+
+  useEffect(() => {
+    if (user) void fetchAssignment();
+  }, [user, fetchAssignment]);
 
   const handleGrade = async () => {
     if (!selectedSubmission) return;

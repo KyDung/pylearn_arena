@@ -1,7 +1,11 @@
 "use client";
 
+import { usePageUser } from "@/hooks/usePageUser";
+import { useNow } from "@/hooks/useNow";
+import { useLatestRequest } from "@/hooks/useLatestRequest";
+
 import { Suspense, useState, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 interface Session {
@@ -25,84 +29,33 @@ interface Ranking {
   submitted_at: string;
 }
 
-interface User {
-  id: number;
-  username: string;
-  full_name: string;
-  role: string;
-}
-
 function StudentQuickSubmitContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const codeParam = searchParams.get("code");
 
-  const [user, setUser] = useState<User | null>(null);
+  const user = usePageUser();
+  const now = useNow();
+  const { start, cancel } = useLatestRequest();
   const [sessionCode, setSessionCode] = useState(codeParam || "");
   const [session, setSession] = useState<Session | null>(null);
   const [rankings, setRankings] = useState<Ranking[]>([]);
   const [userRank, setUserRank] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [joining, setJoining] = useState(false);
-  const [timeLeft, setTimeLeft] = useState("");
+  const [joining, setJoining] = useState(!!codeParam);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (user && codeParam) {
-      joinSession(codeParam);
-    }
-  }, [user, codeParam]);
-
-  useEffect(() => {
-    if (session) {
-      updateTimeLeft();
-      const interval = setInterval(updateTimeLeft, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [session]);
-
-  // Auto refresh rankings
-  useEffect(() => {
-    if (session) {
-      const interval = setInterval(() => {
-        fetchRankings();
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [session]);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      if (!res.ok) {
-        router.push("/login");
-        return;
-      }
-      const data = await res.json();
-      setUser(data.user);
-    } catch {
-      router.push("/login");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const joinSession = async (code: string) => {
-    setJoining(true);
-    setError("");
+  const joinSession = useCallback(async (code: string) => {
+    const signal = start();
 
     try {
-      const res = await fetch(`/api/sessions/${code.toUpperCase()}`);
+      const res = await fetch(`/api/sessions/${code.toUpperCase()}`, { signal });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Session không tồn tại");
       }
 
       const data = await res.json();
+      if (signal.aborted) return;
+      setError("");
       setSession(data.data.session);
       setRankings(data.data.rankings || []);
 
@@ -114,11 +67,11 @@ function StudentQuickSubmitContent() {
         setUserRank(myRank?.rank_position || null);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Có lỗi xảy ra");
+      if (!signal.aborted) setError(err instanceof Error ? err.message : "Có lỗi xảy ra");
     } finally {
-      setJoining(false);
+      if (!signal.aborted) setJoining(false);
     }
-  };
+  }, [start, user]);
 
   const fetchRankings = useCallback(async () => {
     if (!session) return;
@@ -140,31 +93,34 @@ function StudentQuickSubmitContent() {
     }
   }, [session, user]);
 
-  const updateTimeLeft = () => {
+  const remainingSeconds = session && now !== null
+    ? Math.max(0, Math.ceil((new Date(session.expires_at).getTime() - now) / 1000)) : null;
+  const timeLeft = remainingSeconds === null ? "" : remainingSeconds === 0 ? "Hết giờ!"
+    : `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, "0")}`;
+
+  useEffect(() => {
+    if (!user || !codeParam) return;
+    // Auto-join is driven by the URL, not by the session response it produces.
+    void joinSession(codeParam);
+    return cancel;
+  }, [user, codeParam, joinSession, cancel]);
+
+  useEffect(() => {
     if (!session) return;
-
-    const now = new Date();
-    const end = new Date(session.expires_at);
-    const diff = end.getTime() - now.getTime();
-
-    if (diff <= 0) {
-      setTimeLeft("Hết giờ!");
-      return;
-    }
-
-    const minutes = Math.floor(diff / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
-    setTimeLeft(`${minutes}:${seconds.toString().padStart(2, "0")}`);
-  };
+    const timer = setInterval(() => { void fetchRankings(); }, 5000);
+    return () => clearInterval(timer);
+  }, [session, fetchRankings]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (sessionCode.trim()) {
+      setJoining(true);
+      setError("");
       joinSession(sessionCode.trim());
     }
   };
 
-  if (loading) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#16213e] flex items-center justify-center">
         <div className="text-white">Đang tải...</div>

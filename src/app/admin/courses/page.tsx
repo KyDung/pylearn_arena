@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePageUser } from "@/hooks/usePageUser";
+
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 interface Course {
@@ -39,15 +40,8 @@ interface Game {
   is_active: boolean;
 }
 
-interface User {
-  id: number;
-  username: string;
-  role: string;
-}
-
 export default function AdminCoursesPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const user = usePageUser("admin");
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -69,35 +63,7 @@ export default function AdminCoursesPage() {
   });
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      fetchCourses();
-    }
-  }, [user]);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      if (!res.ok) {
-        router.push("/login");
-        return;
-      }
-      const data = await res.json();
-      if (data.user.role !== "admin") {
-        router.push("/");
-        return;
-      }
-      setUser(data.user);
-    } catch {
-      router.push("/login");
-    }
-  };
-
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/courses");
       if (res.ok) {
@@ -109,7 +75,11 @@ export default function AdminCoursesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (user) void fetchCourses();
+  }, [user, fetchCourses]);
 
   const fetchCourseDetails = async (courseId: number) => {
     try {
