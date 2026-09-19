@@ -38,6 +38,13 @@ const eslintConfig = defineConfig([
     // a game more correct, so the rules that only describe type discipline are
     // scoped off here rather than silenced file by file. Everything that can
     // actually break a game still applies.
+    // Each browser QA script is a bare `async (page) => {...}` expression,
+    // because the Playwright driver evaluates the file and takes the function
+    // it produces. Wrapping it in module.exports would break that contract.
+    files: ["tests/browser/*.cjs"],
+    rules: { "@typescript-eslint/no-unused-expressions": "off" },
+  },
+  {
     files: ["src/content/**/*.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
